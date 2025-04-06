@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6"
+  },
+  "include": [
+    "ilms" 
+  ],
+  "exclude": [
+    "**/codebig.js",
+    "**/_*.js",
+    "**/z_*.js",
+    // "a*",
+    // "coding",
+    // "basejs",
+    // "codingnew",
+    // "combu",
+    // "odf",
+    // "*_fail",
+    // "node_modules",
+    // "_unused",
+    // "flask",
+    // "../y/*",
+    // "../zdone/*",
+    // "_hideTEMP",
+    // "_projects",
+    // "CODE.js",
+    // "_weg",
+    // "*elim.js",
+    // "z_april",
+    // "codesafe",
+    // "codesammler.js",
+    // "copi2",
+    // "z_extra",
+    // "z_history",
+    // "allesweg",
+    // "fe*",
+    // "drawline2",
+    // "drawline",
+    // "SAFE",
+    // "ode",
+    // "*/ersetzt.js",
+    // "sarah",
+    // "free"
+  ]
+}
