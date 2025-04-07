@@ -1,0 +1,9 @@
+_______ socket.io
+disconnect Event Parameters
+reason can be one of:
+"transport close" — client closed tab, lost connection, etc.
+"ping timeout" — lost heartbeat
+"client namespace disconnect" — socket.disconnect() was called from client
+"server namespace disconnect" — server called socket.disconnect()
+
+

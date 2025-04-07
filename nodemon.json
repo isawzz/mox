@@ -1,5 +1,5 @@
 {
   "ignore": ["temp/*", "otherDir/*","assets/*","img/*"],
-  "watch": ["todo/app.js"],
+  "watch": ["ilms/app.js"],
   "ext": "js"
 }

@@ -4,10 +4,10 @@
     "target": "es6"
   },
   "include": [
-    "ilms" 
+    "ilms",
+    "all" 
   ],
   "exclude": [
-    "**/codebig.js",
     "**/_*.js",
     "**/z_*.js",
     // "a*",
