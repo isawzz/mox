@@ -1402,7 +1402,7 @@ function createLineBetweenPoints(dboard, pointA, pointB, thickness = 10) {
 	}
 }
 function createOpenTable(gamename, players, options) {
-	let me = getUname();
+	let me = UGetName();
 	let playerNames = [me]; console.log('me', me)
 	assertion(me in players, "_createOpenTable without owner!!!!!")
 	for (const name in players) { addIf(playerNames, name); }
@@ -3663,7 +3663,7 @@ function mPos(d, x, y, offx = 0, offy = 0, unit = 'px') {
 }
 function mRadio(label, val, name, dParent, styles = {}, onchangeHandler, group_id, is_on) {
 	let cursor = styles.cursor; delete styles.cursor;
-	let d = mDiv(dParent, styles, group_id + '_' + val);
+	let d = mDom(dParent, styles, {id:group_id + '_' + val});
 	let id = isdef(group_id) ? `i_${group_id}_${val}` : getUID();
 	let type = isdef(group_id) ? 'radio' : 'checkbox';
 	let checked = isdef(is_on) ? is_on : false;
@@ -4456,10 +4456,6 @@ function onclickPasteDetailObject(text, inputs, wIdeal, df, styles, opts) {
 	}
 }
 async function onclickPlan() { await showCalendarApp(); }
-async function onclickPlay() {
-	await showTables('onclickPlay');
-	showGames();
-}
 async function onclickResetActions(ev) {
 	let res = await mPhpDeleteFile('zdata/action.txt'); //console.log(res); 
 	await actionLoadAll(); console.log(M.actions)
@@ -4689,7 +4685,7 @@ async function onclickTableMenu() {
 }
 async function onclickTableStart(id) {
 	let tData = M.tables[id];
-	if (!tData) { showMessage('table deleted!'); return await showTables(); }
+	if (!tData) { showMessage('table deleted!'); return await showGamesAndTables(); }
 	tData = setTableToStarted(tData);
 	let res = await mPhpPost('mox0', { action: 'savey', file: `tables/${id}`, o: tData });
 	console.log('res', res);
@@ -4766,49 +4762,6 @@ function onleaveHex(item, board) {
 	let selitem = board.items.find(x => x.isSelected == true);
 	if (nundef(selitem)) return;
 	colorSample(board.dSample, selitem.color);
-}
-async function onsockConfig(x) {
-	console.log('SOCK::config', x)
-	Serverdata.config = x; console.log(Serverdata.config);
-}
-async function onsockEvent(x) {
-	console.log('SOCK::event', x)
-	if (isdef(Serverdata.events)) Serverdata.events[x.id] = x;
-}
-async function onsockMerged(x) {
-	console.log('SOCK::merged', x)
-	if (!isSameTableOpen(x.id)) return;
-	await showTable(x);
-}
-async function onsockPending(id) {
-	console.log('SOCK::pending', id)
-	if (!isSameTableOpen(id)) return;
-	await showTable(id);
-}
-async function onsockSuperdi(x) {
-	console.log('SOCK::superdi', x)
-}
-async function onsockTable(x) {
-	console.log('SOCK::table', x);
-	let [msg, id, turn, isNew] = [x.msg, x.id, x.turn, x.isNew];
-	let menu = getMenu();
-	let me = UGetName();
-	console.log('menu', menu, 'me', me, 'turn', turn, 'isNew', isNew)
-	if (turn.includes(me) && menu == 'play') { Tid = id; await switchToMainMenu('table'); }
-	else if (isNew && menu == 'play') { Tid = id; await switchToMainMenu('table'); }
-	else if (menu == 'table') await showTable(id);
-	else if (menu == 'play') await showTables();
-}
-async function onsockTables(x) {
-	console.log('SOCK::tables', x)
-	let menu = getMenu();
-	if (menu == 'play') await showTables('onsockTables');
-	else if (menu == 'table') {
-		assertion(isdef(T), "menu table but no table!!!")
-		let id = T.id;
-		let exists = x.find(t => t.id == id);
-		if (nundef(exists)) { Tid = T = null; await switchToMenu(UI.nav, 'play'); }
-	}
 }
 function p5ClearAll() { clearTimeouts(); mClear('dMain'); DA.stopwatch = null; }
 function paletteAddDistanceTo(pal, color, key, distfunc = colorGetContrast) {
@@ -4980,19 +4933,6 @@ function playerStatCount(key, n, dParent, styles = {}, opts = {}) {
 	else mText(key, d, { fz: sz, w: '100%' });
 	d.innerHTML += `<span ${isdef(opts.id) ? `id='${opts.id}'` : ''} style="font-weight:bold;color:inherit">${n}</span>`;
 	return d;
-}
-async function pollResume(ms) {
-	return;
-	pollStop();
-	DA.polling = true;
-	let func = window[DA.pollFunc];
-	console.log('', DA.pollCounter++, func.name);
-	let res = await func();
-	TO.poll = setTimeout(pollResume, valf(ms, DA.pollms));
-}
-function pollStop() {
-	if (TO.poll) { clearTimeout(TO.poll); TO.poll = null; }
-	DA.polling = false;
 }
 async function postUsers() {
 	let users = jsonToYaml(M.users);
@@ -5831,31 +5771,6 @@ function showGameover(table, dParent) {
 	mDom(d, { h: 12 }, { html: '<br>' })
 	mButton('PLAY AGAIN', () => onclickTableStart(table.id), d, { className: 'button', fz: 24 });
 }
-async function showGames() {
-	DA.pollFunc = 'showGames';
-	let dParent = mBy('dGameList');
-	if (isdef(dParent)) { mClear(dParent); }
-	else {
-		mClear('dMain');
-		dParent = mDom('dMain', {}, { className: 'section', id: 'dGameList' });
-	}
-	mText(`<h2>games</h2>`, dParent, { maleft: 12 });
-	let d = mDom(dParent, { fg: 'white' }, { id: 'game_menu' }); mCenterCenterFlex(d); //mFlexWrap(d);
-	let gamelist = DA.gamelist;
-	for (const gname of gamelist) {
-		let g = MGetGame(gname);
-		let bg = g.color;
-		let d1 = mDom(d, { cursor: 'pointer', rounding: 10, margin: 10, padding: 0, patop: 10, w: 140, height: 100, bg, position: 'relative' }, { id: g.id });
-		d1.setAttribute('gamename', gname);
-		d1.onclick = onclickGameMenuItem;
-		mCenterFlex(d1);
-		let o = M.superdi[g.logo];
-		let fg = colorIdealText(bg);
-		let el = mDom(d1, { matop: 0, mabottom: 6, fz: 65, hline: 65, family: 'emoNoto', fg, display: 'inline-block' }, { html: o.text });
-		mLinebreak(d1);
-		mDom(d1, { fz: 18, align: 'center', fg }, { html: capitalize(g.friendly) });
-	}
-}
 function showImage(key, dParent, styles = {}, useSymbol = false) {
 	let o = M.superdi[key];
 	if (nundef(o)) { console.log('showImage:key not found', key); return; }
@@ -6026,71 +5941,6 @@ function showRibbon(dParent, msg) {
 	let bg = `linear-gradient(270deg, #fffffd, #00000080)`
 	d = mDom(dParent, { bg, mabottom: 10, align: 'center', vpadding: 10, fz: 30, w100: true }, { html: msg, id: 'ribbon' });
 	return d;
-}
-async function showTable(id) {
-	let me = UGetName();
-	DA.pollFunc = 'showTable';
-	let tid = valf(id, DA.tid);
-	if (nundef(tid)) tid = valf(localStorage.getItem('tid'), arrLast(Object.keys(M.tables)));
-	if (nundef(tid)) { return await showTables(); }
-	DA.tid = tid;
-	let tData = await loadStaticYaml(`y/tables/${tid}.yaml`);
-	if (!tData) { showMessage('table deleted!'); return await showTables(); }
-	let changes = deepCompare(M.tables[tid], tData);
-	if (!changes) { return console.log('no changes', changes, tid); }
-	console.log('changes', changes);
-	M.tables[tid] = DA.tData = tData;
-	let func = DA.funcs[tData.game];
-	T = tData;
-	clearMain();
-	mClassRemove('dExtra', 'p10hide');
-	showTitleGame(tData);
-	if (func.hasInstruction) prepInstruction(tData);
-	func.prepLayout(tData);
-	let items = [];
-	await func.stats(tData);
-	if (tData.status == 'over') { showGameover(tData, 'dTitle'); return; }
-	assertion(tData.status == 'started', `showTable status ERROR ${tData.status}`);
-	func.activate(tData, items);
-}
-async function showTables() {
-	DA.pollFunc = 'showTables';
-	await loadTables();
-	let me = UGetName();
-	let tables = dict2list(M.tables);
-	tables.map(x => x.prior = x.status == 'open' ? 0 : x.turn.includes(me) ? 1 : x.playerNames.includes(me) ? 2 : 3);
-	sortBy(tables, 'prior');
-	let dParent = mBy('dTableList');
-	if (isdef(dParent)) { mClear(dParent); }
-	else { mClear('dMain'); dParent = mDom('dMain', {}, { className: 'section', id: 'dTableList' }); }
-	if (isEmpty(tables)) { mText('no active game tables', dParent); return []; }
-	tables.map(x => x.game_friendly = capitalize(MGetGameFriendly(x.game)));
-	mText(`<h2>tables</h2>`, dParent, { maleft: 12 })
-	let t = UI.tables = mDataTable(tables, dParent, null, ['friendly', 'game_friendly', 'playerNames'], 'tables', false);
-	mTableCommandify(t.rowitems.filter(ri => ri.o.status != 'open'), {
-		0: (item, val) => hFunc(val, 'onclickTable', item.o.id, item.id),
-	});
-	mTableStylify(t.rowitems.filter(ri => ri.o.status == 'open'), { 0: { fg: 'blue' }, });
-	let d = iDiv(t);
-	for (const ri of t.rowitems) {
-		let r = iDiv(ri);
-		let id = ri.o.id;
-		if (ri.o.prior == 1) mDom(r, {}, { tag: 'td', html: getWaitingHtml(24) });
-		if (ri.o.status == 'open') {
-			let playerNames = ri.o.playerNames;
-			if (playerNames.includes(me)) {
-				if (ri.o.owner != me) {
-					let h1 = hFunc('leave', 'onclickTableLeave', ri.o.id); let c = mAppend(r, mCreate('td')); c.innerHTML = h1;
-				}
-			} else {
-				let h1 = hFunc('join', 'onclickTableJoin', ri.o.id); let c = mAppend(r, mCreate('td')); c.innerHTML = h1;
-			}
-		}
-		if (ri.o.owner != me) continue;
-		let h = hFunc('delete', 'onclickTableDelete', id); let c = mAppend(r, mCreate('td')); c.innerHTML = h;
-		if (ri.o.status == 'open') { let h1 = hFunc('start', 'onclickTableStart', id); let c1 = mAppend(r, mCreate('td')); c1.innerHTML = h1; }
-	}
-	return tables;
 }
 function showText(dParent, text, bg = 'black') {
 	return mDom(dParent, { align: 'center', wmin: 120, padding: 2, bg, fg: colorIdealText(bg) }, { html: text });
@@ -6897,4 +6747,121 @@ function userToPlayer(name, gamename, playmode = 'human') {
 function valf() {
 	for (const arg of arguments) if (isdef(arg)) return arg;
 	return null;
+}
+function measureElement(el) {
+  let info = window.getComputedStyle(el, null);
+  return { w: info.width, h: info.height };
+}
+function measureFieldset(fs) {
+  let legend = fs.firstChild;
+  let r = getRect(legend);
+  let labels = fs.getElementsByTagName('label');
+  let wmax = 0;
+  for (const l of labels) {
+    let r1 = getRect(l);
+    wmax = Math.max(wmax, r1.w);
+  }
+  let wt = r.w;
+  let wo = wmax + 24;
+  let diff = wt - wo;
+  if (diff >= 10) {
+    for (const l of labels) { let d = l.parentNode; mStyle(d, { maleft: diff / 2 }); }
+  }
+  let wneeded = Math.max(wt, wo) + 10;
+  mStyle(fs, { wmin: wneeded });
+  for (const l of labels) { let d = l.parentNode; mStyle(l, { display: 'inline-block', wmin: 50 }); mStyle(d, { wmin: wneeded - 40 }); }
+}
+function measureHeight(elem) { return mGetStyle(elem, 'h') }
+function measureHeightOfTextStyle(dParent, styles = {}) {
+  let d = mDom(dParent, styles, { html: 'Hql' });
+  let s = measureElement(d);
+  d.remove();
+  return firstNumber(s.h);
+}
+function measureWidth(elem) { return mGetStyle(elem, 'w') }
+function updateUserImageToBotHuman(playername, value) {
+  function doit(checked, name, val) {
+    let du = mByAttr('username', playername);
+    let img = du.getElementsByTagName('img')[0]; //du.firstChild;
+    if (checked == true) if (val == 'human') mStyle(img, { round: true }); else mStyle(img, { rounding: 2 });
+  }
+  if (isdef(value)) doit(true, 0, value); else return doit;
+}
+async function updateUserTheme() {
+  await postUserChange();
+  setUserTheme(U);
+  settingsCheck();
+}
+function getRectInt(elem, relto) {
+  if (isString(elem)) elem = document.getElementById(elem);
+  let res = elem.getBoundingClientRect();
+  if (isdef(relto)) {
+    let b2 = relto.getBoundingClientRect();
+    let b1 = res;
+    res = {
+      x: b1.x - b2.x,
+      y: b1.y - b2.y,
+      left: b1.left - b2.left,
+      top: b1.top - b2.top,
+      right: b1.right - b2.right,
+      bottom: b1.bottom - b2.bottom,
+      width: b1.width,
+      height: b1.height
+    };
+  }
+  let r4 = { x: Math.round(res.left), y: Math.round(res.top), w: Math.round(res.width), h: Math.round(res.height) };
+  extendRect(r4);
+  return r4;
+}
+function extendRect(r4) { r4.l = r4.x; r4.t = r4.y; r4.r = r4.x + r4.w; r4.b = r4.t + r4.h; }
+function mButtonX(dParent, handler = null, sz = 22, offset = 5, color = 'contrast') {
+  mIfNotRelative(dParent);
+  let bx = mDom(dParent, { position: 'absolute', top: -2 + offset, right: -5 + offset, w: sz, h: sz, cursor: 'pointer' }, { className: 'hop1' });
+  bx.onclick = ev => { evNoBubble(ev); if (!handler) dParent.remove(); else handler(ev); }
+  let o = M.superdi.xmark;
+  let bg = mGetStyle(dParent, 'bg'); if (isEmpty(bg)) bg = 'white';
+  let fg = color == 'contrast' ? colorIdealText(bg, true) : color;
+  el = mDom(bx, { fz: sz, hline: sz, family: 'fa6', fg, display: 'inline' }, { html: String.fromCharCode('0x' + o.fa6) });
+}
+function mButton(caption, handler, dParent, styles, classes, id) {
+  let x = mCreate('button');
+  x.innerHTML = caption;
+  if (isdef(handler)) x.onclick = handler;
+  if (isdef(dParent)) toElem(dParent).appendChild(x);
+  if (isdef(styles)) mStyle(x, styles);
+  if (isdef(classes)) mClass(x, classes);
+  if (isdef(id)) x.id = id;
+  return x;
+}
+function getRadioValue(prop) {
+  let fs = mBy(`d_${prop}`);
+  if (nundef(fs)) return null;
+  let val = getCheckedRadios(fs)[0];
+  return isNumber(val) ? Number(val) : val;
+}
+function getCheckedNames(dParent) {
+  let checks = Array.from(dParent.querySelectorAll('input[type="checkbox"]')); //dParent.getElementsByTagName('input'));
+  let res = [];
+  for (const ch of checks) {
+    if (ch.checked) res.push(ch.name);
+  }
+  return res;
+}
+function getCheckedRadios(rg) {
+  let inputs = rg.getElementsByTagName('INPUT');
+  let list = [];
+  for (const ch of inputs) {
+    if (ch.checked) list.push(ch.value);
+  }
+  return list;
+}
+function mByAttr(key, val) {
+  const selector = val ? `[${key}="${val}"]` : `[${key}]`;
+  let list = Array.from(document.querySelectorAll(selector));
+  return (list.length == 1) ? list[0] : list;
+}
+function mByTag(tag) { return document.getElementsByTagName(tag)[0]; }
+function allPlToPlayer(name) {
+  let allPl = DA.allPlayers[name];
+  return jsCopyExceptKeys(allPl, ['div', 'isSelected']);
 }

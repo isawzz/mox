@@ -1,4 +1,74 @@
 
+async function showTable(id) {
+	let me = UGetName();
+	DA.pollFunc = 'showTable';
+	let tid = valf(id, DA.tid);
+	if (nundef(tid)) tid = valf(localStorage.getItem('tid'), arrLast(Object.keys(M.tables)));
+	if (nundef(tid)) { return await showTables(); }
+	DA.tid = tid;
+	let tData = await loadStaticYaml(`y/tables/${tid}.yaml`);
+	if (!tData) { showMessage('table deleted!'); return await showTables(); }
+	let changes = deepCompare(M.tables[tid], tData);
+	if (!changes) { return console.log('no changes', changes, tid); }
+	console.log('changes', changes);
+	M.tables[tid] = DA.tData = tData;
+	let func = DA.funcs[tData.game];
+	T = tData;
+	clearMain();
+	mClassRemove('dExtra', 'p10hide');
+	showTitleGame(tData);
+	if (func.hasInstruction) prepInstruction(tData);
+	func.prepLayout(tData);
+	let items = [];
+	await func.stats(tData);
+	if (tData.status == 'over') { showGameover(tData, 'dTitle'); return; }
+	assertion(tData.status == 'started', `showTable status ERROR ${tData.status}`);
+	func.activate(tData, items);
+}
+
+async function onsockConfig(x) {
+	console.log('SOCK::config', x)
+	Serverdata.config = x; console.log(Serverdata.config);
+}
+async function onsockEvent(x) {
+	console.log('SOCK::event', x)
+	if (isdef(Serverdata.events)) Serverdata.events[x.id] = x;
+}
+async function onsockMerged(x) {
+	console.log('SOCK::merged', x)
+	if (!isSameTableOpen(x.id)) return;
+	await showTable(x);
+}
+async function onsockPending(id) {
+	console.log('SOCK::pending', id)
+	if (!isSameTableOpen(id)) return;
+	await showTable(id);
+}
+async function onsockSuperdi(x) {
+	console.log('SOCK::superdi', x)
+}
+async function onsockTable(x) {
+	console.log('SOCK::table', x);
+	let [msg, id, turn, isNew] = [x.msg, x.id, x.turn, x.isNew];
+	let menu = getMenu();
+	let me = UGetName();
+	console.log('menu', menu, 'me', me, 'turn', turn, 'isNew', isNew)
+	if (turn.includes(me) && menu == 'play') { Tid = id; await switchToMainMenu('table'); }
+	else if (isNew && menu == 'play') { Tid = id; await switchToMainMenu('table'); }
+	else if (menu == 'table') await showTable(id);
+	else if (menu == 'play') await showGamesAndTables();
+}
+async function onsockTables(x) {
+	console.log('SOCK::tables', x)
+	let menu = getMenu();
+	if (menu == 'play') await showTables('onsockTables');
+	else if (menu == 'table') {
+		assertion(isdef(T), "menu table but no table!!!")
+		let id = T.id;
+		let exists = x.find(t => t.id == id);
+		if (nundef(exists)) { Tid = T = null; await switchToMenu(UI.nav, 'play'); }
+	}
+}
 function sockInit(port='3000') {
   let type = detectSessionType();
   let server = type == 'live'? `http://localhost:${port}` : type == 'fastcomet'? `https://moxito.online:${port}` : null;//getServer(); //getServerurl();
