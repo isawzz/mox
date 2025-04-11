@@ -16,6 +16,8 @@ annabel:
   games:
     setgame:
       level: 3
+    button96:
+      handicap: 3
 diana:
   name: diana
   color: '#4c2882'
@@ -68,6 +70,8 @@ lauren:
   games:
     setgame:
       level: 1
+    button96:
+      handicap: 3
 mimi:
   name: mimi
   color: '#ffe4e1'

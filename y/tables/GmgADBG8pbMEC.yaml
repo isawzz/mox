@@ -1,0 +1,21 @@
+status: open
+id: GmgADBG8pbMEC
+fen: null
+game: setgame
+owner: lauren
+friendly: festival_of_Jakarta
+players:
+  lauren:
+    name: lauren
+    color: '#006c7f'
+    texture: ../assets/textures/marble_blue2.jpeg
+    blendMode: normal
+    imgKey: lauren
+    level: 1
+    playmode: human
+playerNames:
+  - lauren
+options:
+  use_level: 'yes'
+  numCards: 12
+  gamemode: multi

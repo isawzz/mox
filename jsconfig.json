@@ -5,9 +5,9 @@
   },
   "include": [
     "ilms",
-    "all" 
   ],
   "exclude": [
+    "**/codebig.js",
     "**/_*.js",
     "**/z_*.js",
     // "a*",

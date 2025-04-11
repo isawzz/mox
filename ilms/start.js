@@ -34,7 +34,9 @@ async function test0_game1() {
 	// let bExpand = await mKey('circle_chevron_down', dParent, styles, { tag: 'button', onclick: expandAll });
 	// let bCollapse = await mKey('circle_chevron_up', dParent, styles, { tag: 'button', onclick: collapseAll });
 	dController = mToggleButton(bPoll, bStop);
+	mDom(d, { className: 'button' }, { tag: 'button', html: 'delete', onclick: async () => await tablesDeleteAll() });
 
+	//await showGamesAndTables();
 	pollChangeState('lobby');
 
 

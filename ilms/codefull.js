@@ -36,6 +36,10 @@ function allNumbers(s) {
 	let m = s.match(/\-.\d+|\-\d+|\.\d+|\d+\.\d+|\d+\b|\d+(?=\w)/g);
 	if (m) return m.map(v => Number(v)); else return [];
 }
+function allPlToPlayer(name) {
+	let allPl = DA.allPlayers[name];
+	return jsCopyExceptKeys(allPl, ['div', 'isSelected']);
+}
 function alphaToHex(a01) {
 	a01 = Math.round(a01 * 100) / 100;
 	var alpha = Math.round(a01 * 255);
@@ -1379,6 +1383,11 @@ function createCountdown(elem, duration) {
 	updateDisplay();
 	return elem;
 }
+function createGamePlayer(name, gamename, opts = {}) {
+	let pl = userToPlayer(name, gamename);
+	copyKeys(opts, pl);
+	return pl;
+}
 function createLineBetweenPoints(dboard, pointA, pointB, thickness = 10) {
 	const [x1, y1] = pointA;
 	const [x2, y2] = pointB;
@@ -1400,24 +1409,6 @@ function createLineBetweenPoints(dboard, pointA, pointB, thickness = 10) {
 	} else {
 		console.error(`Parent element with selector '${dboard}' not found.`);
 	}
-}
-function createOpenTable(gamename, players, options) {
-	let me = UGetName();
-	let playerNames = [me]; console.log('me', me)
-	assertion(me in players, "_createOpenTable without owner!!!!!")
-	for (const name in players) { addIf(playerNames, name); }
-	let table = {
-		status: 'open',
-		id: generateTableId(),
-		fen: null,
-		game: gamename,
-		owner: playerNames[0],
-		friendly: generateTableName(playerNames.length, []),
-		players,
-		playerNames: playerNames,
-		options
-	};
-	return table;
 }
 function createPanZoomCanvas(parentElement, src, wCanvas, hCanvas) {
 	const canvas = document.createElement('canvas');
@@ -1550,6 +1541,7 @@ function createStopwatch(elem) {
 	updateDisplay();
 	return { elem, start, stop, toggle, getElapsed, getStatus, reset };
 }
+function deckDeal(deck, n) { return deck.splice(0, n); }
 function deepCompare(obj1, obj2) {
 	if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null) {
 		return obj1 === obj2 ? null : { oldValue: obj1, newValue: obj2 };
@@ -1882,6 +1874,7 @@ function evToId(ev) {
 	let elem = findAncestorWith(ev.target, { id: true });
 	return elem.id;
 }
+function extendRect(r4) { r4.l = r4.x; r4.t = r4.y; r4.r = r4.x + r4.w; r4.b = r4.t + r4.h; }
 function findAncestorWith(elem, { attribute = null, className = null, id = null }) {
 	elem = toElem(elem);
 	while (elem) {
@@ -2025,6 +2018,10 @@ function formatDate1(d) {
 }
 function formatDate2(d) { if (nundef(d)) d = new Date(); return d.toISOString().slice(0, 19).replace("T", " "); }
 function formatDate3(d) { if (nundef(d)) d = new Date(); return d.toISOString().slice(0, 19).replace(/-/g, "/").replace("T", " "); }
+function formatLegend(key) {
+	return key.includes('per') ? stringBefore(key, '_') + '/' + stringAfterLast(key, '_')
+		: key.includes('_') ? replaceAll(key, '_', ' ') : key;
+}
 function formatNow() { return new Date().toISOString().slice(0, 19).replace("T", " "); }
 function fromNormalized(s, opts = {}) {
 	let sep = valf(opts.sep, '_');
@@ -2134,6 +2131,22 @@ function getCenterRelativeToParent(div) {
 		x: rect.left + rect.width / 2 - parentRect.left,
 		y: rect.top + rect.height / 2 - parentRect.top
 	};
+}
+function getCheckedNames(dParent) {
+	let checks = Array.from(dParent.querySelectorAll('input[type="checkbox"]')); //dParent.getElementsByTagName('input'));
+	let res = [];
+	for (const ch of checks) {
+		if (ch.checked) res.push(ch.name);
+	}
+	return res;
+}
+function getCheckedRadios(rg) {
+	let inputs = rg.getElementsByTagName('INPUT');
+	let list = [];
+	for (const ch of inputs) {
+		if (ch.checked) list.push(ch.value);
+	}
+	return list;
 }
 function getColorHexes(x) {
 	return [
@@ -2552,6 +2565,12 @@ function getQuadPoly(x, y, w, h) {
 	q = [[0.5, -0.5], [0.5, 0.5], [-0.5, 0.5], [-0.5, -0.5]];
 	return getPoly(q, x, y, w, h);
 }
+function getRadioValue(prop) {
+	let fs = mBy(`d_${prop}`);
+	if (nundef(fs)) return null;
+	let val = getCheckedRadios(fs)[0];
+	return isNumber(val) ? Number(val) : val;
+}
 function getRect(elem, relto) {
 	if (isString(elem)) elem = document.getElementById(elem);
 	let res = elem.getBoundingClientRect();
@@ -2573,13 +2592,34 @@ function getRect(elem, relto) {
 	addKeys({ l: r.x, t: r.y, r: r.x + r.w, b: r.y + r.h }, r);
 	return r;
 }
+function getRectInt(elem, relto) {
+	if (isString(elem)) elem = document.getElementById(elem);
+	let res = elem.getBoundingClientRect();
+	if (isdef(relto)) {
+		let b2 = relto.getBoundingClientRect();
+		let b1 = res;
+		res = {
+			x: b1.x - b2.x,
+			y: b1.y - b2.y,
+			left: b1.left - b2.left,
+			top: b1.top - b2.top,
+			right: b1.right - b2.right,
+			bottom: b1.bottom - b2.bottom,
+			width: b1.width,
+			height: b1.height
+		};
+	}
+	let r4 = { x: Math.round(res.left), y: Math.round(res.top), w: Math.round(res.width), h: Math.round(res.height) };
+	extendRect(r4);
+	return r4;
+}
 function getRelCoords(ev, elem) {
 	let x = ev.pageX - elem.offset().left;
 	let y = ev.pageY - elem.offset().top;
 	return { x: x, y: y };
 }
 function getServer(isScript = null) {
-	let sessionType = detectSessionType(); //console.log('session',sessionType);
+	let sessionType = detectSessionType();
 	let server = sessionType == 'fastcomet' ? 'https://moxito.online/' : isScript || sessionType == 'php' ? 'http://localhost:8080/mox/' : '../';
 	return server;
 }
@@ -2606,12 +2646,17 @@ function getUID(pref = '') {
 	UIDCounter += 1;
 	return pref + '_' + UIDCounter;
 }
+function getWaitingHtml(sz = 30) { return `<img src="../assets/icons/active_player.gif" height="${sz}" style="margin:0px ${sz / 3}px" />`; }
 function globalKeyHandling() {
 	DA.hotkeys = {};
 	DA.keysToCheck = {};
 	document.addEventListener('keydown', keyDownHandler);
 	document.addEventListener('keyup', keyUpHandler);
 	document.addEventListener('keydown', hotkeyHandler);
+}
+function hFunc(content, funcname, arg1, arg2, arg3) {
+	let html = `<a style='color:blue' href="javascript:${funcname}('${arg1}','${arg2}','${arg3}');">${content}</a>`;
+	return html;
 }
 function hPrepUi(ev, areas, cols, rows, bg, dParent) {
 	hToggleClassMenu(ev); mClear(dParent);
@@ -2722,6 +2767,12 @@ function isPointOutsideOf(elem, x, y) { const r = elem.getBoundingClientRect(); 
 function isString(param) { return typeof param == 'string'; }
 function isdef(x) { return x !== null && x !== undefined && x !== 'undefined'; }
 function jsCopy(o) { return JSON.parse(JSON.stringify(o)); }
+function jsCopyExceptKeys(o, keys = []) {
+	if (!isDict(o)) return jsCopy(o);
+	let onew = {};
+	for (const k in o) { if (keys.includes(k)) continue; onew[k] = o[k]; }
+	return JSON.parse(JSON.stringify(onew));
+}
 function jsonToYaml(o) { let y = jsyaml.dump(o); return y; }
 function keyDownHandler(ev) { DA.keysToCheck[ev.key] = true; }
 function keyUpHandler(ev) { delete DA.keysToCheck[ev.key]; }
@@ -2898,1055 +2949,6 @@ function lookupSetOverride(dict, keys, val) {
 	}
 	return d;
 }
-function mAlign(d, da, opts) {
-	if (mGetStyle(d, 'display') != 'inline-block') {
-		let parent = d.parentNode;
-		let wrapper = mDom(parent, { display: 'inline-block' });
-		mAppend(wrapper, d);
-		d = wrapper;
-	}
-	let rda = getRect(da);
-	let rd = getRect(d);
-	let align = valf(opts.align, 'bl'), ov = valf(opts.ov, 0);
-	if (align == 'tl') { dx = rda.l; dy = rda.t - rd.h * (1 - ov); }
-	else if (align == 'bl') { dx = rda.l; dy = rda.b - rd.h * ov; }
-	else if (align == 'cl') { dx = rda.l - rd.w * (1 - ov); dy = rda.t + rda.h / 2 - rd.h / 2; }
-	else if (align == 'tr') { dx = rda.l + rda.w - rd.w; dy = rda.t - rd.h * (1 - ov); }
-	else if (align == 'br') { dx = rda.l + rda.w - rd.w; dy = rda.t + rda.h - rd.h * ov; }
-	else if (align == 'cr') { dx = rda.l + rda.w - rd.w + rd.w * (1 - ov); dy = rda.t + rda.h / 2 - rd.h / 2; }
-	else if (align == 'tc') { dx = rda.l + rda.w / 2 - rd.w / 2; dy = rda.t - rd.h * (1 - ov); }
-	else if (align == 'bc') { dx = rda.l + rda.w / 2 - rd.w / 2; dy = rda.t + rda.h - rd.h * ov; }
-	else if (align == 'cc') { dx = rda.l + rda.w / 2 - rd.w / 2; dy = rda.t + rda.h / 2 - rd.h / 2; }
-	dx = clamp(dx, 0, window.innerWidth - rd.w); dy = clamp(dy, 0, window.innerHeight - rd.h);
-	mPos(d, dx, dy, opts.offx, opts.offy);
-}
-function mAnchorTo(elem, dAnchor, align = 'bl') {
-	let rect = dAnchor.getBoundingClientRect();
-	let drect = elem.getBoundingClientRect();
-	let [v, h] = [align[0], align[1]];
-	let vPos = v == 'b' ? { top: rect.bottom } : v == 'c' ? { top: rect.top } : { top: rect.top - drect.height };
-	let hPos = h == 'l' ? { left: rect.left } : h == 'c' ? { left: rect.left } : { right: window.innerWidth - rect.right };
-	let posStyles = { position: 'absolute' };
-	addKeys(vPos, posStyles);
-	addKeys(hPos, posStyles);
-	mStyle(elem, posStyles);
-}
-function mAppend(d, child) { toElem(d).appendChild(child); return child; }
-function mAreas(dParent, areas, gridCols, gridRows) {
-	mClear(dParent); mStyle(dParent, { padding: 0 })
-	let names = arrNoDuplicates(toWords(areas));
-	let dg = mDom(dParent);
-	for (const name of names) {
-		let d = mDom(dg, { family: 'opensans' }, { id: name });
-		d.style.gridArea = name;
-	}
-	mStyle(dg, { display: 'grid', gridCols, gridRows, h: '100%' });
-	dg.style.gridTemplateAreas = areas;
-	return names;
-}
-function mBy(id, what, elem) {
-	if (nundef(elem)) elem = document;
-	if (nundef(what)) return elem.getElementById(id);
-	switch (what) {
-		case 'class': return Array.from(elem.getElementsByClassName(id)); break;
-		case 'tag': return Array.from(elem.getElementsByTagName(id)); break;
-		case 'name': return Array.from(elem.getElementsByName(id)); break;
-		case 'query': return Array.from(elem.querySelectorAll(id)); break;
-		default: return elem.getElementById(id);
-	}
-}
-function mCenterCenter(d, gap) { mCenterCenterFlex(d, gap); }
-function mCenterCenterFlex(d, gap) { mCenterFlex(d, true, true, true, gap); }
-function mCenterFlex(d, hCenter = true, vCenter = false, wrap = true, gap = null) {
-	let styles = { display: 'flex' };
-	if (hCenter) styles['justify-content'] = 'center';
-	styles['align-content'] = vCenter ? 'center' : 'flex-start';
-	if (wrap) styles['flex-wrap'] = 'wrap';
-	if (gap) styles.gap = gap;
-	mStyle(d, styles);
-}
-function mClass(d) {
-	d = toElem(d);
-	if (arguments.length == 2) {
-		let arg = arguments[1];
-		if (isString(arg) && arg.indexOf(' ') > 0) { arg = [toWords(arg)]; }
-		else if (isString(arg)) arg = [arg];
-		if (isList(arg)) {
-			for (let i = 0; i < arg.length; i++) {
-				d.classList.add(arg[i]);
-			}
-		}
-	} else for (let i = 1; i < arguments.length; i++) d.classList.add(arguments[i]);
-}
-function mClassRemove(d) { d = toElem(d); for (let i = 1; i < arguments.length; i++) d.classList.remove(arguments[i]); }
-function mClassToggle(d, classes) {
-	let wlist = toWords(classes);
-	d = toElem(d);
-	for (const c of wlist) if (d.classList.contains(c)) mClassRemove(d, c); else mClass(d, c);
-}
-function mClear(d) {
-	d = toElem(d); if (d) d.innerHTML = '';
-}
-async function mCollapse(divs, dParent, styles = {}) {
-	function collapseOne(div) {
-		let b = div.firstChild.firstChild;
-		b.textContent = '+';
-		let chi = arrChildren(div).slice(1);
-		chi.map(x => mStyle(x, { display: 'none' }));
-	}
-	function expandOne(div) {
-		let b = div.firstChild.firstChild;
-		b.textContent = '- ';
-		let chi = arrChildren(div).slice(1);
-		chi.map(x => mStyle(x, { display: 'block' }));
-	}
-	function isCollapsedOne(div) { let chi = arrChildren(div).slice(1); return chi[0].style.display === 'none'; }
-	function toggleOne(div) { if (isCollapsedOne(div)) expandOne(div); else collapseOne(div); }
-	function collapseAll() { divs.map(collapseOne); }
-	function expandAll() { divs.map(expandOne); }
-	divs.forEach(div => {
-		let d1 = div.firstChild;
-		let b = mDom(d1, { margin: 5, cursor: 'pointer' }, { tag: 'span', html: '- ' }); mInsert(d1, b, 0);
-		b.onclick = () => { toggleOne(div); }
-	});
-	let dController = null;
-	if (isdef(dParent)) {
-		let bExpand = await mKey('circle_chevron_down', dParent, styles, { tag: 'button', onclick: expandAll });
-		let bCollapse = await mKey('circle_chevron_up', dParent, styles, { tag: 'button', onclick: collapseAll });
-		dController = mToggleButton(bExpand, bCollapse);
-	}
-	return { divs, dController, toggleOne, collapseOne, expandOne, isCollapsedOne, collapseAll, expandAll };
-}
-function mCollapseRemove(coll) {
-	coll.divs.forEach(div => {
-		coll.expandOne(div);
-		div.firstChild.firstChild.remove();
-	});
-	if (isdef(coll.dController)) coll.dController.remove();
-}
-function mCreateFrom(htmlString) {
-	var div = document.createElement('div');
-	div.innerHTML = htmlString.trim();
-	return div.firstChild;
-}
-function mDom(dParent, styles = {}, opts = {}) {
-	let tag = valf(opts.tag, 'div');
-	let d = document.createElement(tag);
-	if (isdef(dParent)) mAppend(dParent, d);
-	if (tag == 'textarea') styles.wrap = 'hard';
-	mStyle(d, styles);
-	applyOpts(d, opts);
-	return d;
-}
-function mDraggable(item) {
-	let d = iDiv(item);
-	d.draggable = true;
-	d.ondragstart = drag;
-}
-function mDropZone(dropZone, onDrop) {
-	dropZone.setAttribute('allowDrop', true)
-	dropZone.addEventListener('dragover', function (event) {
-		event.preventDefault();
-		dropZone.style.border = '2px dashed #007bff';
-	});
-	dropZone.addEventListener('dragleave', function (event) {
-		event.preventDefault();
-		dropZone.style.border = '2px dashed #ccc';
-	});
-	dropZone.addEventListener('drop', function (event) {
-		event.preventDefault();
-		dropZone.style.border = '2px dashed #ccc';
-		const files = event.dataTransfer.files;
-		if (files.length > 0) {
-			const reader = new FileReader();
-			reader.onload = ev => {
-				onDrop(ev.target.result);
-			};
-			reader.readAsDataURL(files[0]);
-		}
-	});
-	return dropZone;
-}
-function mDropZone1(dropZone, onDrop) {
-	dropZone.addEventListener('dragover', function (event) {
-		event.preventDefault();
-		dropZone.style.border = '2px dashed #007bff';
-	});
-	dropZone.addEventListener('dragleave', function (event) {
-		event.preventDefault();
-		dropZone.style.border = '2px dashed #ccc';
-	});
-	dropZone.addEventListener('drop', function (evDrop) {
-		evDrop.preventDefault();
-		dropZone.style.border = '2px dashed #ccc';
-		const files = evDrop.dataTransfer.files;
-		if (files.length > 0) {
-			const reader = new FileReader();
-			reader.onload = evReader => {
-				onDrop(evReader.target.result, dropZone);
-			};
-			reader.readAsDataURL(files[0]);
-		}
-	});
-	return dropZone;
-}
-function mDroppable(item, handler, dragoverhandler) {
-	function allowDrop(ev) { ev.preventDefault(); }
-	let d = iDiv(item);
-	d.ondragover = isdef(dragoverhandler) ? dragoverhandler : allowDrop;
-	d.ondrop = handler;
-}
-function mDummyFocus() {
-	if (nundef(mBy('dummy'))) mDom(document.body, { position: 'absolute', top: 0, left: 0, opacity: 0, h: 0, w: 0, padding: 0, margin: 0, outline: 'none', border: 'none', bg: 'transparent' }, { tag: 'button', id: 'dummy', html: 'dummy' }); //addDummy(document.body); //, 'cc');
-	mBy('dummy').focus();
-}
-function mFlex(d, or = 'h') {
-	d = toElem(d);
-	d.style.display = 'flex';
-	d.style.flexFlow = (or == 'v' ? 'column' : 'row') + ' ' + (or == 'w' ? 'wrap' : 'nowrap');
-}
-function mFlexBaseline(d) { mStyle(d, { display: 'flex', 'align-items': 'baseline' }); }
-function mFlexLR(d) { mStyle(d, { display: 'flex', 'justify-content': 'space-between', 'align-items': 'center' }); }
-function mFlexLine(d, startEndCenter = 'center') { mStyle(d, { display: 'flex', 'justify-content': startEndCenter, 'align-items': 'center' }); }
-function mFlexSpacebetween(d) { mFlexLR(d); }
-function mFlexV(d) { mStyle(d, { display: 'flex', 'align-items': 'center' }); }
-function mFlexVWrap(d) { mStyle(d, { display: 'flex', 'align-items': 'center', 'flex-flow': 'row wrap' }); }
-function mFlexWrap(d) { mFlex(d, 'w'); }
-function mGather(f, d, styles = {}, opts = {}) {
-	return new Promise((resolve, _) => {
-		let dShield = mShield();
-		let fCancel = _ => { dShield.remove(); hotkeyDeactivate('Escape'); resolve(null) };
-		let fSuccess = val => { dShield.remove(); hotkeyDeactivate('Escape'); resolve(val) };
-		dShield.onclick = fCancel;
-		hotkeyActivate('Escape', fCancel);
-		let [box, inp] = mInBox(f, dShield, styles, {}, dictMerge(opts, { fSuccess }));
-		mAlign(box, d, { align: 'bl', offx: 20 });
-		inp.focus();
-	});
-}
-async function mGetFilenames(dir) {
-	let res = await mPhpPost('mox0', { action: 'dir', dir });
-	return res.dir.filter(x => x != '.' && x != '..');
-}
-function mGetStyle(elem, prop) {
-	let val;
-	elem = toElem(elem);
-	if (prop == 'bg') { val = getStyleProp(elem, 'background-color'); if (isEmpty(val)) return getStyleProp(elem, 'background'); }
-	else if (isdef(STYLE_PARAMS_2[prop])) { val = getStyleProp(elem, STYLE_PARAMS_2[prop]); }
-	else {
-		switch (prop) {
-			case 'vmargin': val = stringBefore(elem.style.margin, ' '); break;
-			case 'hmargin': val = stringAfter(elem.style.margin, ' '); break;
-			case 'vpadding': val = stringBefore(elem.style.padding, ' '); break;
-			case 'hpadding': val = stringAfter(elem.style.padding, ' '); break;
-			case 'box': val = elem.style.boxSizing; break;
-			case 'dir': val = elem.style.flexDirection; break;
-		}
-	}
-	if (nundef(val)) val = getStyleProp(elem, prop);
-	if (val.endsWith('px')) return firstNumber(val); else return val;
-}
-function mGrid(rows, cols, dParent, styles = {}, opts = {}) {
-	[rows, cols] = [Math.ceil(rows), Math.ceil(cols)]
-	addKeys({ display: 'inline-grid', gridCols: 'repeat(' + cols + ',1fr)' }, styles);
-	if (rows) styles.gridRows = 'repeat(' + rows + ',auto)';
-	else styles.overy = 'auto';
-	let d = mDom(dParent, styles, opts);
-	return d;
-}
-function mHasClass(el, className) {
-	if (el.classList) return el.classList.contains(className);
-	else {
-		let x = !!el.className;
-		return isString(x) && !!el.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
-	}
-}
-function mHomeLogo(d, key, styles = {}, handler = null, menu = null) {
-	addKeys({ display: 'flex', align: 'center', justify: 'center' }, styles);
-	let ui = mKey(key, d, { maright: 12, fz: 30, cursor: 'pointer' }, { onclick: handler, menu });
-	return ui;
-}
-function mIfNotRelative(d) { d = toElem(d); if (isEmpty(d.style.position)) d.style.position = 'relative'; }
-async function mImageDropper(d) {
-	let fileInput = mDom(d, {}, { tag: 'input', type: 'file', accept: 'image/*' }); //,{onchange:onchangeFileInput});
-	let dropZone = mDom(d, { w: 500, hmin: 300, border: 'white 1px dashed', align: 'center' }, { html: 'Drop image here' });
-	function checkIfFromOwnServer(url) {
-		const ownOrigin = window.location.origin;
-		if (url.startsWith(ownOrigin)) {
-			console.log('Dropped from inside the project (server):', url); return true;
-		} else {
-			console.log('Dropped from external website:', url); return false;
-		}
-	}
-	async function ondropImage(ev) {
-		console.log('ondropImage', ev);
-		let item = ev.dataTransfer.items[0]; console.log(item);
-		let file = item.getAsFile(); console.log(file);
-		if (file) await displayImagedata(URL.createObjectURL(file));
-		else {
-			file = ev.dataTransfer.files[0];
-			const url = await new Promise(resolve => item.getAsString(resolve));
-			console.log('Dropped from website:', url);
-			let isOwnServer = checkIfFromOwnServer(url);
-			if (isOwnServer) {
-				await displayImagedata(url);
-			} else {
-				let { dataUrl, width, height } = await resizeImage(file, 500, 1000);
-				await displayImagedata(dataUrl);
-				let name = `img${getNow()}`;
-				name = await mGather(mInput, 'dTop', { bg: 'pink', padding: 4 }, { value: name }); console.log('you entered', name);
-				console.log(width, height, name);
-				uploadImage(dataUrl, `zdata/downloads/${name}.${stringAfter(file.name, '.')}`);
-			}
-		}
-	}
-	async function onchangeFileinput(ev) {
-		let files = ev.target.files;
-		let file = files[0];
-		let src = URL.createObjectURL(file);
-		await displayImagedata(src);
-	}
-	async function displayImagedata(src) {
-		mClear(dropZone);
-		let img = await mLoadImgAsync(dropZone, { wmax: 500 }, { tag: 'img', src: src });
-		console.log('img dims', img.width, img.height);
-	}
-	function preventDefaults(ev) { ev.preventDefault(); ev.stopPropagation(); }
-	function highlight(ev) { mClass(ev.target, 'framedPicture'); }
-	function unhighlight(ev) { mClassRemove(ev.target, 'framedPicture'); }
-	['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evname => {
-		dropZone.addEventListener(evname, preventDefaults, false);
-		document.body.addEventListener(evname, preventDefaults, false);
-	});
-	['dragenter', 'dragover'].forEach(evname => { dropZone.addEventListener(evname, highlight, false); });
-	['dragleave', 'drop'].forEach(evname => { dropZone.addEventListener(evname, unhighlight, false); });
-	dropZone.addEventListener('drop', ondropImage, false);
-	fileInput.addEventListener('change', onchangeFileinput, false);
-}
-function mImg(src, d, styles = {}, opts = {}) {
-	let [w, h] = mSizeSuccession(styles, 40);
-	addKeys({ w, h, 'object-fit': 'cover', 'object-position': 'center center' }, styles);
-	addKeys({ tag: 'img', src }, opts)
-	let img = mDom(d, styles, opts);
-	return img;
-}
-function mImgAsync(d, styles = {}, opts = {}, callback = null) {
-	return new Promise((resolve, reject) => {
-		let img = document.createElement('img');
-		mAppend(d, img);
-		let [w, h] = mSizeSuccession(styles, 40);
-		addKeys({ w, h, 'object-fit': 'cover', 'object-position': 'center center' }, styles);
-		addKeys({ tag: 'img' }, opts);
-		mStyle(img, styles, opts);
-		img.onload = async () => {
-			if (callback) callback(img);
-			resolve(img);
-		};
-		img.onerror = (error) => {
-			reject(error);
-		};
-		img.src = opts.src;
-	});
-}
-function mInBox(f, dParent, boxStyles = {}, inpStyles = {}, opts = {}) {
-	let dbox = mDom(dParent, boxStyles);
-	let dinp = f(dbox, inpStyles, opts);
-	return [dbox, dinp];
-}
-function mInput(dParent, styles = {}, opts = {}) {
-	addKeys({ tag: 'input', id: getUID(), placeholder: '', autocomplete: "off", value: '', selectOnClick: true, type: "text" }, opts);
-	let d = mDom(dParent, styles, opts);
-	d.onclick = opts.selectOnClick ? ev => { evNoBubble(ev); d.select(); } : ev => { evNoBubble(ev); };
-	d.onkeydown = ev => {
-		if (ev.key == 'Enter' && isdef(opts.fSuccess)) { evNoBubble(ev); opts.fSuccess(d.value); }
-		else if (ev.key == 'Escape' && isdef(opts.fCancel)) { evNoBubble(ev); opts.fCancel(); }
-	}
-	return d;
-}
-function mInsert(dParent, el, index = 0) { dParent.insertBefore(el, dParent.childNodes[index]); return el; }
-async function mKey(imgKey, d, styles = {}, opts = {}) {
-	styles = jsCopy(styles);
-	let type = opts.prefer;
-	let o = type != 'plain' ? lookup(M.superdi, [imgKey]) : null;
-	let src;
-	if (nundef(o) && imgKey.includes('.')) src = imgKey;
-	else if (isdef(o) && (type == 'img' || type == 'photo') && isdef(o[type])) src = o[type];
-	else if (isdef(o) && isdef(o.img)) src = o.img;
-	if (isdef(src)) {
-		let [w, h] = mSizeSuccession(styles, 40);
-		addKeys({ w, h }, styles);
-		addKeys({ tag: 'img', src }, opts);
-		let d0 = mDom(d, styles, opts);
-		mCenterCenterFlex(d0);
-		let img = await mImgAsync(d0, styles, opts, roundIfTransparentCorner);
-		return d0;
-	} else if (isdef(o)) {
-		if (nundef(type)) type = isdef(o.text) ? 'text' : isdef(o.fa6) ? 'fa6' : isdef(o.fa) ? 'fa' : isdef(o.ga) ? 'ga' : null;
-		let family = type == 'text' ? 'emoNoto' : type == 'fa6' ? 'fa6' : type == 'fa' ? 'pictoFa' : 'pictoGame';
-		let html = type == 'text' ? o.text : String.fromCharCode('0x' + o[type]);
-		addKeys({ family }, styles);
-		let d0 = mDom(d, styles, opts);
-		mCenterCenterFlex(d0);
-		let d1 = mDom(d0, {}, { html });
-		let r = getRect(d1);
-		[w, h] = [r.w, r.h];
-		return d0;
-	} else {
-		addKeys({ html: imgKey }, opts)
-		let img = mDom(d, styles, opts);
-		return img;
-	}
-	console.log('type', type)
-}
-async function mKeyO(imgKey, d, styles = {}, opts = {}) {
-	styles = jsCopy(styles);
-	let type = opts.prefer;
-	let o = type != 'plain' ? lookup(M.superdi, [imgKey]) : null;
-	let src;
-	if (nundef(o) && imgKey.includes('.')) src = imgKey;
-	else if (isdef(o) && (type == 'img' || type == 'photo') && isdef(o[type])) src = o[type];
-	else if (isdef(o) && isdef(o.img)) src = o.img;
-	if (isdef(src)) {
-		let [w, h] = mSizeSuccession(styles, 40);
-		addKeys({ w, h }, styles);
-		addKeys({ tag: 'img', src }, opts);
-		let d0 = mDom(d, styles, opts);
-		mCenterCenterFlex(d0);
-		let img = await mImgAsync(d0, styles, opts, roundIfTransparentCorner);
-		return d0;
-	} else if (isdef(o)) {
-		let [w, h] = mSizeSuccession(styles, 40);
-		let sz = h;
-		addKeys({ h }, styles);
-		if (nundef(type)) type = isdef(o.text) ? 'text' : isdef(o.fa6) ? 'fa6' : isdef(o.fa) ? 'fa' : isdef(o.ga) ? 'ga' : null;
-		let family = type == 'text' ? 'emoNoto' : type == 'fa6' ? 'fa6' : type == 'fa' ? 'pictoFa' : 'pictoGame';
-		let html = type == 'text' ? o.text : String.fromCharCode('0x' + o[type]);
-		addKeys({ family }, styles);
-		let d0 = mDom(d, styles, opts);
-		mCenterCenterFlex(d0);
-		let d1 = mDom(d0, {}, { html });
-		let r = getRect(d1);
-		[w, h] = [r.w, r.h];
-		let scale = Math.min(sz / w, sz / h);
-		d1.style.transformOrigin = 'center center';
-		d1.style.transform = `scale(${scale})`;
-		d1.style.transform = `scale(${scale})`;
-		return d0;
-	} else {
-		addKeys({ html: imgKey }, opts)
-		let img = mDom(d, styles, opts);
-		return img;
-	}
-	console.log('type', type)
-}
-function mLayout(dParent, rowlist, colt, rowt, styles = {}, opts = {}) {
-	dParent = toElem(dParent);
-	mStyle(dParent, styles);
-	rowlist = rowlist.map(x => x.replaceAll('@', valf(opts.suffix, ''))); //console.log(rowlist);
-	rowt = rowt.replaceAll('@', valf(opts.hrow, 30));
-	colt = colt.replaceAll('@', valf(opts.wcol, 30));
-	let areas = `'${rowlist.join("' '")}'`;
-	if (dParent.id == 'dPage') M.divNames = [];
-	let newNames = mAreas(dParent, areas, colt, rowt);
-	let names = M.divNames = Array.from(new Set(M.divNames.concat(newNames)));
-	if (nundef(styles.bgSrc)) mShade(newNames);
-	return names.map(x => mBy(x));
-}
-function mLayoutLMR(dParent, styles = {}, opts = {}) {
-	let rowlist = [`dLeft@ dMain@ dRight@`];
-	let colt = `minmax(@px, auto) 1fr minmax(@px, auto)`;
-	let rowt = `1fr`;
-	return mLayout(dParent, rowlist, colt, rowt, styles, opts);
-}
-function mLayoutLR(dParent, styles = {}, opts = {}) {
-	let rowlist = [`dLeft@ dRight@`];
-	let colt = `auto 1fr`;
-	let rowt = `1fr`;
-	return mLayout(dParent, rowlist, colt, rowt, styles, opts);
-}
-function mLayoutM(dParent, styles = {}, opts = {}) {
-	let rowlist = [`dMain@`];
-	let colt = `1fr`;
-	let rowt = `1fr`;
-	return mLayout(dParent, rowlist, colt, rowt, styles, opts);
-}
-function mLayoutMR(dParent, styles = {}, opts = {}) {
-	let rowlist = [`dMain@ dRight@`];
-	let colt = `minmax(auto, @px) 1fr`;
-	let rowt = `1fr`;
-	return mLayout(dParent, rowlist, colt, rowt, styles, opts);
-}
-function mLayoutTLM(dParent, styles = {}, opts = {}) {
-	let rowlist = [`dTop@ dTop@`, `dLeft@ dMain@`];
-	let colt = `minmax(@px, auto) 1fr`;
-	let rowt = `minmax(@px, auto) 1fr`;
-	return mLayout(dParent, rowlist, colt, rowt, styles, opts);
-}
-function mLayoutTLMR(dParent, styles = {}, opts = {}) {
-	let rowlist = [`dTop@ dTop@ dTop@`, `dLeft@ dMain@ dRight@`];
-	let colt = `minmax(@px, auto) 1fr minmax(@px, auto)`;
-	let rowt = `minmax(@px, auto) 1fr`;
-	return mLayout(dParent, rowlist, colt, rowt, styles, opts);
-}
-function mLayoutTLMRS(dParent, styles = {}, opts = {}) {
-	let rowlist = [`dTop@ dTop@ dTop@`, `dLeft@ dMain@ dRight@`, `dStatus@ dStatus@ dStatus@`];
-	let colt = `minmax(@px, auto) 1fr minmax(@px, auto)`;
-	let rowt = `minmax(@px, auto) 1fr minmax(@px, auto)`;
-	return mLayout(dParent, rowlist, colt, rowt, styles, opts);
-}
-function mLayoutTLMS(dParent, styles = {}, opts = {}) {
-	let rowlist = [`dTop@ dTop@`, `dLeft@ dMain@`, `dStatus@ dStatus@`];
-	let colt = `minmax(@px, auto) 1fr`;
-	let rowt = `minmax(@px, auto) 1fr minmax(@px, auto)`;
-	return mLayout(dParent, rowlist, colt, rowt, styles, opts);
-}
-function mLayoutTM(dParent, styles = {}, opts = {}, hrow = 30) {
-	let rowlist = [`dTop@`, `dMain@`];
-	let colt = `1fr`;
-	let rowt = `minmax(@px, auto) 1fr`;
-	return mLayout(dParent, rowlist, colt, rowt, styles, opts);
-}
-function mLayoutTMS(dParent, styles = {}, opts = {}, hrow = 30) {
-	let rowlist = [`dTop@`, `dMain@`, `dStatus@`];
-	let colt = `1fr`;
-	let rowt = `minmax(@px, auto) 1fr minmax(@px, auto)`;
-	return mLayout(dParent, rowlist, colt, rowt, styles, opts);
-}
-function mLayoutTopExtraSpaceBetween(dParent) {
-	dParent = toElem(dParent);
-	mStyle(dParent, {}, { id: 'dOuterTop' });
-	let dTop = mDom(dParent, { display: 'flex', justify: 'space-between' }, { id: 'dTop' });
-	let dExtra = mDom(dParent, { display: 'flex', justify: 'space-between' }, { id: 'dExtra' });
-	let [dTopLeft, dTopMiddle, dTopRight] = [mDom('dTop', {}, { id: 'dTopLeft' }), mDom('dTop', {}, { id: 'dTopMiddle' }), mDom('dTop', {}, { id: 'dTopRight' })]
-	let [dExtraLeft, dExtraMiddle, dExtraRight] = [mDom('dExtra', {}, { id: 'dExtraLeft' }), mDom('dExtra', {}, { id: 'dExtraMiddle' }), mDom('dExtra', {}, { id: 'dExtraRight' })]
-}
-function mLayoutTopTestExtraMessageTitle(dParent) {
-	dParent = toElem(dParent);
-	mStyle(dParent, {}, { id: 'dOuterTop' });
-	let dTop = mDom(dParent, { display: 'flex', justify: 'space-between' }, { id: 'dTop' });
-	let dTest = mDom(dParent, { display: 'flex', justify: 'space-between', hpadding: 10 }, { id: 'dTest' });
-	let dExtra = mDom(dParent, { display: 'flex', justify: 'space-between' }, { id: 'dExtra' });
-	let dMessage = mDom(dParent, { h: 0, bg: 'red', fg: 'yellow' }, { id: 'dMessage' });
-	let [dTopLeft, dTopMiddle, dTopRight] = [mDom('dTop', {}, { id: 'dTopLeft' }), mDom('dTop', {}, { id: 'dTopMiddle' }), mDom('dTop', {}, { id: 'dTopRight' })]
-	let [dTestLeft, dTestMiddle, dTestRight] = [mDom('dTest', {}, { id: 'dTestLeft' }), mDom('dTest', {}, { id: 'dTestMiddle' }), mDom('dTest', {}, { id: 'dTestRight' })]
-	let [dExtraLeft, dExtraMiddle, dExtraRight] = [mDom('dExtra', {}, { id: 'dExtraLeft' }), mDom('dExtra', {}, { id: 'dExtraMiddle' }), mDom('dExtra', {}, { id: 'dExtraRight' })]
-	mDom(dExtraLeft, {}, { id: 'dTitle' });
-}
-function mLinebreak(dParent, gap = 0) {
-	dParent = toElem(dParent);
-	let display = getComputedStyle(dParent).display;
-	if (display == 'flex') {
-		d = mDom(dParent, { 'flex-basis': '100%', h: gap, hline: gap, w: '100%' }, { html: '' });
-	} else {
-		d = mDom(dParent, { hline: gap, h: gap }, { html: '&nbsp;' });
-	}
-	return d;
-}
-function mLoadImgAsync(d, styles = {}, opts = {}, callback = null) {
-	return new Promise((resolve, reject) => {
-		let img = document.createElement('img');
-		mAppend(d, img);
-		mStyle(img, styles, opts);
-		img.onload = async () => {
-			if (callback) callback(img);
-			resolve(img);
-		};
-		img.onerror = (error) => {
-			reject(error);
-		};
-		img.src = opts.src;
-	});
-}
-function mMagnify(elem, scale = 5) {
-	elem.classList.add(`topmost`);
-	MAGNIFIER_IMAGE = elem;
-	const rect = elem.getBoundingClientRect();
-	let [w, h] = [rect.width * scale, rect.height * scale];
-	let [cx, cy] = [rect.width / 2 + rect.left, rect.height / 2 + rect.top];
-	let [l, t, r, b] = [cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2];
-	let originX = 'center';
-	let originY = 'center';
-	let [tx, ty] = [0, 0];
-	if (l < 0) { tx = -l / scale; }
-	if (t < 0) { ty = -t / scale; }
-	if (r > window.innerWidth) { tx = -(r - window.innerWidth) / scale; }
-	if (b > window.innerHeight) { ty = -(b - window.innerHeight) / scale; }
-	elem.style.transform = `scale(${scale}) translate(${tx}px,${ty}px)`;
-	elem.style.transformOrigin = `${originX} ${originY}`;
-}
-function mMagnifyOff() {
-	if (!MAGNIFIER_IMAGE) return;
-	let elem = MAGNIFIER_IMAGE;
-	MAGNIFIER_IMAGE = null;
-	elem.classList.remove(`topmost`);
-	elem.style.transform = null;
-}
-function mMenuH(d, text, styles = {}, handler = null, menu = null, kennzahl = null) {
-	if (nundef(kennzahl)) kennzahl = getUID();
-	addKeys({ deco: 'none', className: 'a', rounding: 10, wmin: 100, margin: 4, align: 'center' }, styles)
-	let ui = mDom(d, styles, { tag: 'a', html: text, href: '#', onclick: handler, kennzahl, menu });
-	return ui;
-}
-function mMenuV(d, text, styles = {}, handler = null, menu = null, kennzahl = null) {
-	if (nundef(kennzahl)) kennzahl = getUID();
-	addKeys({ display: 'block', deco: 'none', className: 'a', rounding: 10, margin: 4, align: 'center' }, styles)
-	let ui = mDom(d, styles, { tag: 'a', html: text, href: '#', onclick: handler, kennzahl, menu });
-	return ui;
-}
-function mOnEnter(elem, handler) {
-	elem.addEventListener('keydown', ev => {
-		if (ev.key == 'Enter') {
-			ev.preventDefault();
-			mDummyFocus();
-			if (handler) handler(ev);
-		}
-	});
-}
-function mOnEnterInput(elem, handler) {
-	elem.addEventListener('keydown', ev => {
-		if (ev.key == 'Enter') {
-			ev.preventDefault();
-			mDummyFocus();
-			if (handler) handler(ev.target.value);
-		}
-	});
-}
-async function mPalette(dParent, src, showPal = true, showImg = false) {
-	async function getPaletteFromCanvas(canvas, n) {
-		if (nundef(ColorThiefObject)) ColorThiefObject = new ColorThief();
-		const dataUrl = canvas.toDataURL();
-		const img = new Image();
-		img.src = dataUrl;
-		return new Promise((resolve, reject) => {
-			img.onload = () => {
-				const palette = ColorThiefObject.getPalette(img, n);
-				resolve(palette ? palette.map(x => colorFrom(x)) : ['black', 'white']);
-			};
-			img.onerror = () => {
-				reject(new Error('Failed to load the image from canvas.'));
-			};
-		});
-	}
-	let dc = mDom(dParent, { display: showImg ? 'inline' : 'none' })
-	let ca = await getCanvasCtx(dc, { w: 100, h: 100, fill: 'white' }, { src });
-	let palette = await getPaletteFromCanvas(ca.cv);
-	if (!showImg) dc.remove();
-	if (showPal) showPaletteMini(dParent, palette);
-	return palette;
-}
-async function mPhpDeleteFile(path) { return await mPhpGet('delete_file', { path }); }
-async function mPhpGet(cmd, o, projectName = 'ilms', verbose = false, jsonResult = true) {
-	let server = getServer();
-	let suffix = '';
-	for (const k in o) {
-		let s = JSON.stringify(o[k]);
-		if (!isEmpty(suffix)) suffix += '&';
-		suffix += `${k}=${encodeURIComponent(o[k])}`;
-	}
-	let command = server + `${projectName}/php/${cmd}.php?${suffix}`;
-	if (verbose) console.log('to php:', command, o); //return;
-	let res = await fetch(command,
-		{
-			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
-		}
-	);
-	let text;
-	try {
-		text = await res.text();
-		if (!jsonResult) {
-			return text;
-		}
-		let obj = JSON.parse(text);
-		if (verbose) console.log('from php:\n', obj);
-		let mkeys = ["config", "superdi", "users", "details"];
-		for (const k of mkeys) {
-			if (isdef(obj[k])) {
-				M[k] = obj[k];
-				if (k == "superdi") {
-					loadSuperdiAssets();
-				} else if (k == "users") {
-					loadUsers();
-				}
-			}
-		}
-		return obj;
-	} catch (e) {
-		return isString(text) ? text : e;
-	}
-}
-async function mPhpGetFile(path) { return await mPhpPost('read_file', { path }, false); }
-async function mPhpPost(cmd, o, projectName = 'ilms', verbose = false, jsonResult = true) {
-	let server = getServer('php');
-	if (isdef(o.path) && (o.path.startsWith('zdata') || o.path.startsWith('y'))) o.path = '../../' + o.path;
-	if (verbose) console.log('to php:', server + `${projectName}/php/${cmd}.php`, o);
-	//return;	
-	let res = await fetch(server + `${projectName}/php/${cmd}.php`,
-		{
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(o),
-		}
-	);
-	let text;
-	try {
-		text = await res.text();
-		if (!jsonResult) {
-			return text;
-		}
-		let obj = JSON.parse(text);
-		if (verbose) console.log('from php:\n', obj);
-		let mkeys = ["config", "superdi", "users", "details"];
-		for (const k of mkeys) {
-			if (isdef(obj[k])) {
-				M[k] = obj[k];
-				if (k == "superdi") {
-					loadSuperdiAssets();
-				} else if (k == "users") {
-					loadUsers();
-				}
-			}
-		}
-		return obj;
-	} catch (e) {
-		return isString(text) ? text : e;
-	}
-}
-async function mPhpPostAudio(url, path, projectName = 'ilms', verbose = true) { return await mPhpPost('dl', { url, path }); }
-async function mPhpPostFile(text, path, projectName = 'ilms', verbose = true) { return await mPhpPost('write_file', { text, path }, projectName, verbose); }
-async function mPhpPostLine(line, path, projectName = 'ilms', verbose = true) { return await mPhpPost('append_action', { line, path }, false); }
-async function mPhpPostText(text, path, projectName = 'ilms', verbose = true) { return await mPhpPost('append_text', { text, path }, false); }
-function mPickOneOfGrid(dParent, styles = {}, opts = {}) {
-	let d0 = mDom(dParent, dictMerge(styles, { gap: 6 }), opts);
-	mGrid(d0);
-	function onclick(ev) {
-		evNoBubble(ev);
-		if (isdef(opts.fSuccess)) opts.fSuccess(ev.target.innerHTML);
-	}
-	for (const html of opts.list) {
-		mDom(d0, {}, { tag: 'button', html, onclick });
-	}
-	return d0;
-}
-function mPlace(elem, pos, offx, offy) {
-	elem = toElem(elem);
-	pos = pos.toLowerCase();
-	let dParent = elem.parentNode; mIfNotRelative(dParent);
-	let hor = valf(offx, 0);
-	let vert = isdef(offy) ? offy : hor;
-	if (pos[0] == 'c' || pos[1] == 'c') {
-		let dpp = dParent.parentNode;
-		let opac = mGetStyle(dParent, 'opacity'); //console.log('opac', opac);
-		if (nundef(dpp)) { mAppend(document.body, dParent); mStyle(dParent, { opacity: 0 }) }
-		let rParent = getRect(dParent);
-		let [wParent, hParent] = [rParent.w, rParent.h];
-		let rElem = getRect(elem);
-		let [wElem, hElem] = [rElem.w, rElem.h];
-		if (nundef(dpp)) { dParent.remove(); mStyle(dParent, { opacity: valf(opac, 1) }) }
-		switch (pos) {
-			case 'cc': mStyle(elem, { position: 'absolute', left: hor + (wParent - wElem) / 2, top: vert + (hParent - hElem) / 2 }); break;
-			case 'tc': mStyle(elem, { position: 'absolute', left: hor + (wParent - wElem) / 2, top: vert }); break;
-			case 'bc': mStyle(elem, { position: 'absolute', left: hor + (wParent - wElem) / 2, bottom: vert }); break;
-			case 'cl': mStyle(elem, { position: 'absolute', left: hor, top: vert + (hParent - hElem) / 2 }); break;
-			case 'cr': mStyle(elem, { position: 'absolute', right: hor, top: vert + (hParent - hElem) / 2 }); break;
-		}
-		return;
-	}
-	let di = { t: 'top', b: 'bottom', r: 'right', l: 'left' };
-	elem.style.position = 'absolute';
-	let kvert = di[pos[0]], khor = di[pos[1]];
-	elem.style[kvert] = vert + 'px'; elem.style[khor] = hor + 'px';
-}
-function mPos(d, x, y, offx = 0, offy = 0, unit = 'px') {
-	let dParent = d.parentNode; mIfNotRelative(dParent);
-	mStyle(d, { left: `${x + offx}${unit}`, top: `${y + offy}${unit}`, position: 'absolute' });
-}
-function mRadio(label, val, name, dParent, styles = {}, onchangeHandler, group_id, is_on) {
-	let cursor = styles.cursor; delete styles.cursor;
-	let d = mDom(dParent, styles, {id:group_id + '_' + val});
-	let id = isdef(group_id) ? `i_${group_id}_${val}` : getUID();
-	let type = isdef(group_id) ? 'radio' : 'checkbox';
-	let checked = isdef(is_on) ? is_on : false;
-	let inp = mCreateFrom(`<input class='radio' id='${id}' type="${type}" name="${name}" value="${val}">`);
-	if (checked) inp.checked = true;
-	let text = mCreateFrom(`<label for='${inp.id}'>${label}</label>`);
-	if (isdef(cursor)) { inp.style.cursor = text.style.cursor = cursor; }
-	mAppend(d, inp);
-	mAppend(d, text);
-	if (isdef(onchangeHandler)) {
-		inp.onchange = ev => {
-			ev.cancelBubble = true;
-			if (onchangeHandler == 'toggle') {
-			} else if (isdef(onchangeHandler)) {
-				onchangeHandler(ev.target.checked, name, val);
-			}
-		};
-	}
-	return d;
-}
-function mRadioGroup(dParent, styles, id, legend, legendstyles) {
-	let dOuter = mDom(dParent, { bg: 'white', rounding: 10, margin: 4 })
-	let f = mCreate('fieldset');
-	f.id = id;
-	if (isdef(styles)) mStyle(f, styles);
-	if (isdef(legend)) {
-		let l = mCreate('legend');
-		l.innerHTML = legend;
-		mAppend(f, l);
-		if (isdef(legendstyles)) { mStyle(l, legendstyles); }
-	}
-	mAppend(dOuter, f);
-	return f;
-}
-function mRemove(elem) {
-	elem = toElem(elem); if (nundef(elem)) return;
-	var a = elem.attributes, i, l, n;
-	if (a) {
-		for (i = a.length - 1; i >= 0; i -= 1) {
-			n = a[i].name;
-			if (typeof elem[n] === 'function') {
-				elem[n] = null;
-			}
-		}
-	}
-	a = elem.childNodes;
-	if (a) {
-		l = a.length;
-		for (i = a.length - 1; i >= 0; i -= 1) {
-			mRemove(elem.childNodes[i]);
-		}
-	}
-	elem.remove();
-}
-function mRemoveClass(d) { for (let i = 1; i < arguments.length; i++) d.classList.remove(arguments[i]); }
-function mRemoveIfExists(d) { d = toElem(d); if (isdef(d)) d.remove(); }
-function mRemoveStyle(d, styles) { for (const k of styles) d.style[k] = null; }
-function mRise(d, ms = 800) {
-	toElem(d).animate([{ opacity: 0, transform: 'translateY(50px)' }, { opacity: 1, transform: 'translateY(0px)' },], { fill: 'both', duration: ms, easing: 'ease' });
-}
-function mSelect(dParent, styles = {}, opts = {}) {
-	let d0 = mDom(dParent, dictMerge(styles, { gap: 6 }), opts);
-	mCenterCenterFlex(d0);
-	function onclick(ev) {
-		evNoBubble(ev);
-		if (isdef(opts.fSuccess)) opts.fSuccess(ev.target.innerHTML);
-	}
-	for (const html of opts.list) {
-		mDom(d0, {}, { tag: 'button', html, onclick });
-	}
-	return d0;
-}
-function mShade(names, offset = 1, contrast = 1) {
-	let palette = paletteTransWhiteBlack(names.length * contrast + 2 * offset).slice(offset);
-	for (const name of names) {
-		let d = toElem(name);
-		mStyle(d, { bg: palette.shift(), fg: 'contrast', wbox: true });
-	}
-}
-function mShape(shape, dParent, styles = {}, opts = {}) {
-	styles = jsCopy(styles);
-	styles.display = 'inline-block';
-	let [w, h] = mSizeSuccession(styles, 100);
-	addKeys({ w, h }, styles);
-	let clip = PolyClips[shape];
-	if (nundef(clip)) styles.round = true; else styles.clip = clip;
-	let d = mDom(dParent, styles, opts);
-	if (isdef(opts.pos)) { mPlace(d, opts.pos); }
-	else if (isdef(opts.center)) centerAt(d, opts.center.x, opts.center.y);
-	return d;
-}
-function mShield(dParent, styles = {}, opts = {}) {
-	addKeys({ bg: '#00000080' }, styles);
-	addKeys({ id: 'shield' }, opts);
-	dParent = valf(toElem(dParent), document.body);
-	let d = mDom(dParent, styles, opts);
-	mIfNotRelative(dParent);
-	mStyle(d, { position: 'absolute', left: 0, top: 0, w: '100%', h: '100%' });
-	mClass(d, 'topmost');
-	return d;
-}
-function mSizeSuccession(styles = {}, szDefault = 100, fromWidth = true) {
-	let [w, h] = [styles.w, styles.h];
-	if (fromWidth) {
-		w = valf(w, styles.sz, h, szDefault);
-		h = valf(h, styles.sz, w, szDefault);
-	} else {
-		h = valf(h, styles.sz, w, szDefault);
-		w = valf(w, styles.sz, h, szDefault);
-	}
-	return [w, h];
-}
-function mSleep(ms = 1000) {
-	return new Promise(
-		(res, rej) => {
-			if (ms > 10000) { ms = 10000; }
-			if (isdef(TO.SLEEPTIMEOUT)) clearTimeout(TO.SLEEPTIMEOUT);
-			TO.SLEEPTIMEOUT = setTimeout(res, ms);
-			setTimeout(() => {
-				try {
-					rej(`PROMISE REJECT ${isdef(TO.SLEEPTIMEOUT)}`);
-				} catch (err) {
-					console.log(`WTF!!!!!!!!!!!!!!!!!!`, err);
-				}
-			}, ms + 1);
-		});
-}
-function mStyle(elem, styles = {}, opts = {}) {
-	elem = toElem(elem);
-	styles = jsCopy(styles);
-	let noUnit = ['opacity', 'flex', 'grow', 'shrink', 'grid', 'z', 'iteration', 'count', 'orphans', 'widows', 'weight', 'order', 'index'];
-	const STYLE_PARAMS_3 = {
-		bgSrc: (elem, v) => elem.style.backgroundImage = `url(${v})`,
-		gridRows: (elem, v) => elem.style.gridTemplateRows = isNumber(v) ? `repeat(${v},1fr)` : v,
-		gridCols: (elem, v) => elem.style.gridTemplateColumns = isNumber(v) ? `repeat(${v},1fr)` : v,
-		html: (elem, v) => elem.innerHTML = v,
-		hpadding: (elem, v) => elem.style.padding = `0 ${v}px`,
-		vpadding: (elem, v) => elem.style.padding = `${v}px ${valf(styles.hpadding, 0)}px`,
-		hmargin: (elem, v) => elem.style.margin = `0 ${v}px`,
-		vmargin: (elem, v) => elem.style.margin = `${v}px ${valf(styles.hmargin, 0)}px`,
-		w100: elem => elem.style.width = '100%',
-		h100: elem => elem.style.height = '100%',
-		round: elem => elem.style.borderRadius = '50%',
-		wbox: (elem, v) => elem.style.boxSizing = v ? 'border-box' : 'content-box',
-		wrap: (elem, v) => { if (v == 'hard') elem.setAttribute('wrap', 'hard'); else elem.style.flexWrap = 'wrap'; }
-	};
-	for (const k in styles) {
-		let v = styles[k];
-		let key = STYLE_PARAMS_2[k];
-		let val = isNumber(v) && !noUnit.some(x => k.includes(x)) || k == 'fz' ? '' + Number(v) + 'px' : v;
-		if (isdef(key)) { elem.style.setProperty(key, val); continue; }
-		if (v == 'contrast') { //nur bei fg verwenden!!!!
-			let bg = nundef(styles.bg) ? mGetStyle(elem, 'bg') : colorFrom(styles.bg);
-			elem.style.setProperty('color', colorIdealText(bg));
-		} else if (k == 'bg') {
-			if (v.includes('grad')) elem.style.setProperty('background', v);
-			else if (v.includes('/')) elem.style.setProperty('background-image', `url(${v})`);
-			else elem.style.setProperty('background-color', colorFrom(v, styles.alpha));
-			continue;
-		} else if (k == 'fg') {
-			elem.style.setProperty('color', colorFrom(v, styles.alpha));
-			continue;
-		} else if (k.startsWith('class')) {
-			mClass(elem, v)
-			continue;
-		} else if (isdef(STYLE_PARAMS_3[k])) {
-			STYLE_PARAMS_3[k](elem, v);
-		} else elem.style.setProperty(k, val);
-	}
-	applyOpts(elem, opts);
-}
-function mTable(dParent, headers, showheaders, styles = { mabottom: 0 }, className = 'table') {
-	let d = mDiv(dParent);
-	let t = mCreate('table');
-	mAppend(d, t);
-	if (isdef(className)) mClass(t, className);
-	if (isdef(styles)) mStyle(t, styles);
-	if (showheaders) {
-		let code = `<tr>`;
-		for (const h of headers) {
-			code += `<th>${h}</th>`
-		}
-		code += `</tr>`;
-		t.innerHTML = code;
-	}
-	return t;
-}
-function mTableCol(r, val) {
-	let col = mCreate('td');
-	mAppend(r, col);
-	if (isdef(val)) col.innerHTML = val;
-	return col;
-}
-function mTableCommandify(rowitems, di) {
-	for (const item of rowitems) {
-		for (const index in di) {
-			let colitem = item.colitems[index];
-			colitem.div.innerHTML = di[index](item, colitem.val);
-		}
-	}
-}
-function mTableRow(t, o, headers, id) {
-	let elem = mCreate('tr');
-	if (isdef(id)) elem.id = id;
-	mAppend(t, elem);
-	let colitems = [];
-	for (const k of headers) {
-		let val = isdef(o[k]) ? isDict(o[k]) ? JSON.stringify(o[k]) : isList(o[k]) ? o[k].join(', ') : o[k] : '';
-		let col = mTableCol(elem, val);
-		colitems.push({ div: col, key: k, val: val });
-	}
-	return { div: elem, colitems: colitems };
-}
-function mTableStylify(rowitems, di) {
-	for (const item of rowitems) {
-		for (const index in di) {
-			let colitem = item.colitems[index];
-			mStyle(colitem.div, di[index]);
-		}
-	}
-}
-function mText(text, dParent, styles, classes) {
-	if (!isString(text)) text = text.toString();
-	let d = mDom(dParent);
-	if (!isEmpty(text)) { d.innerHTML = text; }
-	if (isdef(styles)) mStyle(d, styles);
-	if (isdef(classes)) mClass(d, classes);
-	return d;
-}
-function mTextArea100(dParent, styles = {}) {
-	mCenterCenterFlex(dParent)
-	let html = `<textarea style="width:100%;height:100%;box-sizing:border-box" wrap="hard"></textarea>`;
-	let t = mCreateFrom(html);
-	mStyle(t, styles);
-	mAppend(dParent, t);
-	return t;
-}
-function mToggle(ev) {
-	let key = ev.target.getAttribute('data-toggle');
-	let t = DA.toggle[key];
-	let prev = t.state;
-	t.state = (t.state + 1) % t.seq.length;
-	let html = t.seq[t.state];
-	mStyle(t.elem, { bg: t.states[html] }, { html });
-	if (isdef(t.handler)) t.handler(key, prev, t.state);
-}
-function mToggleButton() {
-	let list = Array.from(arguments);
-	if (isEmpty(list)) return;
-	let dParent = list[0].parentNode;
-	let tb = mDom(dParent);
-	let n = list.length;
-	let i = 0;
-	for (const b of list) {
-		mAppend(tb, b);
-		b.setAttribute('idx', i++);
-		if (i < n) mStyle(b, { display: 'none' });
-	}
-	tb.onclick = ev => {
-		let idx = Number(evToAttr(ev, 'idx'));
-		let inew = (idx + 1) % n;
-		let b = list[inew];
-		list.map(x => mStyle(x, { display: 'none' }));
-		mStyle(b, { display: 'inline' });
-	}
-	return tb;
-}
-function mToggleElem(elem, key, states, seq, i, handler) {
-	if (nundef(DA.toggle)) DA.toggle = {};
-	let t = DA.toggle[key] = { handler, key, elem, state: i, states, seq };
-	elem.setAttribute('data-toggle', key);
-	mStyle(elem, { cursor: 'pointer' });
-	let html = seq[i];
-	mStyle(elem, { bg: states[html] }, { html });
-	elem.onclick = mToggle;
-	return t;
-}
-function mYaml(d, js) {
-	d.innerHTML = '<pre>' + jsonToYaml(js) + '</pre>';
-}
-function mYesNo(dParent, styles = {}, opts = {}) {
-	return mSelect(dParent, styles, dictMerge(opts, { list: ['yes', 'no'] }));
-}
 function makeEditable(elem) {
 	elem.setAttribute('contenteditable', 'true');
 	elem.style.border = '1px solid #ccc'; // Optional: Visual indication
@@ -4007,6 +3009,36 @@ function measureActualTextWidth(text, styles = {}) {
 	const actualWidth = endX - startX + 1;
 	return actualWidth;
 }
+function measureElement(el) {
+	let info = window.getComputedStyle(el, null);
+	return { w: info.width, h: info.height };
+}
+function measureFieldset(fs) {
+	let legend = fs.firstChild;
+	let r = getRect(legend);
+	let labels = fs.getElementsByTagName('label');
+	let wmax = 0;
+	for (const l of labels) {
+		let r1 = getRect(l);
+		wmax = Math.max(wmax, r1.w);
+	}
+	let wt = r.w;
+	let wo = wmax + 24;
+	let diff = wt - wo;
+	if (diff >= 10) {
+		for (const l of labels) { let d = l.parentNode; mStyle(d, { maleft: diff / 2 }); }
+	}
+	let wneeded = Math.max(wt, wo) + 10;
+	mStyle(fs, { wmin: wneeded });
+	for (const l of labels) { let d = l.parentNode; mStyle(l, { display: 'inline-block', wmin: 50 }); mStyle(d, { wmin: wneeded - 40 }); }
+}
+function measureHeight(elem) { return mGetStyle(elem, 'h') }
+function measureHeightOfTextStyle(dParent, styles = {}) {
+	let d = mDom(dParent, styles, { html: 'Hql' });
+	let s = measureElement(d);
+	d.remove();
+	return firstNumber(s.h);
+}
 function measureText(text, styles = {}, cx = null) {
 	function getTextWidth(text, font) {
 		var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement('canvas'));
@@ -4023,6 +3055,7 @@ function measureText(text, styles = {}, cx = null) {
 	var metrics = cx.measureText(text);
 	return [metrics.width, metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent];
 }
+function measureWidth(elem) { return mGetStyle(elem, 'w') }
 function normalizeString(s, opts = {}) {
 	let sep = valf(opts.sep, '_');
 	let keep = valf(opts.keep, []);
@@ -4420,12 +3453,6 @@ async function onclickNewBlog(ev) {
 	let d1 = mDom(d, { bg: 'red', h: 100 }, { html: `${formattedDate} ${title}` });
 	mInsert(d, d1, 0);
 }
-async function onclickOpenToJoinGame() {
-	let options = collectOptions();
-	let players = collectPlayers();
-	mRemove('dGameMenu');
-	let t = await tableCreate(DA.gamename, players, options);
-}
 function onclickPasteDetailObject(text, inputs, wIdeal, df, styles, opts) {
 	function parseToInputs(o) {
 		let keys = Object.keys(o);
@@ -4616,12 +3643,6 @@ async function onclickSleeping(ev) {
 	clearTimeouts(); mClear('dMain'); DA.stopwatch = null;
 	console.log(res);
 }
-async function onclickStartGame() {
-	await saveDataFromPlayerOptionsUI(DA.gamename);
-	let options = collectOptions();
-	let players = collectPlayers();
-	await startGame(DA.gamename, players, options);
-}
 function onclickStopwatch(ev) {
 	let [prevElem, elem] = hToggleClassMenu(ev);
 	if (prevElem == elem) return;
@@ -4644,33 +3665,6 @@ function onclickStopwatch(ev) {
 		}
 	}
 }
-async function onclickTable(id) {
-	showTable(id);
-}
-async function onclickTableDelete(id) {
-	let res = await mPhpPost('mox0', { action: 'deletey', file: `tables/${id}` });
-	console.log('res', res);
-}
-async function onclickTableJoin(id) {
-	let tData = M.tables[id];
-	let me = UGetName();
-	assertion(tData.status == 'open', 'too late to join! game has already started!')
-	assertion(!tData.playerNames.includes(me), `${me} already joined!!!`);
-	tData.players[me] = createGamePlayer(me, tData.game);
-	tData.playerNames.push(me);
-	let res = await mPhpPost('mox0', { action: 'savey', file: `tables/${id}`, o: tData });
-	console.log('res', res);
-}
-async function onclickTableLeave(id) {
-	let tData = M.tables[id];
-	let me = UGetName();
-	assertion(tData.status == 'open', 'too late to leave! game has already started!')
-	assertion(tData.playerNames.includes(me), `${me} NOT in joined players!!!!`);
-	delete tData.players[me];
-	removeInPlace(tData.playerNames, me);
-	let res = await mPhpPost('mox0', { action: 'savey', file: `tables/${id}`, o: tData });
-	console.log('res', res);
-}
 async function onclickTableMenu() {
 	let id = getTid();
 	if (nundef(id)) {
@@ -4682,13 +3676,6 @@ async function onclickTableMenu() {
 		if (isdef(table)) id = table.id;
 	}
 	if (isdef(id)) { Tid = null; await showTable(id); } else await switchToMainMenu('play');
-}
-async function onclickTableStart(id) {
-	let tData = M.tables[id];
-	if (!tData) { showMessage('table deleted!'); return await showGamesAndTables(); }
-	tData = setTableToStarted(tData);
-	let res = await mPhpPost('mox0', { action: 'savey', file: `tables/${id}`, o: tData });
-	console.log('res', res);
 }
 async function onclickTest() { console.log('nations!!!!'); }
 async function onclickTextColor(fg) {
@@ -4933,6 +3920,37 @@ function playerStatCount(key, n, dParent, styles = {}, opts = {}) {
 	else mText(key, d, { fz: sz, w: '100%' });
 	d.innerHTML += `<span ${isdef(opts.id) ? `id='${opts.id}'` : ''} style="font-weight:bold;color:inherit">${n}</span>`;
 	return d;
+}
+function pollChangeMs(state, ms) { DA.pollms[state] = ms; }
+function pollChangeState(newState) {
+	if (nundef(DA.pollms)) DA.pollms = { lobby: 3000, mymove: 1000, othermove: 2000 };
+	if (nundef(DA.pollCounter)) DA.pollCounter = 0;
+	DA.prevState = DA.state;
+	DA.state = newState;
+	pollResume();
+}
+async function pollResume() {
+	let ms = DA.pollms[DA.state];
+	console.log('', DA.pollCounter++, ms, DA.prevState, DA.state);
+	switch (DA.state) {
+		case 'lobby':
+			await showGamesAndTables();
+
+			TO.poll = setTimeout(pollResume, ms);
+			break;
+		case 'mymove':
+			TO.poll = setTimeout(pollResume, ms);
+			break;
+		case 'othermove':
+			TO.poll = setTimeout(pollResume, ms);
+			break;
+		default:
+			pollStop(); break;
+	}
+}
+function pollStop() {
+	if (TO.poll) { clearTimeout(TO.poll); TO.poll = null; }
+	DA.polling = false;
 }
 async function postUsers() {
 	let users = jsonToYaml(M.users);
@@ -5771,6 +4789,75 @@ function showGameover(table, dParent) {
 	mDom(d, { h: 12 }, { html: '<br>' })
 	mButton('PLAY AGAIN', () => onclickTableStart(table.id), d, { className: 'button', fz: 24 });
 }
+async function showGamesAndTables() {
+	async function showGames(dParent) {
+		mText(`<h2>games</h2>`, dParent, { maleft: 12 });
+		let d = mDom(dParent, { fg: 'white' }, { id: 'game_menu' }); mCenterCenterFlex(d); //mFlexWrap(d);
+		let gamelist = DA.gamelist;
+		for (const gname of gamelist) {
+			let g = MGetGame(gname);
+			let bg = g.color;
+			let d1 = mDom(d, { cursor: 'pointer', rounding: 10, margin: 10, padding: 0, patop: 10, w: 140, height: 100, bg, position: 'relative' }, { id: g.id });
+			d1.setAttribute('gamename', gname);
+			d1.onclick = onclickGameMenuItem;
+			mCenterFlex(d1);
+			let o = M.superdi[g.logo];
+			let fg = colorIdealText(bg);
+			let el = mDom(d1, { matop: 0, mabottom: 6, fz: 65, hline: 65, family: 'emoNoto', fg, display: 'inline-block' }, { html: o.text });
+			mLinebreak(d1);
+			mDom(d1, { fz: 18, align: 'center', fg }, { html: capitalize(g.friendly) });
+		}
+	}
+	async function showTables(dParent, tables, me) {
+		mText(`<h2>tables</h2>`, dParent, { maleft: 12 });
+		if (isEmpty(tables)) { mDom(dParent, { maleft: 12, fz: 24, fg: 'blue' }, { html: 'no active game tables' }); return; }
+		let t = UI.tables = mDataTable(tables, dParent, null, ['friendly', 'game_friendly', 'playerNames'], 'tables', false);
+		mTableCommandify(t.rowitems.filter(ri => ri.o.status != 'open'), {
+			0: (item, val) => hFunc(val, 'onclickTable', item.o.id, item.id),
+		});
+		mTableStylify(t.rowitems.filter(ri => ri.o.status == 'open'), { 0: { fg: 'blue' }, });
+		let d = iDiv(t);
+		for (const ri of t.rowitems) {
+			let r = iDiv(ri);
+			let id = ri.o.id;
+			if (ri.o.prior == 1) mDom(r, {}, { tag: 'td', html: getWaitingHtml(24) });
+			if (ri.o.status == 'open') {
+				let playerNames = ri.o.playerNames;
+				if (playerNames.includes(me)) {
+					if (ri.o.owner != me) {
+						let h1 = hFunc('leave', 'onclickTableLeave', ri.o.id); let c = mAppend(r, mCreate('td')); c.innerHTML = h1;
+					}
+				} else {
+					let h1 = hFunc('join', 'onclickTableJoin', ri.o.id); let c = mAppend(r, mCreate('td')); c.innerHTML = h1;
+				}
+			}
+			if (ri.o.owner != me) continue;
+			let h = hFunc('delete', 'onclickTableDelete', id); let c = mAppend(r, mCreate('td')); c.innerHTML = h;
+			if (ri.o.status == 'open') { let h1 = hFunc('start', 'onclickTableStart', id); let c1 = mAppend(r, mCreate('td')); c1.innerHTML = h1; }
+		}
+		return tables;
+	}
+	let dParent = mBy('dTableList');
+	if (nundef(dParent)) { mClear('dMain'); dParent = mDom('dMain', {}, { className: 'section', id: 'dTableList' }); }
+	await loadTables();
+	let tables = dict2list(M.tables);
+	let me = UGetName();
+	tables.map(x => x.prior = x.status == 'open' ? 0 : x.turn.includes(me) ? 1 : x.playerNames.includes(me) ? 2 : 3);
+	sortBy(tables, 'prior');
+	tables.map(x => x.game_friendly = capitalize(MGetGameFriendly(x.game)));
+	let changes = deepCompare(DA.tableList, tables);
+	DA.tableList = tables;
+	if (changes) {
+		console.log('changes', changes)
+		mClear(dParent);
+		await showTables(dParent, tables, me);
+	} else console.log('tables: no changes', changes);
+
+	dParent = mBy('dGameList');
+	if (isdef(dParent)) { mClear(dParent); }
+	else { dParent = mDom('dMain', {}, { className: 'section', id: 'dGameList' }); }
+	await showGames(dParent);
+}
 function showImage(key, dParent, styles = {}, useSymbol = false) {
 	let o = M.superdi[key];
 	if (nundef(o)) { console.log('showImage:key not found', key); return; }
@@ -5941,6 +5028,31 @@ function showRibbon(dParent, msg) {
 	let bg = `linear-gradient(270deg, #fffffd, #00000080)`
 	d = mDom(dParent, { bg, mabottom: 10, align: 'center', vpadding: 10, fz: 30, w100: true }, { html: msg, id: 'ribbon' });
 	return d;
+}
+async function showTable(id) {
+	let me = UGetName();
+	let tid = valf(id, DA.tid);
+	if (nundef(tid)) tid = valf(localStorage.getItem('tid'), arrLast(Object.keys(M.tables)));
+	if (nundef(tid)) { return await showGamesAndTables(); }
+	DA.tid = tid;
+	let tData = await loadStaticYaml(`y/tables/${tid}.yaml`);
+	if (!tData) { showMessage('table deleted!'); return await showGamesAndTables(); }
+	let changes = deepCompare(M.tables[tid], tData);
+	if (!changes) { return console.log('no changes', changes, tid); }
+	console.log('changes', changes);
+	M.tables[tid] = DA.tData = tData;
+	let func = DA.funcs[tData.game];
+	T = tData;
+	clearMain();
+	mClassRemove('dExtra', 'p10hide');
+	showTitleGame(tData);
+	if (func.hasInstruction) prepInstruction(tData);
+	func.prepLayout(tData);
+	let items = [];
+	await func.stats(tData);
+	if (tData.status == 'over') { showGameover(tData, 'dTitle'); return; }
+	assertion(tData.status == 'started', `showTable status ERROR ${tData.status}`);
+	func.activate(tData, items);
 }
 function showText(dParent, text, bg = 'black') {
 	return mDom(dParent, { align: 'center', wmin: 120, padding: 2, bg, fg: colorIdealText(bg) }, { html: text });
@@ -6209,23 +5321,6 @@ function sortDatesDescending(dates) {
 	return dates.sort((a, b) => new Date(b) - new Date(a));
 }
 async function start() { await test0_p5(); }
-async function startGame(gamename, players, options) {
-	let table = createOpenTable(gamename, players, options);
-	table = setTableToStarted(table);
-	let tid = table.id;
-	let tData = table;
-	let res = await mPhpPost('mox0', { action: 'create', tid, tData });
-	if (res.tid) {
-		console.log("Game Creation:", res.tid);
-		let data = M.tables[tid] = await tableGetDefault(res.tid); console.log(data);
-		M.tableFilenames.push(tid);
-		DA.tid = tid; DA.tData = tData;
-	} else {
-		console.log("Game Creation failed");
-		return null;
-	}
-	return table;
-}
 function startsWith(s, sSub) {
 	return s.substring(0, sSub.length) == sSub;
 }
@@ -6261,40 +5356,8 @@ async function switchToUser(username) {
 	mStyle('dTopRight', { className: 'button', display: 'inline', h: '80%', bg, fg }, { html: `${username}` });
 	localStorage.setItem('username', username);
 	setTheme(U);
-}
-async function tableCreate(gamename, players, options) {
-	if (nundef(gamename)) gamename = "setgame";
-	if (nundef(players)) players = { mimi: userToPlayer('mimi', gamename), felix: userToPlayer('felix', gamename), amanda: userToPlayer('amanda', gamename) };
-	if (nundef(options)) options = MGetGameOptions(gamename);
-	console.log('tableCreate', gamename, players, options);
-	let me = UGetName();
-	let playerNames = [me]; console.log('me', me)
-	assertion(me in players, "_createOpenTable without owner!!!!!")
-	for (const name in players) { addIf(playerNames, name); }
-	let table = {
-		status: 'open',
-		id: generateTableId(),
-		fen: null,
-		game: gamename,
-		owner: playerNames[0],
-		friendly: generateTableName(playerNames.length, []), //MGetTableNames()),
-		players,
-		playerNames: playerNames,
-		options
-	};
-	let tid = table.id;
-	let tData = table;
-	let res = await mPhpPost('mox0', { action: 'create', tid, tData });
-	if (res.tid) {
-		console.log("Game Creation:", res.tid);
-		let data = M.tables[tid] = await tableGetDefault(res.tid); console.log(data);
-		M.tableFilenames.push(tid);
-		DA.tid = tid; DA.tData = tData;
-	} else {
-		console.log("Game Creation failed");
-		return null;
-	}
-	return table;
+
+	await forceUpdate();
 }
 async function tableGetDefault(tid = null, tData = null) {
 	if (nundef(tid)) tid = valf(DA.tid, localStorage.getItem('tid'), arrLast(Object.keys(M.tables)));
@@ -6718,6 +5781,19 @@ function uiTypeSelect(any, dParent, styles = {}, opts = {}) {
 	dselect.value = '';
 	return [d0, dselect];
 }
+function updateUserImageToBotHuman(playername, value) {
+	function doit(checked, name, val) {
+		let du = mByAttr('username', playername);
+		let img = du.getElementsByTagName('img')[0]; //du.firstChild;
+		if (checked == true) if (val == 'human') mStyle(img, { round: true }); else mStyle(img, { rounding: 2 });
+	}
+	if (isdef(value)) doit(true, 0, value); else return doit;
+}
+async function updateUserTheme() {
+	await postUserChange();
+	setUserTheme(U);
+	settingsCheck();
+}
 function userToPlayer(name, gamename, playmode = 'human') {
 	let user = MGetUser(name);
 	let pl = jsCopyExceptKeys(user, ['games']);
@@ -6737,121 +5813,4 @@ function userToPlayer(name, gamename, playmode = 'human') {
 function valf() {
 	for (const arg of arguments) if (isdef(arg)) return arg;
 	return null;
-}
-function measureElement(el) {
-  let info = window.getComputedStyle(el, null);
-  return { w: info.width, h: info.height };
-}
-function measureFieldset(fs) {
-  let legend = fs.firstChild;
-  let r = getRect(legend);
-  let labels = fs.getElementsByTagName('label');
-  let wmax = 0;
-  for (const l of labels) {
-    let r1 = getRect(l);
-    wmax = Math.max(wmax, r1.w);
-  }
-  let wt = r.w;
-  let wo = wmax + 24;
-  let diff = wt - wo;
-  if (diff >= 10) {
-    for (const l of labels) { let d = l.parentNode; mStyle(d, { maleft: diff / 2 }); }
-  }
-  let wneeded = Math.max(wt, wo) + 10;
-  mStyle(fs, { wmin: wneeded });
-  for (const l of labels) { let d = l.parentNode; mStyle(l, { display: 'inline-block', wmin: 50 }); mStyle(d, { wmin: wneeded - 40 }); }
-}
-function measureHeight(elem) { return mGetStyle(elem, 'h') }
-function measureHeightOfTextStyle(dParent, styles = {}) {
-  let d = mDom(dParent, styles, { html: 'Hql' });
-  let s = measureElement(d);
-  d.remove();
-  return firstNumber(s.h);
-}
-function measureWidth(elem) { return mGetStyle(elem, 'w') }
-function updateUserImageToBotHuman(playername, value) {
-  function doit(checked, name, val) {
-    let du = mByAttr('username', playername);
-    let img = du.getElementsByTagName('img')[0]; //du.firstChild;
-    if (checked == true) if (val == 'human') mStyle(img, { round: true }); else mStyle(img, { rounding: 2 });
-  }
-  if (isdef(value)) doit(true, 0, value); else return doit;
-}
-async function updateUserTheme() {
-  await postUserChange();
-  setUserTheme(U);
-  settingsCheck();
-}
-function getRectInt(elem, relto) {
-  if (isString(elem)) elem = document.getElementById(elem);
-  let res = elem.getBoundingClientRect();
-  if (isdef(relto)) {
-    let b2 = relto.getBoundingClientRect();
-    let b1 = res;
-    res = {
-      x: b1.x - b2.x,
-      y: b1.y - b2.y,
-      left: b1.left - b2.left,
-      top: b1.top - b2.top,
-      right: b1.right - b2.right,
-      bottom: b1.bottom - b2.bottom,
-      width: b1.width,
-      height: b1.height
-    };
-  }
-  let r4 = { x: Math.round(res.left), y: Math.round(res.top), w: Math.round(res.width), h: Math.round(res.height) };
-  extendRect(r4);
-  return r4;
-}
-function extendRect(r4) { r4.l = r4.x; r4.t = r4.y; r4.r = r4.x + r4.w; r4.b = r4.t + r4.h; }
-function mButtonX(dParent, handler = null, sz = 22, offset = 5, color = 'contrast') {
-  mIfNotRelative(dParent);
-  let bx = mDom(dParent, { position: 'absolute', top: -2 + offset, right: -5 + offset, w: sz, h: sz, cursor: 'pointer' }, { className: 'hop1' });
-  bx.onclick = ev => { evNoBubble(ev); if (!handler) dParent.remove(); else handler(ev); }
-  let o = M.superdi.xmark;
-  let bg = mGetStyle(dParent, 'bg'); if (isEmpty(bg)) bg = 'white';
-  let fg = color == 'contrast' ? colorIdealText(bg, true) : color;
-  el = mDom(bx, { fz: sz, hline: sz, family: 'fa6', fg, display: 'inline' }, { html: String.fromCharCode('0x' + o.fa6) });
-}
-function mButton(caption, handler, dParent, styles, classes, id) {
-  let x = mCreate('button');
-  x.innerHTML = caption;
-  if (isdef(handler)) x.onclick = handler;
-  if (isdef(dParent)) toElem(dParent).appendChild(x);
-  if (isdef(styles)) mStyle(x, styles);
-  if (isdef(classes)) mClass(x, classes);
-  if (isdef(id)) x.id = id;
-  return x;
-}
-function getRadioValue(prop) {
-  let fs = mBy(`d_${prop}`);
-  if (nundef(fs)) return null;
-  let val = getCheckedRadios(fs)[0];
-  return isNumber(val) ? Number(val) : val;
-}
-function getCheckedNames(dParent) {
-  let checks = Array.from(dParent.querySelectorAll('input[type="checkbox"]')); //dParent.getElementsByTagName('input'));
-  let res = [];
-  for (const ch of checks) {
-    if (ch.checked) res.push(ch.name);
-  }
-  return res;
-}
-function getCheckedRadios(rg) {
-  let inputs = rg.getElementsByTagName('INPUT');
-  let list = [];
-  for (const ch of inputs) {
-    if (ch.checked) list.push(ch.value);
-  }
-  return list;
-}
-function mByAttr(key, val) {
-  const selector = val ? `[${key}="${val}"]` : `[${key}]`;
-  let list = Array.from(document.querySelectorAll(selector));
-  return (list.length == 1) ? list[0] : list;
-}
-function mByTag(tag) { return document.getElementsByTagName(tag)[0]; }
-function allPlToPlayer(name) {
-  let allPl = DA.allPlayers[name];
-  return jsCopyExceptKeys(allPl, ['div', 'isSelected']);
 }

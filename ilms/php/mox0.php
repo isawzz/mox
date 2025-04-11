@@ -59,6 +59,18 @@ if ($data['action'] === 'deletey' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+if ($data['action'] === 'delete_dir' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $path = realpath(dirname(__DIR__,2) . '/y/' . $data['dir']);
+    // echo json_encode(["path" => $path, "msg" => 'deleted all files']); die;
+    $path = YDIR . $data['dir'];
+    $files = scandir($path);
+    $files = array_diff(scandir($path), array('.', '..')); // Exclude '.' and '..'
+    foreach ($files as $file) unlink($path . '/' . $file); 
+    echo json_encode(["files" => $files, "path" => $path, "msg" => 'deleted all files']);
+    exit;
+}
+
+
 if ($data['action'] === 'test_array' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $arr = ["users" => 1]; //, "typeConfig" => ["a" => "du"], "parsedData" => "wer", "typeParse" => "hallo"];
     arrayToYamlFile($arr, "hallo.yaml");
