@@ -1084,27 +1084,6 @@ function mToggle(ev) {
 	mStyle(t.elem, { bg: t.states[html] }, { html });
 	if (isdef(t.handler)) t.handler(key, prev, t.state);
 }
-function mToggleButton() {
-	let list = Array.from(arguments);
-	if (isEmpty(list)) return;
-	let dParent = list[0].parentNode;
-	let tb = mDom(dParent);
-	let n = list.length;
-	let i = 0;
-	for (const b of list) {
-		mAppend(tb, b);
-		b.setAttribute('idx', i++);
-		if (i < n) mStyle(b, { display: 'none' });
-	}
-	tb.onclick = ev => {
-		let idx = Number(evToAttr(ev, 'idx'));
-		let inew = (idx + 1) % n;
-		let b = list[inew];
-		list.map(x => mStyle(x, { display: 'none' }));
-		mStyle(b, { display: 'inline' });
-	}
-	return tb;
-}
 function mToggleElem(elem, key, states, seq, i, handler) {
 	if (nundef(DA.toggle)) DA.toggle = {};
 	let t = DA.toggle[key] = { handler, key, elem, state: i, states, seq };

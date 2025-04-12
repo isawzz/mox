@@ -52,20 +52,6 @@ function animatedTitle(msg = 'DU BIST DRAN!!!!!') {
 		document.title = `${corner} ${msg}`; //'⌞&amp;21543;    U+231E \0xE2Fo\u0027o Bar';
 	}, 1000);
 }
-function applyOpts(d, opts = {}) {
-	const aliases = {
-		classes: 'className',
-		inner: 'innerHTML',
-		html: 'innerHTML',
-		w: 'width',
-		h: 'height',
-	};
-	for (const opt in opts) {
-		let name = valf(aliases[opt], opt), val = opts[opt];
-		if (['style', 'tag', 'innerHTML', 'className', 'checked', 'value'].includes(name) || name.startsWith('on')) d[name] = val;
-		else d.setAttribute(name, val);
-	}
-}
 function arrChildren(elem) { return [...toElem(elem).children]; }
 function arrClear(arr) { arr.length = 0; return arr; }
 function arrCycle(arr, count) { return arrRotate(arr, count); }
@@ -2678,14 +2664,6 @@ function hToggleClassMenu(ev) {
 	mClass(elem, 'active');
 	return [prev, elem];
 }
-function handleVisibilityChange() {
-	if (DA.polling == false) return;
-	if (document.visibilityState === "hidden") {
-		pollStop();
-	} else {
-		pollResume();
-	}
-}
 function hexBoardCenters(topside, side) {
 	if (nundef(topside)) topside = 4;
 	if (nundef(side)) side = topside;
@@ -3921,42 +3899,6 @@ function playerStatCount(key, n, dParent, styles = {}, opts = {}) {
 	d.innerHTML += `<span ${isdef(opts.id) ? `id='${opts.id}'` : ''} style="font-weight:bold;color:inherit">${n}</span>`;
 	return d;
 }
-function pollChangeMs(state, ms) { DA.pollms[state] = ms; }
-function pollChangeState(newState) {
-	if (nundef(DA.pollms)) DA.pollms = { lobby: 3000, mymove: 1000, othermove: 2000 };
-	if (nundef(DA.pollCounter)) DA.pollCounter = 0;
-	DA.prevState = DA.state;
-	DA.state = newState;
-	pollResume();
-}
-async function pollResume() {
-	let ms = DA.pollms[DA.state];
-	console.log('', DA.pollCounter++, ms, DA.prevState, DA.state);
-	switch (DA.state) {
-		case 'lobby':
-			await showGamesAndTables();
-
-			TO.poll = setTimeout(pollResume, ms);
-			break;
-		case 'mymove':
-			TO.poll = setTimeout(pollResume, ms);
-			break;
-		case 'othermove':
-			TO.poll = setTimeout(pollResume, ms);
-			break;
-		default:
-			pollStop(); break;
-	}
-}
-function pollStop() {
-	if (TO.poll) { clearTimeout(TO.poll); TO.poll = null; }
-	DA.polling = false;
-}
-async function postUsers() {
-	let users = jsonToYaml(M.users);
-	let res = await mPhpPost('mox0', { action: 'savey', file: 'users', o: M.users });
-	console.log('res', res);
-}
 function qsort(arr) {
 	if (arr.length <= 1) return arr
 	let x = arr[0]
@@ -4789,75 +4731,6 @@ function showGameover(table, dParent) {
 	mDom(d, { h: 12 }, { html: '<br>' })
 	mButton('PLAY AGAIN', () => onclickTableStart(table.id), d, { className: 'button', fz: 24 });
 }
-async function showGamesAndTables() {
-	async function showGames(dParent) {
-		mText(`<h2>games</h2>`, dParent, { maleft: 12 });
-		let d = mDom(dParent, { fg: 'white' }, { id: 'game_menu' }); mCenterCenterFlex(d); //mFlexWrap(d);
-		let gamelist = DA.gamelist;
-		for (const gname of gamelist) {
-			let g = MGetGame(gname);
-			let bg = g.color;
-			let d1 = mDom(d, { cursor: 'pointer', rounding: 10, margin: 10, padding: 0, patop: 10, w: 140, height: 100, bg, position: 'relative' }, { id: g.id });
-			d1.setAttribute('gamename', gname);
-			d1.onclick = onclickGameMenuItem;
-			mCenterFlex(d1);
-			let o = M.superdi[g.logo];
-			let fg = colorIdealText(bg);
-			let el = mDom(d1, { matop: 0, mabottom: 6, fz: 65, hline: 65, family: 'emoNoto', fg, display: 'inline-block' }, { html: o.text });
-			mLinebreak(d1);
-			mDom(d1, { fz: 18, align: 'center', fg }, { html: capitalize(g.friendly) });
-		}
-	}
-	async function showTables(dParent, tables, me) {
-		mText(`<h2>tables</h2>`, dParent, { maleft: 12 });
-		if (isEmpty(tables)) { mDom(dParent, { maleft: 12, fz: 24, fg: 'blue' }, { html: 'no active game tables' }); return; }
-		let t = UI.tables = mDataTable(tables, dParent, null, ['friendly', 'game_friendly', 'playerNames'], 'tables', false);
-		mTableCommandify(t.rowitems.filter(ri => ri.o.status != 'open'), {
-			0: (item, val) => hFunc(val, 'onclickTable', item.o.id, item.id),
-		});
-		mTableStylify(t.rowitems.filter(ri => ri.o.status == 'open'), { 0: { fg: 'blue' }, });
-		let d = iDiv(t);
-		for (const ri of t.rowitems) {
-			let r = iDiv(ri);
-			let id = ri.o.id;
-			if (ri.o.prior == 1) mDom(r, {}, { tag: 'td', html: getWaitingHtml(24) });
-			if (ri.o.status == 'open') {
-				let playerNames = ri.o.playerNames;
-				if (playerNames.includes(me)) {
-					if (ri.o.owner != me) {
-						let h1 = hFunc('leave', 'onclickTableLeave', ri.o.id); let c = mAppend(r, mCreate('td')); c.innerHTML = h1;
-					}
-				} else {
-					let h1 = hFunc('join', 'onclickTableJoin', ri.o.id); let c = mAppend(r, mCreate('td')); c.innerHTML = h1;
-				}
-			}
-			if (ri.o.owner != me) continue;
-			let h = hFunc('delete', 'onclickTableDelete', id); let c = mAppend(r, mCreate('td')); c.innerHTML = h;
-			if (ri.o.status == 'open') { let h1 = hFunc('start', 'onclickTableStart', id); let c1 = mAppend(r, mCreate('td')); c1.innerHTML = h1; }
-		}
-		return tables;
-	}
-	let dParent = mBy('dTableList');
-	if (nundef(dParent)) { mClear('dMain'); dParent = mDom('dMain', {}, { className: 'section', id: 'dTableList' }); }
-	await loadTables();
-	let tables = dict2list(M.tables);
-	let me = UGetName();
-	tables.map(x => x.prior = x.status == 'open' ? 0 : x.turn.includes(me) ? 1 : x.playerNames.includes(me) ? 2 : 3);
-	sortBy(tables, 'prior');
-	tables.map(x => x.game_friendly = capitalize(MGetGameFriendly(x.game)));
-	let changes = deepCompare(DA.tableList, tables);
-	DA.tableList = tables;
-	if (changes) {
-		console.log('changes', changes)
-		mClear(dParent);
-		await showTables(dParent, tables, me);
-	} else console.log('tables: no changes', changes);
-
-	dParent = mBy('dGameList');
-	if (isdef(dParent)) { mClear(dParent); }
-	else { dParent = mDom('dMain', {}, { className: 'section', id: 'dGameList' }); }
-	await showGames(dParent);
-}
 function showImage(key, dParent, styles = {}, useSymbol = false) {
 	let o = M.superdi[key];
 	if (nundef(o)) { console.log('showImage:key not found', key); return; }
@@ -5346,6 +5219,7 @@ function stringBefore(sFull, sSub) {
 	return sFull.substring(0, idx);
 }
 async function switchToUser(username) {
+	//console.log('switching to user', arguments)
 	if (!isEmpty(username)) username = normalizeString(username);
 	if (isEmpty(username)) username = 'guest';
 	let res = await mPhpPost('mox0', { username, action: 'login' });

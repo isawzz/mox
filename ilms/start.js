@@ -15,29 +15,26 @@ async function test0_game1() {
 
 	let elems = mLayoutTM('dPage'); mStyle('dMain', { overy: 'auto' }); mCenterFlex('dMain');
 
-	mLayoutTopTestExtraMessageTitle('dTop'); mFlexV('dTop'); //mStyle('dTop', { hmin: 32 }); mStyle('dExtra', { hmin: 32 })
+	mLayoutTopTestExtraMessageTitle('dTop'); mFlexV('dTop');
 
 	let names = ['amanda', 'felix', 'lauren', 'mimi', 'gul'];
 	let d = mBy('dTestRight'); mFlexV(d);
-	for (const name of names) { let b = mDom(d, { className: 'button' }, { tag: 'button', html: name, onclick: async () => await switchToUser(name) }); }
+	for (const name of names) { let b = mDom(d, { className: 'button' }, { tag: 'button', html: name, fClick: _=>switchToUser(name) }); }
 
-	//await mSleep(rNumber(0,2000));
 	let username = rChoose(names); //['felix','lauren','diana','mimi','amanda','guest','gul']); //localStorage.getItem('username') ?? 'hans'; 
-	//if (username == 'felix') username = 'mimi'; else { username = 'felix';}
 	await switchToUser(username);
 
-	d = mBy('dTestLeft'); mFlexV(d);
-	// mDom(d, { className: 'button', bg: 'green' }, { tag: 'button', html: 'POLL', onclick: pollResume });
-	// mDom(d, { className: 'button', bg: 'red' }, { tag: 'button', html: 'STOP', onclick: pollStop });
-	let bPoll = await mKey('circle_right', d, { fz:24,cursor: 'pointer', round: true, fg: 'green' }, { onclick: pollResume });
-	let bStop = await mKey('circle_stop', d, { fz:24,cursor: 'pointer', round: true, fg: 'red' }, { onclick: pollStop });
-	// let bExpand = await mKey('circle_chevron_down', dParent, styles, { tag: 'button', onclick: expandAll });
-	// let bCollapse = await mKey('circle_chevron_up', dParent, styles, { tag: 'button', onclick: collapseAll });
-	dController = mToggleButton(bPoll, bStop);
-	mDom(d, { className: 'button' }, { tag: 'button', html: 'delete', onclick: async () => await tablesDeleteAll() });
+	sysInit();
 
-	//await showGamesAndTables();
-	pollChangeState('lobby');
+	d = mBy('dTopLeft'); mFlexV(d);
+	await showStateButtons(d);
+
+	d = mBy('dTestLeft'); mFlexV(d);
+	mDom(d, { className: 'button', maleft: 10 }, { tag: 'button', html: 'state', fClick: showState });
+	mDom(d, { className: 'button', maleft: 10 }, { tag: 'button', html: 'delete', fClick: tablesDeleteAll });
+
+	await showGamesAndTables();
+	//pollStart('lobby');
 
 
 }

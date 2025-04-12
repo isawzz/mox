@@ -1,6 +1,18 @@
 alles ist fuer immer ok - I have left this plane.
 
-___ 5:32 AM 4/11/2025 airport lib 15.4. 25000 kminv
+___ 5:02 AM 4/12/2025 airport lib 22.4. 26000 kminv
+6:59 AM 4/12/2025
+firstVisibleChild
+wie das polling gehen soll?
+ich sollte auf alle faelle alles manually ohne polling tun koennen!
+vielleicht sollte ich garnie poll stoppen? einfach nur nichts tun
+geht es wenn ich einen state und einen pollState habe?
+uiState: manual, auto(=polling)
+state: idle,busy
+pollState: on,off
+tableState: mymove,othermove,over,open
+menuState: lobby,table,
+___ 5:32 AM 4/11/2025 airport lib 22.4. 25000 kminv
 6:03 AM 4/11/2025 SLOW DOWN!!!
 - delete all tables holen und in mox0 integrieren!
 ok damit hat es sich

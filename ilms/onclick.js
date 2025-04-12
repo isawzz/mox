@@ -37,7 +37,7 @@ async function startGame(gamename, players, options) {
 function unselectPlayerItem(item) { mStyle(iDiv(item), { bg: 'transparent', fg: 'black', border: `transparent` }); }
 
 async function onclickOpenToJoinGame() {
-	pollStop();
+	sysBusy();
 	let options = collectOptions();
 	let players = collectPlayers();
 	mRemove('dGameMenu');
@@ -55,39 +55,39 @@ async function onclickOpenToJoinGame() {
 		return null;
 	}
 	//await showGamesAndTables();
-	pollResume();
+	sysIdle();
 	return table;
 	// let t = await tableCreate(DA.gamename, players, options);
 }
 async function onclickStartGame() {
-	pollStop();
+	sysBusy();
 	await saveDataFromPlayerOptionsUI(DA.gamename);
 	let options = collectOptions();
 	let players = collectPlayers();
 	let table = await startGame(DA.gamename, players, options);
-	pollResume();
+	sysIdle();
 }
 async function onclickTableStart(id) {
-	pollStop();
+	sysBusy();
 	let tData = M.tables[id];
 	if (!tData) { showMessage('table deleted!'); return await showGamesAndTables(); }
 	tData = setTableToStarted(tData);
 	let res = await mPhpPost('mox0', { action: 'savey', file: `tables/${id}`, o: tData });
 	console.log('res', res);
 	//await showGamesAndTables();
-	pollResume();
+	sysIdle();
 }
 async function onclickTable(id) {
 	showTable(id);
 }
 async function onclickTableDelete(id) {
-	pollStop();
+	sysBusy();
 	let res = await mPhpPost('mox0', { action: 'deletey', file: `tables/${id}` });
 	console.log('res', res);
-	pollResume();
+	sysIdle();
 }
 async function onclickTableJoin(id) {
-	pollStop();
+	sysBusy();
 	let tData = jsCopy(M.tables[id]);
 	let me = UGetName(); console.log('me', me)
 	assertion(tData.status == 'open', 'too late to join! game has already started!')
@@ -96,10 +96,10 @@ async function onclickTableJoin(id) {
 	tData.playerNames.push(me);
 	let res = await mPhpPost('mox0', { action: 'savey', file: `tables/${id}`, o: tData });
 	console.log('res', res);
-	pollResume();
+	sysIdle();
 }
 async function onclickTableLeave(id) {
-	pollStop();
+	sysBusy();
 	let tData = jsCopy(M.tables[id]);
 	let me = UGetName();
 	assertion(tData.status == 'open', 'too late to leave! game has already started!')
@@ -108,7 +108,7 @@ async function onclickTableLeave(id) {
 	removeInPlace(tData.playerNames, me);
 	let res = await mPhpPost('mox0', { action: 'savey', file: `tables/${id}`, o: tData });
 	console.log('res', res);
-	pollResume();
+	sysIdle();
 }
 
 
