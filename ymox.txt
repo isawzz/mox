@@ -1,5 +1,16 @@
 alles ist fuer immer ok - I have left this plane.
 
+___ 6:46 AM 4/13/2025 airport lib 22.4. 27000 kminv
+6:55 AM 4/13/2025
+- togglebutton mit label!
+
+hand_fist
+display
+
+bester plan:
+*4-6h30
+f+prog, dann vp, dann maedi, dann sarah mathe, dann kurze runde, dann aus
+toggleButton mit label!
 ___ 5:02 AM 4/12/2025 airport lib 22.4. 26000 kminv
 6:59 AM 4/12/2025
 firstVisibleChild

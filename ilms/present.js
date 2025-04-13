@@ -70,11 +70,13 @@ async function showGamesAndTables() {
 }
 async function showStateButtons(d){
 	//uiState manual or auto
-	let d1=mDom(d,{maleft:10,bg:'black',fg:'white',hpadding:4,h:24,w:84}); mFlexV(d1)
-	mDom(d1, {}, { html: 'uiState:' });
-	let bManual = DA.bManual = await mKey('hand', d1, { h:24,w:24,cursor: 'pointer', round: true }, { onclick: uiAuto });
-	let bAuto = DA.bAuto = await mKey('robot', d1, { h:24,w:24,cursor: 'pointer', round: true }, { onclick: uiManual });
-	DA.dControlUiState = mToggleButton(bAuto,bManual);
+	let styles = { rounding: 10, maleft: 10, h: 28, bg: 'black', fg: 'white', padding: 5};
+
+	let label = 'ui:';
+	DA.dControlUiState = mToggleButton(d,styles,{label,key:'hand',onclick:uiManual},{label,key:'display',onclick:uiAuto})
+
+	label = 'menu:';
+	DA.dControlUiState = mToggleButton(d,styles,{label,key:'list',onclick:menuLobby},{label,key:'round_table',onclick:menuTable})
 
 	// let bPoll = DA.bPoll = await mKey('circle_right', d, { fz:24,cursor: 'pointer', round: true, fg: 'green' }, { onclick: pollResume });
 	// let bStop = DA.bStop = await mKey('circle_stop', d, { fz:24,cursor: 'pointer', round: true, fg: 'red' }, { onclick: pollStop });

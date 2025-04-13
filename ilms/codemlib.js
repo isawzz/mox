@@ -139,7 +139,7 @@ async function mCollapse(divs, dParent, styles = {}) {
 	if (isdef(dParent)) {
 		let bExpand = await mKey('circle_chevron_down', dParent, styles, { tag: 'button', onclick: expandAll });
 		let bCollapse = await mKey('circle_chevron_up', dParent, styles, { tag: 'button', onclick: collapseAll });
-		dController = mToggleButton(bExpand, bCollapse);
+		dController = mToggleCompose(bExpand, bCollapse);
 	}
 	return { divs, dController, toggleOne, collapseOne, expandOne, isCollapsedOne, collapseAll, expandAll };
 }
@@ -275,18 +275,6 @@ function mDummyFocus() {
 	if (nundef(mBy('dummy'))) mDom(document.body, { position: 'absolute', top: 0, left: 0, opacity: 0, h: 0, w: 0, padding: 0, margin: 0, outline: 'none', border: 'none', bg: 'transparent' }, { tag: 'button', id: 'dummy', html: 'dummy' }); //addDummy(document.body); //, 'cc');
 	mBy('dummy').focus();
 }
-function mFlex(d, or = 'h') {
-	d = toElem(d);
-	d.style.display = 'flex';
-	d.style.flexFlow = (or == 'v' ? 'column' : 'row') + ' ' + (or == 'w' ? 'wrap' : 'nowrap');
-}
-function mFlexBaseline(d) { mStyle(d, { display: 'flex', 'align-items': 'baseline' }); }
-function mFlexLR(d) { mStyle(d, { display: 'flex', 'justify-content': 'space-between', 'align-items': 'center' }); }
-function mFlexLine(d, startEndCenter = 'center') { mStyle(d, { display: 'flex', 'justify-content': startEndCenter, 'align-items': 'center' }); }
-function mFlexSpacebetween(d) { mFlexLR(d); }
-function mFlexV(d) { mStyle(d, { display: 'flex', 'align-items': 'center' }); }
-function mFlexVWrap(d) { mStyle(d, { display: 'flex', 'align-items': 'center', 'flex-flow': 'row wrap' }); }
-function mFlexWrap(d) { mFlex(d, 'w'); }
 function mGather(f, d, styles = {}, opts = {}) {
 	return new Promise((resolve, _) => {
 		let dShield = mShield();

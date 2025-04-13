@@ -21,7 +21,7 @@ function sysInit() {
 async function updateState() {
 	clearTimeout(TO.system); TO.system = null;
 	await mSleep(100);
-	await showState();
+	showState();
 	TO.system = setTimeout(updateState, 1000);
 }
 function uiManual() { DA.prevUiState = DA.uiState; DA.uiState = 'manual'; }

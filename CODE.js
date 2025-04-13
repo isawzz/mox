@@ -1,4 +1,33 @@
 
+function _mFlex(d, or = 'h') {
+	d = toElem(d);
+	d.style.display = 'flex';
+	d.style.flexFlow = (or == 'v' ? 'column' : 'row') + ' ' + (or == 'w' ? 'wrap' : 'nowrap');
+}
+function _mFlexBaseline(d) { mStyle(d, { display: 'flex', 'align-items': 'baseline' }); }
+function _mFlexLR(d) { mStyle(d, { display: 'flex', 'justify-content': 'space-between', 'align-items': 'center' }); }
+function _mFlexLine(d, startEndCenter = 'center') { mStyle(d, { display: 'flex', 'justify-content': startEndCenter, 'align-items': 'center' }); }
+function _mFlexSpacebetween(d) { mFlexLR(d); }
+function _mFlexV(d) { mStyle(d, { display: 'flex', 'align-items': 'center' }); }
+function _mFlexVWrap(d) { mStyle(d, { display: 'flex', 'align-items': 'center', 'flex-flow': 'row wrap' }); }
+function _mFlexWrap(d) { mFlex(d, 'w'); }
+async function showStateButtons(d) {
+	//uiState manual or auto
+	let d1 = mDom(d, { maleft: 10, bg: 'black', fg: 'white', hpadding: 4, h: 24, w: 84 }); mFlexV(d1);
+
+
+
+
+	mDom(d1, {}, { html: 'uiState:' });
+	let bManual = DA.bManual = await mKey('hand', d1, { h: 24, w: 24, cursor: 'pointer', round: true }, { id: 'bManual', onclick: uiAuto });
+	let bAuto = DA.bAuto = await mKey('robot', d1, { h: 24, w: 24, cursor: 'pointer', round: true }, { id: 'bAuto', onclick: uiManual });
+	DA.dControlUiState = mToggleButton(bAuto, bManual);
+
+	// let bPoll = DA.bPoll = await mKey('circle_right', d, { fz:24,cursor: 'pointer', round: true, fg: 'green' }, { onclick: pollResume });
+	// let bStop = DA.bStop = await mKey('circle_stop', d, { fz:24,cursor: 'pointer', round: true, fg: 'red' }, { onclick: pollStop });
+	// dController = mToggleButton(bPoll, bStop);
+
+}
 async function test0_game1() {
 	DA.gamelist = ['setgame', 'button96']; //'accuse aristo bluff ferro fishgame fritz huti lacuna nations setgame sheriff spotit wise'; if (DA.TEST0) gamelist += ' a_game'; gamelist = toWords(gamelist);
 	DA.funcs = { setgame: setgame(), button96: button96() }; //implemented games!
@@ -26,12 +55,12 @@ async function test0_game1() {
 	d = mBy('dTestLeft'); mFlexV(d);
 	// mDom(d, { className: 'button', bg: 'green' }, { tag: 'button', html: 'POLL', onclick: pollResume });
 	// mDom(d, { className: 'button', bg: 'red' }, { tag: 'button', html: 'STOP', onclick: pollStop });
-	let bPoll = await mKey('circle_right', d, { fz:24,cursor: 'pointer', round: true, fg: 'green' }, { onclick: pollResume });
-	let bStop = await mKey('circle_stop', d, { fz:24,cursor: 'pointer', round: true, fg: 'red' }, { onclick: pollStop });
+	let bPoll = await mKey('circle_right', d, { fz: 24, cursor: 'pointer', round: true, fg: 'green' }, { onclick: pollResume });
+	let bStop = await mKey('circle_stop', d, { fz: 24, cursor: 'pointer', round: true, fg: 'red' }, { onclick: pollStop });
 	// let bExpand = await mKey('circle_chevron_down', dParent, styles, { tag: 'button', onclick: expandAll });
 	// let bCollapse = await mKey('circle_chevron_up', dParent, styles, { tag: 'button', onclick: collapseAll });
 	dController = mToggleButton(bPoll, bStop);
-	mDom(d, { className: 'button', maleft:10 }, { tag: 'button', html: 'delete', onclick: async () => await tablesDeleteAll() });
+	mDom(d, { className: 'button', maleft: 10 }, { tag: 'button', html: 'delete', onclick: async () => await tablesDeleteAll() });
 
 	//await showGamesAndTables();
 	//pollChangeState('lobby');
@@ -143,26 +172,26 @@ async function onsockTables(x) {
 		if (nundef(exists)) { Tid = T = null; await switchToMenu(UI.nav, 'play'); }
 	}
 }
-function sockInit(port='3000') {
-  let type = detectSessionType();
-  let server = type == 'live'? `http://localhost:${port}` : type == 'fastcomet'? `https://moxito.online:${port}` : null;//getServer(); //getServerurl();
-  console.log('::sockInit:', type, server); return;
-  if (!server){  console.log('::sockInit: NO SOCKETS!!!', type, server); return;}
+function sockInit(port = '3000') {
+	let type = detectSessionType();
+	let server = type == 'live' ? `http://localhost:${port}` : type == 'fastcomet' ? `https://moxito.online:${port}` : null;//getServer(); //getServerurl();
+	console.log('::sockInit:', type, server); return;
+	if (!server) { console.log('::sockInit: NO SOCKETS!!!', type, server); return; }
 
-  Socket = io(server);
-  Socket.on('disconnect', x => console.log('::io disconnect:', x));
-  Socket.on('connection', x => console.log('::io connect:', x));
-  // Socket.on('config', onsockConfig);
-  // Socket.on('event', onsockEvent);
-  Socket.on('message', o=>console.log('message',o)); //showChatMessage);
-  // Socket.on('merged', onsockMerged);
-  // Socket.on('pending', onsockPending);
-  // Socket.on('table', onsockTable);
-  // Socket.on('tables', onsockTables);
-  // Socket.on('superdi', onsockSuperdi);
+	Socket = io(server);
+	Socket.on('disconnect', x => console.log('::io disconnect:', x));
+	Socket.on('connection', x => console.log('::io connect:', x));
+	// Socket.on('config', onsockConfig);
+	// Socket.on('event', onsockEvent);
+	Socket.on('message', o => console.log('message', o)); //showChatMessage);
+	// Socket.on('merged', onsockMerged);
+	// Socket.on('pending', onsockPending);
+	// Socket.on('table', onsockTable);
+	// Socket.on('tables', onsockTables);
+	// Socket.on('superdi', onsockSuperdi);
 }
 function sockPostUserChange(oldname, newname) {
-  Socket.emit('userChange', { oldname, newname });
+	Socket.emit('userChange', { oldname, newname });
 }
 async function mPhpGetFiles(dir, projectName = 'ilms', verbose = false, jsonResult = true) {
 	let server = getServer();
