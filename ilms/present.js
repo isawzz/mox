@@ -68,21 +68,33 @@ async function showGamesAndTables() {
 	else { dParent = mDom('dMain', {}, { className: 'section', id: 'dGameList' }); }
 	await showGames(dParent);
 }
-async function showStateButtons(d){
+async function showStateButtons(d) {
 	//uiState manual or auto
-	let styles = { rounding: 10, maleft: 10, h: 28, bg: 'black', fg: 'white', padding: 5};
+	let styles = { rounding: 6, maleft: 10, h: 24, bg: 'dimgray', fg: 'white', padding: 5 };
 
 	let label = 'ui:';
-	DA.dControlUiState = mToggleButton(d,styles,{label,key:'hand',onclick:uiManual},{label,key:'display',onclick:uiAuto})
+	DA.dControlUiState = mToggleButton(d, styles, { label, key: 'hand', onclick: uiManual }, { label, key: 'display', onclick: uiAuto })
 
 	label = 'menu:';
-	DA.dControlUiState = mToggleButton(d,styles,{label,key:'list',onclick:menuLobby},{label,key:'round_table',onclick:menuTable})
+	DA.dControlUiState = mToggleButton(d, styles, { label, key: 'list', onclick: menuLobby }, { label, key: 'round_table', onclick: menuTable })
 
-	// let bPoll = DA.bPoll = await mKey('circle_right', d, { fz:24,cursor: 'pointer', round: true, fg: 'green' }, { onclick: pollResume });
-	// let bStop = DA.bStop = await mKey('circle_stop', d, { fz:24,cursor: 'pointer', round: true, fg: 'red' }, { onclick: pollStop });
-	// dController = mToggleButton(bPoll, bStop);
+	label = 'table:';
+	DA.dControlUiState = mToggleButton(d, styles,
+		{ label: `${label} none`, key: null, onclick: tableNone },
+		{ label: `${label} open`, key: null, onclick: tableOpen },
+		{ label: `${label} me`, key: null, onclick: tableMyMove },
+		{ label: `${label} wait`, key: null, onclick: tableOtherMove },
+		{ label: `${label} over`, key: null, onclick: tableGameover },
+	);
+	label = 'system:';
+	DA.dControlUiState = mToggleButton(d, styles,
+		{ label: `${label} idle`, key: null, onclick: sysIdle },
+		{ label: `${label} busy`, key: null, onclick: sysBusy },
+		{ label: `${label} polling`, key: null, onclick: sysPolling },
+	);
 
 }
-function showState(){
-	console.log('uiState:',DA.uiState,firstVisibleChild(DA.dControlUiState).innerHTML);
+function showState() {
+	
+	console.log('uiState:', DA.uiState, firstVisibleChild(DA.dControlUiState).innerHTML);
 }

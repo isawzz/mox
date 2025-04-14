@@ -11,12 +11,12 @@ function sysInit() {
 	DA.evList = [];
 	DA.pollms = { lobby: 3000, table: { myMove: 1000, otherMove: 2000 } };
 	DA.pollCounter = 0;
-	menuLobby();
-	tableNone();
-	sysIdle();
-	uiManual();
-	clearTimeout(TO.poll); TO.poll = null;
-	clearTimeout(TO.system); TO.system = null;
+	// menuLobby();
+	// tableNone();
+	// sysIdle();
+	// uiManual();
+	// clearTimeout(TO.poll); TO.poll = null;
+	// clearTimeout(TO.system); TO.system = null;
 }
 async function updateState() {
 	clearTimeout(TO.system); TO.system = null;

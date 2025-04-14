@@ -1,4 +1,88 @@
 
+async function mToggleButton(dParent, styles = {}) {
+	addKeys({ display: 'flex', wrap: 'wrap', aitems: 'center' }, styles)
+	let d1 = mDom(dParent, styles);
+	let list = Array.from(arguments).slice(2);
+	let buttons = [];
+	let style = { className: 'no_select', display: 'flex', 'flex-wrap': 'nowrap', aitems: 'center', cursor: 'pointer' };
+
+	let words = list.map(x => x.label);
+	let hasKey = list.some(x => x.key);
+	let w = getMaxWordWidth(words, d1) + (hasKey ? styles.h * 1.35+2 : 10); console.log(w);
+	mStyle(d1, { w });
+
+	for (const l of list) {
+
+		let b = mDom(d1, style, { onclick: l.onclick });
+		mDom(b, { maright: 6, 'white-space': 'nowrap' }, { html: l.label });
+		if (l.key) await mKey(l.key, b, { h: styles.h, w: styles.h, fz: styles.h }); //:fz:valf(styles.h,50) });
+
+		// let dAuto = mDom(d1,{ cursor: 'pointer'}, { onclick: uiAuto });	
+		// mDom(dAuto, {}, { html: 'uiState:' });
+		// await mKey('display', dAuto,{sz:24});
+
+		buttons.push(b);
+
+	}
+
+	return mToggleCompose(...buttons);
+
+}
+function mToggleCompose() {
+	let list = Array.from(arguments);
+	if (isEmpty(list)) return;
+	let dParent = list[0].parentNode;
+	let tb = mDom(dParent);
+	let n = list.length;
+	let i = 0;
+	for (const b of list) {
+		mAppend(tb, b);
+		b.setAttribute('idx', i++);
+		if (i < n) mStyle(b, { display: 'none' });
+	}
+	tb.onclick = ev => {
+		let idx = Number(evToAttr(ev, 'idx'));
+		let inew = (idx + 1) % n;
+		let b = list[inew];
+		list.map(x => mStyle(x, { display: 'none' }));
+		mStyle(b, { display: 'flex' });
+	}
+	return tb;
+}
+async function postUsers() {
+	let users = jsonToYaml(M.users);
+	let res = await mPhpPost('mox0', { action: 'savey', file: 'users', o: M.users });
+	console.log('res', res);
+}
+function firstVisibleChild(div) {
+	if (!div || !div.children) return null;
+
+	for (const child of div.children) {
+		const style = window.getComputedStyle(child);
+		if (style.display !== 'none') {
+			return child;
+		}
+	}
+
+	return null; // if none are visible
+}
+function presentStandardBGA() {
+  let dTable = mDom('dMain');
+  mClass('dPage', 'wood');
+  let [dOben, dOpenTable, dMiddle, dRechts] = tableLayoutMR(dTable); mFlexWrap(dOpenTable)
+  mDom(dRechts, {}, { id: 'dStats' });
+}
+function presentStandardRoundTable() {
+  d = mDom('dMain'); mCenterFlex(d);
+  mDom(d, { className: 'instruction' }, { id: 'dInstruction' }); mLinebreak(d); // instruction
+  mDom(d, {}, { id: 'dStats' }); mLinebreak(d);
+  let minTableSize = 400;
+  let dTable = mDom(d, { hmin: minTableSize, wmin: minTableSize, margin: 20, round: true, className: 'wood' }, { id: 'dTable' });
+  mCenterCenter(dTable);
+}
+function name2id(name) { return 'd_' + name.split(' ').join('_'); }
+function isMyTurn(table) { return table.turn.includes(UGetName()) }
+
 function applyOpts(d, opts = {}) {
 	const aliases = {
 		classes: 'className',

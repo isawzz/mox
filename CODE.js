@@ -1,4 +1,47 @@
 
+async function mToggleButton(dParent, styles = {}) {
+	addKeys({ display: 'flex', wrap: 'wrap', aitems: 'center' }, styles)
+	let d1 = mDom(dParent, styles);
+	let list = Array.from(arguments).slice(2);
+	let buttons = [];
+	let style = { hpadding: 4, display: 'flex', 'flex-wrap': 'nowrap', 'align-items': 'center', cursor: 'pointer' };
+	for (const l of list) {
+		let b = mDom(d1, style, { onclick: l.onclick });
+		mDom(b, { maright: 6 }, { html: l.label });
+		if (l.key) await mKey(l.key, b, { h: styles.h, fz: styles.h }); //:fz:valf(styles.h,50) });
+		buttons.push(b);
+	}
+	return mToggleCompose(...buttons);
+}
+async function mToggleButton(dParent,styles={}) {
+	addKeys({display: 'flex', wrap: 'wrap', aitems: 'center' },styles)
+	let d1 = mDom(dParent, styles); 
+	let list = Array.from(arguments).slice(2);
+	let buttons = [];
+	let style = { display: 'flex', 'flex-wrap':'nowrap', aitems: 'center', cursor: 'pointer' };
+
+	let words = list.map(x => x.label);
+	let w = getMaxWordWidth(words, d1) + styles.h*1.25 +2; console.log(w);
+	mStyle(d1, { w });
+
+	for (const l of list) {
+
+		let b = mDom(d1, style, { onclick: l.onclick });
+		mDom(b, {maright:6}, { html: l.label });
+		await mKey(l.key, b, { h:styles.h,w:styles.h,fz:styles.h }); //:fz:valf(styles.h,50) });
+
+		// let dAuto = mDom(d1,{ cursor: 'pointer'}, { onclick: uiAuto });	
+		// mDom(dAuto, {}, { html: 'uiState:' });
+		// await mKey('display', dAuto,{sz:24});
+
+		buttons.push(b);
+
+	}
+
+	return mToggleCompose(...buttons);
+
+}
+
 function _mFlex(d, or = 'h') {
 	d = toElem(d);
 	d.style.display = 'flex';
