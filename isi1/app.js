@@ -1,8 +1,15 @@
-let gameState = null;
+let gameState = {
+  message: "Initial state",
+  version: 0,
+  claimed_sets: [],
+  scores: {}
+};
 
 const backendURL = 'http://localhost:8080/mox/isi/backend';
+let pollCounter = 0;
 
 function pollState() {
+  //console.log('',pollCounter++,"Polling state...");
   fetch(`${backendURL}/get_state.php`)
     .then(res => res.json())
     .then(state => {
@@ -10,6 +17,14 @@ function pollState() {
         gameState = state;
         updateUI();
       }
+    });
+}
+function pollStateTest() {
+  fetch('http://localhost:8080/mox/isi/backend/get_state.php')
+    .then(res => res.json())
+    .then(state => {
+      gameState = state;
+      console.log("Polled state:", gameState);
     });
 }
 
@@ -31,16 +46,28 @@ function claimSet(selectedCards, playerName) {
     return;
   }
 
-  gameState.claimed_sets.push({
-    set: selectedCards,
-    player: playerName,
-    time: Date.now()
-  });
-  gameState.scores[playerName] = (gameState.scores[playerName] || 0) + 1;
+  const move = {
+    version: gameState.version,
+    claimed_set: selectedCards,
+    player: playerName
+  };
 
-  saveState();
-  updateUI();
+  fetch(`${backendURL}/claim_set.php`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(move)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      console.log("Set claimed!");
+      pollState(); // Refresh local state
+    } else {
+      alert("Move rejected (likely too late).");
+    }
+  });
 }
+
 
 function isAlreadyClaimed(selected) {
   return gameState.claimed_sets.some(claimed => 
@@ -62,16 +89,15 @@ function generateDeck() {
   return Array.from({ length: 81 }, (_, i) => 'card' + (i + 1));
 }
 
-function initializeGameIfNeeded() {
-  if (!gameState) {
-    gameState = {
-      cards: generateDeck().slice(0, 12),
-      claimed_sets: [],
-      scores: {}
-    };
+document.addEventListener('DOMContentLoaded', ev => {
+  const button = document.getElementById('testButton');
+  button.addEventListener('click', () => {
+    gameState.message = "Updated at " + new Date().toLocaleTimeString();
+    
+    // 💾 Send the updated game state to the server
     saveState();
-  }
-}
+  });
 
-setInterval(pollState, 1500);
-initializeGameIfNeeded();
+  // Optional: Start polling if you want
+  setInterval(pollState, 1500);
+});
