@@ -5,7 +5,8 @@ let gameState = {
   scores: {}
 };
 
-const backendURL = 'http://localhost:8080/mox/isi/backend';
+//const backendURL = 'http://localhost:8080/mox/isi/backend';
+const backendURL = 'https://moxito.online/mox/isi/backend';
 let pollCounter = 0;
 
 function pollState() {

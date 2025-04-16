@@ -3,7 +3,7 @@ onload = start;
 async function start() { mlib_ilms(); } //project_ilms(); }//return;mlib_p5();return;project_p5(); }
 
 async function mlib_ilms(){
-	codePackMLib('../ilms',['codebig','done','onclick','bau1','bau2','bau3','bau4']);
+	codePackMLib('../ilms',['access_globals','codefull','codemlib','done','onclick','polling','present','bau1','bau2','bau3']);
 }
 async function project_ilms(){
 	codePackClosure('../ilms',['codefull','codemlib','done','onclick','bau1','bau2','bau3','bau4','start'],['test4_game0']);
