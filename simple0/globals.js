@@ -83,6 +83,7 @@ var UID = 0;
 var UIDCounter = 0;
 var UIROOT;
 var Username;
+var VERBOSE = false;
 var Z = {};
 var Zones = {};
 

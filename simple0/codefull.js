@@ -3554,7 +3554,7 @@ async function onclickOpenToJoinGame() {
 	let table = createOpenTable(DA.gamename, players, options);
 	let tid = table.id;
 	let tData = table;
-	let res = await mPhpPost('mox0', { action: 'create', tid, tData });
+	let res = await mPhpPost('simple0', { action: 'create', tid, tData });
 	if (res.tid) {
 		console.log("Game Creation:", res.tid);
 		let data = M.tables[tid] = await tableGetDefault(res.tid); console.log(data);
@@ -3792,7 +3792,7 @@ async function onclickTable(id) {
 }
 async function onclickTableDelete(id) {
 	sysBusy();
-	let res = await mPhpPost('mox0', { action: 'deletey', file: `tables/${id}` });
+	let res = await mPhpPost('simple0', { action: 'deletey', file: `tables/${id}` });
 	console.log('res', res);
 	sysIdle();
 }
@@ -3804,7 +3804,7 @@ async function onclickTableJoin(id) {
 	assertion(!tData.playerNames.includes(me), `${me} already joined!!!`);
 	tData.players[me] = createGamePlayer(me, tData.game);
 	tData.playerNames.push(me);
-	let res = await mPhpPost('mox0', { action: 'savey', file: `tables/${id}`, o: tData });
+	let res = await mPhpPost('simple0', { action: 'savey', file: `tables/${id}`, o: tData });
 	console.log('res', res);
 	sysIdle();
 }
@@ -3816,7 +3816,7 @@ async function onclickTableLeave(id) {
 	assertion(tData.playerNames.includes(me), `${me} NOT in joined players!!!!`);
 	delete tData.players[me];
 	removeInPlace(tData.playerNames, me);
-	let res = await mPhpPost('mox0', { action: 'savey', file: `tables/${id}`, o: tData });
+	let res = await mPhpPost('simple0', { action: 'savey', file: `tables/${id}`, o: tData });
 	console.log('res', res);
 	sysIdle();
 }
@@ -3837,7 +3837,7 @@ async function onclickTableStart(id) {
 	let tData = M.tables[id];
 	if (!tData) { showMessage('table deleted!'); return await showGamesAndTables(); }
 	tData = setTableToStarted(tData);
-	let res = await mPhpPost('mox0', { action: 'savey', file: `tables/${id}`, o: tData });
+	let res = await mPhpPost('simple0', { action: 'savey', file: `tables/${id}`, o: tData });
 	console.log('res', res);
 	sysIdle();
 }
@@ -4115,7 +4115,7 @@ function pollStop() {
 }
 async function postUsers() {
 	let users = jsonToYaml(M.users);
-	let res = await mPhpPost('mox0', { action: 'savey', file: 'users', o: M.users });
+	let res = await mPhpPost('simple0', { action: 'savey', file: 'users', o: M.users });
 	console.log('res', res);
 }
 function presentStandardBGA() {
@@ -5528,7 +5528,7 @@ async function startGame(gamename, players, options) {
 	table = setTableToStarted(table);
 	let tid = table.id;
 	let tData = table;
-	let res = await mPhpPost('mox0', { action: 'create', tid, tData });
+	let res = await mPhpPost('simple0', { action: 'create', tid, tData });
 	if (res.tid) {
 		console.log("Game Creation:", res.tid);
 		let data = M.tables[tid] = await tableGetDefault(res.tid); console.log(data);
@@ -5567,7 +5567,7 @@ function stringBefore(sFull, sSub) {
 async function switchToUser(username) {
 	if (!isEmpty(username)) username = normalizeString(username);
 	if (isEmpty(username)) username = 'guest';
-	let res = await mPhpPost('mox0', { username, action: 'login' });
+	let res = await mPhpPost('simple0', { username, action: 'login' });
 	U = res.userdata;
 	DA.tid = localStorage.getItem('tid');
 	let bg = U.color;
@@ -5619,7 +5619,7 @@ function tablePresent(tData) {
 	mDom('dMain', { bg: 'white', fg: 'black' }, { tag: 'pre', html: jsonToYaml(tData) });
 }
 async function tablesDeleteAll() {
-	let res = await mPhpPost('mox0', { action: 'delete_dir', dir: 'tables' });
+	let res = await mPhpPost('simple0', { action: 'delete_dir', dir: 'tables' });
 	console.log('res', res);
 	DA.tid = null;
 	DA.tData = null;

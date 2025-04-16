@@ -298,7 +298,7 @@ function mGather(f, d, styles = {}, opts = {}) {
 	});
 }
 async function mGetFilenames(dir) {
-	let res = await mPhpPost('mox0', { action: 'dir', dir });
+	let res = await mPhpPost('all', { action: 'dir', dir });
 	return res.dir.filter(x => x != '.' && x != '..');
 }
 function mGetStyle(elem, prop) {
@@ -708,7 +708,7 @@ async function mPalette(dParent, src, showPal = true, showImg = false) {
 	return palette;
 }
 async function mPhpDeleteFile(path) { return await mPhpGet('delete_file', { path }); }
-async function mPhpGet(cmd, o, projectName = 'ilms', verbose = false, jsonResult = true) {
+async function mPhpGet(cmd, o, projectName = 'simple0', verbose = false, jsonResult = true) {
 	let server = getServer();
 	let suffix = '';
 	for (const k in o) {
@@ -749,7 +749,7 @@ async function mPhpGet(cmd, o, projectName = 'ilms', verbose = false, jsonResult
 	}
 }
 async function mPhpGetFile(path) { return await mPhpPost('read_file', { path }, false); }
-async function mPhpPost(cmd, o, projectName = 'ilms', verbose = false, jsonResult = true) {
+async function mPhpPost(cmd, o, projectName = 'simple0', verbose = false, jsonResult = true) {
 	let server = getServer('php');
 	if (isdef(o.path) && (o.path.startsWith('zdata') || o.path.startsWith('y'))) o.path = '../../' + o.path;
 	if (verbose) console.log('to php:', server + `${projectName}/php/${cmd}.php`, o);
@@ -784,10 +784,10 @@ async function mPhpPost(cmd, o, projectName = 'ilms', verbose = false, jsonResul
 		return isString(text) ? text : e;
 	}
 }
-async function mPhpPostAudio(url, path, projectName = 'ilms', verbose = true) { return await mPhpPost('dl', { url, path }); }
-async function mPhpPostFile(text, path, projectName = 'ilms', verbose = true) { return await mPhpPost('write_file', { text, path }, projectName, verbose); }
-async function mPhpPostLine(line, path, projectName = 'ilms', verbose = true) { return await mPhpPost('append_action', { line, path }, false); }
-async function mPhpPostText(text, path, projectName = 'ilms', verbose = true) { return await mPhpPost('append_text', { text, path }, false); }
+async function mPhpPostAudio(url, path, projectName = 'simple0', verbose = true) { return await mPhpPost('dl', { url, path }); }
+async function mPhpPostFile(text, path, projectName = 'simple0', verbose = true) { return await mPhpPost('write_file', { text, path }, projectName, verbose); }
+async function mPhpPostLine(line, path, projectName = 'simple0', verbose = true) { return await mPhpPost('append_action', { line, path }, false); }
+async function mPhpPostText(text, path, projectName = 'simple0', verbose = true) { return await mPhpPost('append_text', { text, path }, false); }
 function mPickOneOfGrid(dParent, styles = {}, opts = {}) {
 	let d0 = mDom(dParent, dictMerge(styles, { gap: 6 }), opts);
 	mGrid(d0);
