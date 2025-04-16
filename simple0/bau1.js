@@ -16,7 +16,15 @@ async function DAInit(){
 	if (VERBOSE) console.log('backendURL', DA.backendURL);
 	DA.pollCounter = 0;
 }
-async function DASaveState(){
+async function DASaveState(state){
+	if (isdef(state)) DA.gameState = state;
+  let res = await fetch(`${DA.backendURL}/save_state.php`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(DA.gameState)
+  });
+	let data = res.json();
 
+	return data;
 }
 

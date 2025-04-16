@@ -1,22 +1,15 @@
 onload = start; VERBOSE = true;
 
-async function start() { await test0_get_state(); }
+async function start() { await test0_save_state(); }
 
 async function test0_save_state() {
-	DA.backendURL = getServer(true)  + 'simple0/php'; //'https://moxito.online/mox/simple0/php';
-	console.log('backendURL', DA.backendURL);
-	DA.pollCounter = 0;
+	await DAInit();
+	let state = await DAGetState(); console.log('vorher', jsCopy(state));
 
-  await fetch(`${backendURL}/save_state.php`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(DA.gameState)
-  })
-  .then(res => res.json())
-  .then(data => console.log("Saved:", data))
-  .catch(err => console.error("Save error:", err));
+	state.hallo = {word:'random'};
 
-	console.log('DONE!')
+	let res = await DASaveState(state); console.log('nachher', res);
+
 }	
 async function test0_get_state() {
 
