@@ -1,6 +1,11 @@
 alles ist fuer immer ok - I have left this plane.
 
 ___ 5:11 AM 4/17/2025 airport lib 22.4. 33000
+ich koennt ein poll&show machen
+choices:
+=>1. MPoll... holt nur die daten und updated M
+2. MPoll macht auch ein updateUI
+MGet... MPoll... MSet DAGet... DAPoll... DASet... UPoll... USet... UGet..
 wie geh ich zu ilms zurueck ohne game zu disturben?
 wieviel soll setgame sein?
 set darstellen!

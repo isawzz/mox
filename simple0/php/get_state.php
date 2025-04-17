@@ -7,7 +7,7 @@ if (!file_exists($stateFile)) {
     'version' => 0,
     'last_modified' => time()
   ];
-  file_put_contents($stateFile, json_encode($initial));
+  arrayToYamlFile($initial, $stateFile); //file_put_contents($stateFile, json_encode($initial));
 }
 header('Content-Type: application/json');
-echo file_get_contents($stateFile);
+echo json_encode(yamlFileToArray($stateFile)); //file_get_contents($stateFile);

@@ -15,9 +15,18 @@ define('CONFIG_READ', dirname(__DIR__,2) . '/y/config.yaml');
 define('CONFIG_WRITE', 'hallo.yaml'); 
 define('YDIR', dirname(__DIR__,2) . '/y/'); 
 
-$stateFile = __DIR__ . '/../../y/state.json';
+$stateFile = __DIR__ . '/../../y/state.yaml';
 
 if (!is_dir(GAME_DIR)) mkdir(GAME_DIR, 0777, true);
+
+function arrayToYamlFile(array $data, string $file) {
+	// file_put_contents($file, "hallo"); //arrayToYaml($array));
+	// file_put_contents($file, Yaml::dump($array)); //, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+	file_put_contents($file, Yaml::dump($data, 4, 2, Yaml::DUMP_OBJECT_AS_MAP)); //Yaml::dump($array,2,0,Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+}
+function yamlFileToArray(string $file) {
+	return Yaml::parse(file_get_contents($file));
+}
 
 // #region general functions
 function randomColor() {
@@ -41,11 +50,6 @@ function arrayToObject(array $array) {
 }
 function arrayToYaml(array $array) {
 	return Yaml::dump($array, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
-}
-function arrayToYamlFile(array $data, string $file) {
-	// file_put_contents($file, "hallo"); //arrayToYaml($array));
-	// file_put_contents($file, Yaml::dump($array)); //, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
-	file_put_contents($file, Yaml::dump($data, 4, 2, Yaml::DUMP_OBJECT_AS_MAP)); //Yaml::dump($array,2,0,Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
 }
 
 function jsonToYaml(string $json): string {
@@ -93,9 +97,6 @@ function yamlToObject(string $yaml) {
 }
 function yamlToJsonFile(string $yaml, string $file) {
 	file_put_contents($file, yamlToJson($yaml));
-}
-function yamlFileToArray(string $file) {
-	return Yaml::parse(file_get_contents($file));
 }
 function yamlFileToJson(string $file) {
 	return yamlToJson(file_get_contents($file));

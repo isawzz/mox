@@ -1,0 +1,31 @@
+status: open
+id: Glpfa5TPmekqU
+fen: null
+game: setgame
+owner: mimi
+friendly: soiree_in_Madrid
+players:
+  mimi:
+    name: mimi
+    color: '#ffe4e1'
+    texture: ../assets/textures/marble_rosa.jpeg
+    blendMode: normal
+    imgKey: mimi
+    level: 1
+    playmode: human
+  guest:
+    name: guest
+    color: '#002e63'
+    texture: ../assets/textures/marble_blue1.jpeg
+    imgKey: stellers_jay
+    blendMode: normal
+    bg: '#55bc41'
+    level: 7
+    playmode: human
+playerNames:
+  - mimi
+  - guest
+options:
+  use_level: 'yes'
+  numCards: 12
+  gamemode: multi
