@@ -1,6 +1,14 @@
 alles ist fuer immer ok - I have left this plane.
 
-___ 4:21 AM 4/16/2025 airport lib 22.4. 31000
+___ 5:11 AM 4/17/2025 airport lib 22.4. 33000
+wie geh ich zu ilms zurueck ohne game zu disturben?
+wieviel soll setgame sein?
+set darstellen!
+arrayToYamlFile($o, $path);
+$users = yamlFileToArray(USERS_READ);
+- hol wieder das andere
+- geige spielen
+___ 4:21 AM 4/16/2025 airport lib 22.4. 31000 xa
 ok - phptest geht!
 was will ich jetzt machen? alles ist moeglich!
 billa plus vanillemilch und milch, himbeersaft

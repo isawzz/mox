@@ -5567,7 +5567,7 @@ function stringBefore(sFull, sSub) {
 async function switchToUser(username) {
 	if (!isEmpty(username)) username = normalizeString(username);
 	if (isEmpty(username)) username = 'guest';
-	let res = await mPhpPost('simple0', { username, action: 'login' });
+	let res = await mPhpPost('all', { username, action: 'login' });
 	U = res.userdata;
 	DA.tid = localStorage.getItem('tid');
 	let bg = U.color;
