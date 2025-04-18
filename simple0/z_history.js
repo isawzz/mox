@@ -1,3 +1,26 @@
+function onclickStopwatch(ev) {
+	let [prevElem, elem] = hToggleClassMenu(ev);
+	if (prevElem == elem) {console.log('same!!!');return;}
+	console.log('different',prevElem,elem); return;
+	p5ClearAll();
+	let d0 = mDom(dMain);
+	let styles = { fz: 50, hpadding: 10, rounding: 10, wmax: 260, margin: 10, align: 'center', hline: 50, 'user-select': 'none' };
+	let d = mDom(d0, styles);
+	DA.stopwatch = createStopwatch(d);
+	let r = getRect(DA.stopwatch.elem); let left = r.w / 2 - 110;
+	let dBlinker = mDom(d0, { position: 'absolute', top: 0, left, w: 20, h: 20, rounding: 10 }, { id: 'dBlinker' });
+	copyKeys({ h: 50, fz: 40 }, styles);
+	let a = DA.action;
+	for (const action of ['prog', 'violin', 'move', 'piano', 'math', 'hut', 'agfa', 'hprog']) {
+		let d1 = mKey(action, d0, styles, { prefer: 'plain', onclick: onclickAction, menu: 'main' });
+		if (a && a.key == key) {
+			if (isdef(a.from)) {
+				let from = new Date(DA.from);
+			}
+			DA.action = { elem: d1, key: action, status: 'started' };
+		}
+	}
+}
 async function showTable(id) {
 	let me = UGetName();
 	let tid = valf(id, DA.tid);

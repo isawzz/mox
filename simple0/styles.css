@@ -242,6 +242,26 @@ button:active {
   z-index: 100000;
 }
 
+.vert_align {
+  display: flex;
+  align-items: center;
+  /* Vertical alignment */
+  justify-content: center;
+  /* Optional: horizontal alignment */
+  /* Or any fixed height */
+}
+.vert_align_button {
+  padding: 4px 10px;
+  cursor:'pointer';
+  background-color: 'beige';
+  display: flex;
+  align-items: center;
+  /* Vertical alignment */
+  justify-content: center;
+  /* Optional: horizontal alignment */
+  /* Or any fixed height */
+}
+
 /*#region hex zeug*/
 .hex_NO::after {
   content: "";

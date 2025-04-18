@@ -4,12 +4,26 @@ async function start() { await test0_game0(); }
 
 async function test0_game0() {
 	await DAInit(true);
+	let isTest = true;
 	
-	//await switchToMenu('games');
-	let d = mBy('dTopLeft');
-	let d1 = mKey('watch', d, {}, { onclick: onclickStopwatch, menu: 'top' });
-	let d2 = mKey('game', d, {}, { onclick: onclickResetActions, menu: 'top' });
+	//if (isTest) await showTestButtons();
+	// await showMenuButtons();
 
+	//await switchToMenu('games');
+	let styles = { className: 'vert_align_button', rounding: 10 };
+	let d = mBy('dTopLeft'); mFlex(d); mStyle(d,{padding:10,gap:10}) //mClass(d,'flex')
+	let d0 = mDom(d, styles, { html:'game',onclick: onclickTest, menu: 'top' }); return;
+	let d1 = mKey('watch', d, styles, { onclick: onclickTest, menu: 'top' });
+	// let d2 = mKey('game', d, {cursor:'pointer',h100:true}, { onclick: onclickTest, menu: 'top' });
+
+	let username = localStorage.getItem('username') ?? 'hans';
+	if (isTest) {
+		let names = ['amanda', 'felix', 'lauren', 'mimi', 'gul'];
+		let d = mBy('dTestRight'); mFlex(d);
+		for (const name of names) { let b = mDom(d, { className: 'button' }, { tag: 'button', html: name, onclick: async(ev) => await switchToUser(name) }); }
+		username = rChoose(names); //['felix','lauren','diana','mimi','amanda','guest','gul']); //localStorage.getItem('username') ?? 'hans'; 
+	}
+	await switchToUser(username);
 
 	//showTestButtons();
 

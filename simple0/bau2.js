@@ -1,4 +1,10 @@
 
+async function onclickTest(ev){
+	let [prevElem, elem] = hToggleClassMenu(ev);
+	if (prevElem == elem) {console.log('same!!!');return;}
+	console.log('different',prevElem,elem); 
+
+}
 async function pollAndShow() {
 
   if (DA.menu == 'games') {
