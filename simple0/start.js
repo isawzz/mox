@@ -4,11 +4,19 @@ async function start() { await test0_game0(); }
 
 async function test0_game0() {
 	await DAInit(true);
+	
+	//await switchToMenu('games');
+	let d = mBy('dTopLeft');
+	let d1 = mKey('watch', d, {}, { onclick: onclickStopwatch, menu: 'top' });
+	let d2 = mKey('game', d, {}, { onclick: onclickResetActions, menu: 'top' });
+
+
+	//showTestButtons();
 
 }	
 async function test0_save_state() {
 	await DAInit(true);
-	let state = await DAGetState(); //console.log('vorher', jsCopy(state));
+	let state = await showTable(); //console.log('vorher', jsCopy(state));
 
 	state.num = rNumber();
 
@@ -18,7 +26,7 @@ async function test0_save_state() {
 async function test0_get_state() {
 
 	await DAInit();
-	let state = await DAGetState();
+	let state = await showTable();
 
 	console.log('DONE!',state);
 }	

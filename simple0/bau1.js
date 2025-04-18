@@ -1,5 +1,69 @@
+async function DAInit(isTest = false) {
+	if (isTest) VERBOSE = true;
+	DA.backendURL = getServer(true) + 'simple0/php'; //'https://moxito.online/mox/simple0/php';
+	if (VERBOSE) console.log('backendURL', DA.backendURL);
+	DA.gamelist = ['setgame', 'button96']; //'accuse aristo bluff ferro fishgame fritz huti lacuna nations setgame sheriff spotit wise'; if (DA.TEST0) gamelist += ' a_game'; gamelist = toWords(gamelist);
+	DA.funcs = { setgame: setgame(), button96: button96() }; //implemented games!
+	for (const gname in DA.gamelist) {
+		if (isdef(DA.funcs[gname])) continue;
+		DA.funcs[gname] = defaultGameFunc();
+	}
+	DA.evList = [];
+	await loadAssetsStatic();
+	await loadTables();
+	if (VERBOSE) console.log('M', M);
 
-async function DAGetState() {
+	let elems = mLayoutTM('dPage'); mStyle('dMain', { overy: 'auto' }); mCenterFlex('dMain');
+	mLayoutTopTestExtraMessageTitle('dTop');
+
+	if (isTest) await showTestButtons();
+	await showMenuButtons();
+
+	let username = localStorage.getItem('username') ?? 'hans';
+	if (isTest) {
+		let names = ['amanda', 'felix', 'lauren', 'mimi', 'gul'];
+		let d = mBy('dTestRight'); mFlex(d);
+		for (const name of names) { let b = mDom(d, { className: 'button' }, { tag: 'button', html: name, onclick: async(ev) => await switchToUser(name) }); }
+		username = rChoose(names); //['felix','lauren','diana','mimi','amanda','guest','gul']); //localStorage.getItem('username') ?? 'hans'; 
+	}
+	await switchToUser(username);
+
+
+
+}
+
+async function switchToMenu(menu){
+	// if (isdef(TO.poll)) await pollStop();
+	menu = valf(menu,DA.menu,localStorage.getItem('menu'),'games');
+	DA.pollCounter = 0;
+	DA.menu = menu;
+	switch(menu){
+		case 'games': await showGamesAndTables(); DA.pollCounter=0;DA.pollInterval=3000;break;
+		case 'table': DA.pollCounter=0;DA.pollInterval=1000;break;
+	}
+	localStorage.setItem('menu', menu);
+	// await pollAndShow();
+}
+async function switchToUser(username) {
+	if (!isEmpty(username)) username = normalizeString(username);
+	if (isEmpty(username)) username = 'guest';
+	let res = await mPhpPost('all', { username, action: 'login' });
+	U = res.userdata;
+	DA.tid = localStorage.getItem('tid');
+	let bg = U.color;
+	let fg = U.fg ?? colorIdealText(bg);
+	mStyle('dTopRight', { className: 'button', display: 'inline', h: '80%', bg, fg }, { html: `${username}` });
+	localStorage.setItem('username', username);
+	setTheme(U);
+	// await forceUpdate();
+}
+async function showTable() {
+	function updateUI() {
+		const area = mBy('dMain');
+		area.innerHTML = '<pre>' + JSON.stringify(DA.gameState, null, 2) + '</pre>';
+		console.log("UI updated:", DA.gameState);
+	}
+
 	let res = await fetch(`${DA.backendURL}/get_state.php`);
 	if (!res.ok) {
 		console.error('Error fetching game state:', res.statusText);
@@ -23,39 +87,6 @@ async function MPollTables() {
 		M.tables[f] = t;
 	}
 	return M.tables;
-}
-async function DAInit(isTest = false,menu='games') {
-	if (isTest) VERBOSE = true;
-	DA.backendURL = getServer(true) + 'simple0/php'; //'https://moxito.online/mox/simple0/php';
-	if (VERBOSE) console.log('backendURL', DA.backendURL);
-	DA.pollCounter = 0;
-	DA.gamelist = ['setgame', 'button96']; //'accuse aristo bluff ferro fishgame fritz huti lacuna nations setgame sheriff spotit wise'; if (DA.TEST0) gamelist += ' a_game'; gamelist = toWords(gamelist);
-	DA.funcs = { setgame: setgame(), button96: button96() }; //implemented games!
-	for (const gname in DA.gamelist) {
-		if (isdef(DA.funcs[gname])) continue;
-		DA.funcs[gname] = defaultGameFunc();
-	}
-	DA.evList = [];
-	await loadAssetsStatic();
-	await loadTables();
-	if (VERBOSE) console.log('M', M);
-
-	let elems = mLayoutTM('dPage'); mStyle('dMain', { overy: 'auto' }); mCenterFlex('dMain');
-	mLayoutTopTestExtraMessageTitle('dTop');
-
-	DA.menu = menu;
-
-	let username = localStorage.getItem('username') ?? 'hans';
-	if (isTest) {
-		let names = ['amanda', 'felix', 'lauren', 'mimi', 'gul'];
-		let d = mBy('dTestRight'); mFlex(d);
-		for (const name of names) { let b = mDom(d, { className: 'button' }, { tag: 'button', html: name, onclick: async(ev) => await switchToUser(name) }); }
-		username = rChoose(names); //['felix','lauren','diana','mimi','amanda','guest','gul']); //localStorage.getItem('username') ?? 'hans'; 
-	}
-
-	await switchToUser(username);
-
-
 }
 async function DASaveState(state) {
 	if (isdef(state)) DA.gameState = state;

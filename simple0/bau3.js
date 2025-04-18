@@ -67,4 +67,18 @@ async function showGamesAndTables() {
 	else { dParent = mDom('dMain', {}, { className: 'section', id: 'dGameList' }); }
 	showGames(dParent);
 }
+async function showMenuButtons(){
+}
+async function showTestButtons(){
+	let d=mBy('dTestLeft');
+	let styles = { rounding: 6, maleft: 10, h: 24, bg: 'dimgray', fg: 'white', padding: 5 };
+	let label = 'polling:';
+	DA.dControlUiState = await mToggleButton(d, styles, { label, key: 'hand', onclick: onclickHand }, { label, key: 'display', onclick: onclickDisplay })
 
+}
+async function onclickHand(){
+	await pollStop();
+}
+async function onclickDisplay(){
+	await pollStart();
+}
