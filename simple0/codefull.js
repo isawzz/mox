@@ -3809,7 +3809,6 @@ async function onclickTableStart(id) {
 	console.log('res', res);
 	sysIdle();
 }
-async function onclickTest() { console.log('nations!!!!'); }
 async function onclickTextColor(fg) {
 	let hex = colorToHex79(fg);
 	U.fg = hex;

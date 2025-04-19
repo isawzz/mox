@@ -54,7 +54,7 @@ fieldset .disabled {
 }
 
 .active {
-  background: #00000070;
+  background: #00000040;
   color: white;
 }
 
@@ -250,16 +250,40 @@ button:active {
   /* Optional: horizontal alignment */
   /* Or any fixed height */
 }
+
 .vert_align_button {
   padding: 4px 10px;
-  cursor:'pointer';
-  background-color: 'beige';
+  cursor: pointer;
+  background-color: #00000080;
   display: flex;
   align-items: center;
-  /* Vertical alignment */
   justify-content: center;
-  /* Optional: horizontal alignment */
-  /* Or any fixed height */
+  border-radius: 10px;
+}
+.align_baseline{
+  align-self: baseline;
+}
+.align_center{
+  align-self: center;
+}
+.align_stretch{
+  align-self: stretch;
+}
+.align_start{
+  align-self: start;
+}
+.align_end{
+  align-self: end;
+}
+.vert_align_button:hover {
+  background-color: #00000060;
+}
+
+.vert_align_button:active {
+  background-color: #00000020;
+}
+.vert_align_button.active {
+  background-color: red;
 }
 
 /*#region hex zeug*/
