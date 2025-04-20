@@ -8,13 +8,11 @@ async function test0_flex() {
 	let b = mDom(d, { className: 'vert_align_button', 'align-self': 'baseline', bg: 'red' }, { html: 'Help' });
 	b = mDom(d, { className: 'vert_align_button', bg: 'red' }, { html: 'Help' });
 	b = mDom(d, { className: 'vert_align_button', 'align-self': 'stretch', bg: 'red' }, { html: 'Help' });
-	b = mDom(d, { className: 'vert_align_button', 'align-self': 'stretch', bg: 'red' }, { html: 'Help' });
 	b = mDom(d, { className: 'vert_align_button', 'align-self': 'start', bg: 'red' }, { html: 'Help' });
 	b = mDom(d, { className: 'vert_align_button', 'align-self': 'end', bg: 'red' }, { html: 'Help' });
 
 	b = mDom(d, { 'align-self': 'baseline', bg: 'green' }, { html: 'Help' });
 	b = mDom(d, { bg: 'green' }, { html: 'Help' });
-	b = mDom(d, { 'align-self': 'stretch', bg: 'green' }, { html: 'Help' });
 	b = mDom(d, { 'align-self': 'stretch', bg: 'green' }, { html: 'Help' });
 	b = mDom(d, { 'align-self': 'start', bg: 'green' }, { html: 'Help' });
 	b = mDom(d, { 'align-self': 'end', bg: 'green' }, { html: 'Help' });
