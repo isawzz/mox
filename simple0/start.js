@@ -3,8 +3,7 @@ onload = start;
 async function start() { await test0_flex(); }
 
 async function test0_flex() {
-	let d = mDom('dPage', { display: 'flex', 'align-items': 'center', bg: 'blue', fg: 'white', gap: 10, padding: 10, box: true, h: 50 });
-
+	let d = mDom('dPage', { display: 'flex', vstretch: true, bg: 'blue', fg: 'white', gap: 10, padding: 10, box: true, h: 50 });
 	let b = mDom(d, { className: 'vert_align_button', 'align-self': 'baseline', bg: 'red' }, { html: 'Help' });
 	b = mDom(d, { className: 'vert_align_button', bg: 'red' }, { html: 'Help' });
 	b = mDom(d, { className: 'vert_align_button', 'align-self': 'stretch', bg: 'red' }, { html: 'Help' });
