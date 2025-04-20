@@ -275,10 +275,15 @@ button:active {
 .align_end{
   align-self: end;
 }
+.hover_darker:hover{
+  background-color: #00000060;
+}
+.hover_lighter:hover{
+  background-color: #ffffff60;
+
 .vert_align_button:hover {
   background-color: #00000060;
 }
-
 .vert_align_button:active {
   background-color: #00000020;
 }
