@@ -3324,7 +3324,7 @@ async function onclickArchiveActions(ev) {
 }
 async function onclickCalc(ev) {
 	hPrepUi(ev, ` 'dSide dMain' `, 'auto 1fr', '1fr', rColor(), 'dMain');
-	let dSide = mBy('dSide'); mStyle(dSide, { padding: 10, wbox: true });
+	let dSide = mBy('dSide'); mStyle(dSide, { padding: 10, box: true });
 	return;
 	let dMenu = mDom('dSide', { display: 'flex', dir: 'column' }); //side menu
 	let gencase = mLinkMenu(dMenu, 'Manual', {}, onclickStatistik, 'side');
@@ -4302,7 +4302,7 @@ async function setPlayerPlaying(allPlItem, gamename) {
 	let dParent = mBy('dGameMenu');
 	let bg = MGetUserColor(name);
 	let rounding = 6;
-	let d1 = mDom(dParent, { bg: colorLight(bg, 50), border: `solid 2px ${bg}`, rounding, display: 'inline-block', hpadding: 3, rounding }, { id });
+	let d1 = mDom(dParent, { bg: colorLight(bg, 50), border: `solid 2px ${bg}`, rounding, display: 'inline-block', hPadding: 3, rounding }, { id });
 	mDom(d1, {}, { html: `${name}` }); //title
 	d = mDom(d1, {}); mCenterFlex(d);
 	mCenterCenter(d);
@@ -4819,11 +4819,11 @@ function showEventOpen(id) {
 	let dt = mDom(popup, { display: 'inline-block', fz: '80%', maleft: 20, pabottom: 4 }, { html: `time:` });
 	let inpt = mDom(popup, { fz: '80%', maleft: 3, mabottom: 4, w: 60 }, { tag: 'input', value: e.time });
 	mOnEnter(inpt);
-	let ta = mDom(popup, { rounding: 4, matop: 7, box: true, w: '100%', vpadding: 4, hpadding: 10, }, { tag: 'textarea', rows: 7, value: e.text });
+	let ta = mDom(popup, { rounding: 4, matop: 7, box: true, w: '100%', vPadding: 4, hPadding: 10, }, { tag: 'textarea', rows: 7, value: e.text });
 	let line = mDom(popup, { matop: 6, w: '100%' }); //,'align-items':'space-between'});
 	let buttons = mDom(line, { display: 'inline-block' });
 	let bsend = mButton('Save', () => onEventEdited(id, ta.value, inpt.value), buttons);
-	mButton('Cancel', () => closePopup(), buttons, { hmargin: 10 })
+	mButton('Cancel', () => closePopup(), buttons, { hMargin: 10 })
 	mButton('Delete', () => { deleteEvent(id); closePopup(); }, buttons, { fg: 'red' })
 	mDom(line, { fz: '90%', maright: 5, float: 'right', }, { html: `by ${e.user}` });
 }
@@ -5075,7 +5075,7 @@ function showPlaetze(dCard, item, gap, color = 'silver') {
 function showRibbon(dParent, msg) {
 	let d = mBy('ribbon'); if (isdef(d)) d.remove();
 	let bg = `linear-gradient(270deg, #fffffd, #00000080)`
-	d = mDom(dParent, { bg, mabottom: 10, align: 'center', vpadding: 10, fz: 30, w100: true }, { html: msg, id: 'ribbon' });
+	d = mDom(dParent, { bg, mabottom: 10, align: 'center', vPadding: 10, fz: 30, w100: true }, { html: msg, id: 'ribbon' });
 	return d;
 }
 function showText(dParent, text, bg = 'black') {
@@ -5539,7 +5539,7 @@ function uiGadgetTypeMultiText(dParent, dict, resolve, styles = {}, opts = {}) {
 	addKeys({ className: 'input', tag: 'textarea', }, opts);
 	addKeys({ fz: 14, family: 'tahoma', w: wIdeal, resize: 'none' }, styles);
 	let df = mDom(form);
-	let db = mDom(form, { vmargin: 10, align: 'right' });
+	let db = mDom(form, { vMargin: 10, align: 'right' });
 	mButton('Cancel', ev => resolve(null), db, { classes: 'button', maright: 10 });
 	mButton('Save', ev => {
 		let di = {};
@@ -5593,7 +5593,7 @@ async function uiTypeCalendar(dParent) {
 	var container = mDiv(dParent, {}, 'dCalendar');
 	var currentDate = new Date();
 	var today = new Date();
-	let dTitle = mDiv(container, { w: 890, vpadding: gap, fz: 26, family: 'sans-serif', display: 'flex', justify: 'space-between' }, { className: 'title' });
+	let dTitle = mDiv(container, { w: 890, vPadding: gap, fz: 26, family: 'sans-serif', display: 'flex', justify: 'space-between' }, { className: 'title' });
 	var dWeekdays = mGrid(1, 7, container, { gap: gap });
 	var dDays = [];
 	var info = {};
@@ -5754,11 +5754,11 @@ function uiTypeExtraWorker(w) {
 async function uiTypePalette(dParent, color, fg, src, blendMode) {
 	let fill = color;
 	let bgBlend = getBlendModeForCanvas(blendMode);
-	let d = mDom(dParent, { wbox: true }); //, { w100: true, gap: 4 }); //mFlex(d);
+	let d = mDom(dParent, { box: true }); //, { w100: true, gap: 4 }); //mFlex(d);
 	let NewValues = { fg, bg: color };
 	let palette = [color];
 	let w = 350;
-	let dContainer = mDom(d, { w, padding: 0, wbox: true });
+	let dContainer = mDom(d, { w, padding: 0, box: true });
 	if (isdef(src)) {
 		let ca = await getCanvasCtx(dContainer, { w, fill, bgBlend }, { src });
 		palette = await getPaletteFromCanvas(ca.cv);

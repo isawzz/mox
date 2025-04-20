@@ -3,18 +3,18 @@ onload = start;
 async function start() { await test0_flex(); }
 
 async function test0_flex() {
-	let d = mDom('dPage', { display: 'flex', vstretch: true, bg: 'blue', fg: 'white', gap: 10, padding: 10, box: true, h: 50 });
-	let b = mDom(d, { className: 'vert_align_button', 'align-self': 'baseline', bg: 'red' }, { html: 'Help' });
+	let d = mDom('dPage', { display: 'flex', vStretch: true, bg: 'blue', fg: 'white', gap: 10, padding: 10, box: true, h: 75 });
+	let b = mDom(d, { className: 'vert_align_button', alignSelf: 'baseline', bg: 'red' }, { html: 'Help' });
 	b = mDom(d, { className: 'vert_align_button', bg: 'red' }, { html: 'Help' });
-	b = mDom(d, { className: 'vert_align_button', 'align-self': 'stretch', bg: 'red' }, { html: 'Help' });
-	b = mDom(d, { className: 'vert_align_button', 'align-self': 'start', bg: 'red' }, { html: 'Help' });
-	b = mDom(d, { className: 'vert_align_button', 'align-self': 'end', bg: 'red' }, { html: 'Help' });
+	b = mDom(d, { className: 'vert_align_button', alignSelf: 'center', bg: 'red' }, { html: 'Help' });
+	b = mDom(d, { className: 'vert_align_button', alignSelf: 'start', bg: 'red' }, { html: 'Help' });
+	b = mDom(d, { className: 'vert_align_button', alignSelf: 'end', bg: 'red' }, { html: 'Help' });
 
-	b = mDom(d, { 'align-self': 'baseline', bg: 'green' }, { html: 'Help' });
+	b = mDom(d, { alignSelf: 'baseline', bg: 'green' }, { html: 'Help' });
 	b = mDom(d, { bg: 'green' }, { html: 'Help' });
-	b = mDom(d, { 'align-self': 'stretch', bg: 'green' }, { html: 'Help' });
-	b = mDom(d, { 'align-self': 'start', bg: 'green' }, { html: 'Help' });
-	b = mDom(d, { 'align-self': 'end', bg: 'green' }, { html: 'Help' });
+	b = mDom(d, { alignSelf: 'center', bg: 'green' }, { html: 'Help' });
+	b = mDom(d, { alignSelf: 'start', bg: 'green' }, { html: 'Help' });
+	b = mDom(d, { alignSelf: 'end', bg: 'green' }, { html: 'Help' });
 }
 async function test0_game0() {
 	await DAInit(true);

@@ -4,7 +4,7 @@ function onclickStopwatch(ev) {
 	console.log('different',prevElem,elem); return;
 	p5ClearAll();
 	let d0 = mDom(dMain);
-	let styles = { fz: 50, hpadding: 10, rounding: 10, wmax: 260, margin: 10, align: 'center', hline: 50, 'user-select': 'none' };
+	let styles = { fz: 50, hPadding: 10, rounding: 10, wmax: 260, margin: 10, align: 'center', hline: 50, 'user-select': 'none' };
 	let d = mDom(d0, styles);
 	DA.stopwatch = createStopwatch(d);
 	let r = getRect(DA.stopwatch.elem); let left = r.w / 2 - 110;

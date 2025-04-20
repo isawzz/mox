@@ -308,10 +308,10 @@ function mGetStyle(elem, prop) {
 	else if (isdef(STYLE_PARAMS_2[prop])) { val = getStyleProp(elem, STYLE_PARAMS_2[prop]); }
 	else {
 		switch (prop) {
-			case 'vmargin': val = stringBefore(elem.style.margin, ' '); break;
-			case 'hmargin': val = stringAfter(elem.style.margin, ' '); break;
-			case 'vpadding': val = stringBefore(elem.style.padding, ' '); break;
-			case 'hpadding': val = stringAfter(elem.style.padding, ' '); break;
+			case 'vMargin': val = stringBefore(elem.style.margin, ' '); break;
+			case 'hMargin': val = stringAfter(elem.style.margin, ' '); break;
+			case 'vPadding': val = stringBefore(elem.style.padding, ' '); break;
+			case 'hPadding': val = stringAfter(elem.style.padding, ' '); break;
 			case 'box': val = elem.style.boxSizing; break;
 			case 'dir': val = elem.style.flexDirection; break;
 		}
@@ -335,7 +335,7 @@ function mHasClass(el, className) {
 	}
 }
 function mHomeLogo(d, key, styles = {}, handler = null, menu = null) {
-	addKeys({ display: 'flex', align: 'center', justify: 'center' }, styles);
+	addKeys({ display: 'flex', align: 'center', justifyContent: 'center' }, styles);
 	let ui = mKey(key, d, { maright: 12, fz: 30, cursor: 'pointer' }, { onclick: handler, menu });
 	return ui;
 }
@@ -588,17 +588,17 @@ function mLayoutTMS(dParent, styles = {}, opts = {}, hrow = 30) {
 function mLayoutTopExtraSpaceBetween(dParent) {
 	dParent = toElem(dParent);
 	mStyle(dParent, {}, { id: 'dOuterTop' });
-	let dTop = mDom(dParent, { display: 'flex', justify: 'space-between' }, { id: 'dTop' });
-	let dExtra = mDom(dParent, { display: 'flex', justify: 'space-between' }, { id: 'dExtra' });
+	let dTop = mDom(dParent, { display: 'flex', justifyContent: 'space-between' }, { id: 'dTop' });
+	let dExtra = mDom(dParent, { display: 'flex', justifyContent: 'space-between' }, { id: 'dExtra' });
 	let [dTopLeft, dTopMiddle, dTopRight] = [mDom('dTop', {}, { id: 'dTopLeft' }), mDom('dTop', {}, { id: 'dTopMiddle' }), mDom('dTop', {}, { id: 'dTopRight' })]
 	let [dExtraLeft, dExtraMiddle, dExtraRight] = [mDom('dExtra', {}, { id: 'dExtraLeft' }), mDom('dExtra', {}, { id: 'dExtraMiddle' }), mDom('dExtra', {}, { id: 'dExtraRight' })]
 }
 function mLayoutTopTestExtraMessageTitle(dParent) {
 	dParent = toElem(dParent);
 	mStyle(dParent, {}, { id: 'dOuterTop' });
-	let dTop = mDom(dParent, { display: 'flex', justify: 'space-between' }, { id: 'dTop' });
-	let dTest = mDom(dParent, { display: 'flex', justify: 'space-between', hpadding: 10 }, { id: 'dTest' });
-	let dExtra = mDom(dParent, { display: 'flex', justify: 'space-between' }, { id: 'dExtra' });
+	let dTop = mDom(dParent, { display: 'flex', justifyContent: 'space-between' }, { id: 'dTop' });
+	let dTest = mDom(dParent, { display: 'flex', justifyContent: 'space-between', hPadding: 10 }, { id: 'dTest' });
+	let dExtra = mDom(dParent, { display: 'flex', justifyContent: 'space-between' }, { id: 'dExtra' });
 	let dMessage = mDom(dParent, { h: 0, bg: 'red', fg: 'yellow' }, { id: 'dMessage' });
 	let [dTopLeft, dTopMiddle, dTopRight] = [mDom('dTop', {}, { id: 'dTopLeft' }), mDom('dTop', {}, { id: 'dTopMiddle' }), mDom('dTop', {}, { id: 'dTopRight' })]
 	let [dTestLeft, dTestMiddle, dTestRight] = [mDom('dTest', {}, { id: 'dTestLeft' }), mDom('dTest', {}, { id: 'dTestMiddle' }), mDom('dTest', {}, { id: 'dTestRight' })]
@@ -912,7 +912,7 @@ function mShade(names, offset = 1, contrast = 1) {
 	let palette = paletteTransWhiteBlack(names.length * contrast + 2 * offset).slice(offset);
 	for (const name of names) {
 		let d = toElem(name);
-		mStyle(d, { bg: palette.shift(), fg: 'contrast', wbox: true });
+		mStyle(d, { bg: palette.shift(), fg: 'contrast', box: true });
 	}
 }
 function mShape(shape, dParent, styles = {}, opts = {}) {
@@ -968,23 +968,23 @@ function mStyle(elem, styles = {}, opts = {}) {
 	styles = jsCopy(styles);
 	let noUnit = ['opacity', 'flex', 'grow', 'shrink', 'grid', 'z', 'iteration', 'count', 'orphans', 'widows', 'weight', 'order', 'index'];
 	const STYLE_PARAMS_3 = {
+		box: (elem, v) => elem.style.boxSizing = v ? 'border-box' : 'content-box',
 		bgSrc: (elem, v) => elem.style.backgroundImage = `url(${v})`,
 		gridRows: (elem, v) => elem.style.gridTemplateRows = isNumber(v) ? `repeat(${v},1fr)` : v,
 		gridCols: (elem, v) => elem.style.gridTemplateColumns = isNumber(v) ? `repeat(${v},1fr)` : v,
 		hCenter: elem => elem.style.alignContent = 'center',
 		h100: elem => elem.style.height = '100%',
 		hEnd: elem => elem.style.alignContent = 'center',
-		hmargin: (elem, v) => elem.style.margin = `0 ${v}px`,
-		hpadding: (elem, v) => elem.style.padding = `0 ${v}px`,
+		hMargin: (elem, v) => elem.style.margin = `0 ${v}px`,
+		hPadding: (elem, v) => elem.style.padding = `0 ${v}px`,
 		html: (elem, v) => elem.innerHTML = v,
 		round: elem => elem.style.borderRadius = '50%',
 		vBaseline: elem => elem.style.alignItems = 'baseline',
 		vCenter: elem => elem.style.alignItems = 'center',
-		vmargin: (elem, v) => elem.style.margin = `${v}px ${valf(styles.hmargin, 0)}px`,
-		vpadding: (elem, v) => elem.style.padding = `${v}px ${valf(styles.hpadding, 0)}px`,
+		vMargin: (elem, v) => elem.style.margin = `${v}px ${valf(styles.hMargin, 0)}px`,
+		vPadding: (elem, v) => elem.style.padding = `${v}px ${valf(styles.hPadding, 0)}px`,
 		vStretch: elem => elem.style.alignItems = 'stretch',
 		w100: elem => elem.style.width = '100%',
-		wbox: (elem, v) => elem.style.boxSizing = v ? 'border-box' : 'content-box',
 		wrap: (elem, v) => { if (v == 'hard') elem.setAttribute('wrap', 'hard'); else elem.style.flexWrap = 'wrap'; }
 	};
 	for (const k in styles) {
@@ -1088,11 +1088,11 @@ function mToggle(ev) {
 	if (isdef(t.handler)) t.handler(key, prev, t.state);
 }
 async function mToggleButton(dParent, styles = {}) {
-	addKeys({ display: 'flex', wrap: 'wrap', aitems: 'center' }, styles)
+	addKeys({ display: 'flex', wrap: 'wrap', alignItems: 'center' }, styles)
 	let d1 = mDom(dParent, styles);
 	let list = Array.from(arguments).slice(2);
 	let buttons = [];
-	let style = { className: 'no_select', display: 'flex', 'flex-wrap': 'nowrap', aitems: 'center', cursor: 'pointer' };
+	let style = { className: 'no_select', display: 'flex', 'flex-wrap': 'nowrap', alignItems: 'center', cursor: 'pointer' };
 	let words = list.map(x => x.label);
 	let hasKey = list.some(x => x.key);
 	let w = getMaxWordWidth(words, d1) + (hasKey ? styles.h * 1.35 + 2 : 10); console.log(w);
