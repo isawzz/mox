@@ -24,6 +24,8 @@ async function DAInit(isTest = false) {
 
 async function switchToMenu(menu){
 	// if (isdef(TO.poll)) await pollStop();
+	let button = getElementWithAttribute('key',menu);
+	hToggleClassMenu({target:button});
 	menu = valf(menu,DA.menu,localStorage.getItem('menu'),'games');
 	DA.pollCounter = 0;
 	DA.menu = menu;

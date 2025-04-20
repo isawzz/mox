@@ -437,40 +437,6 @@ function mInput(dParent, styles = {}, opts = {}) {
 	return d;
 }
 function mInsert(dParent, el, index = 0) { dParent.insertBefore(el, dParent.childNodes[index]); return el; }
-async function mKey(imgKey, d, styles = {}, opts = {}) {
-	styles = jsCopy(styles);
-	let type = opts.prefer;
-	let o = type != 'plain' ? lookup(M.superdi, [imgKey]) : null;
-	let src;
-	if (nundef(o) && imgKey.includes('.')) src = imgKey;
-	else if (isdef(o) && (type == 'img' || type == 'photo') && isdef(o[type])) src = o[type];
-	else if (isdef(o) && isdef(o.img)) src = o.img;
-	if (isdef(src)) {
-		let [w, h] = mSizeSuccession(styles, 40);
-		addKeys({ w, h }, styles);
-		addKeys({ tag: 'img', src }, opts);
-		let d0 = mDom(d, styles, opts);
-		mCenterCenterFlex(d0);
-		let img = await mImgAsync(d0, styles, opts, roundIfTransparentCorner);
-		return d0;
-	} else if (isdef(o)) {
-		if (nundef(type)) type = isdef(o.text) ? 'text' : isdef(o.fa6) ? 'fa6' : isdef(o.fa) ? 'fa' : isdef(o.ga) ? 'ga' : null;
-		let family = type == 'text' ? 'emoNoto' : type == 'fa6' ? 'fa6' : type == 'fa' ? 'pictoFa' : 'pictoGame';
-		let html = type == 'text' ? o.text : String.fromCharCode('0x' + o[type]);
-		addKeys({ family }, styles);
-		let d0 = mDom(d, styles, opts);
-		mCenterCenterFlex(d0);
-		let d1 = mDom(d0, {}, { html });
-		let r = getRect(d1);
-		[w, h] = [r.w, r.h];
-		return d0;
-	} else {
-		addKeys({ html: imgKey }, opts)
-		let img = mDom(d, styles, opts);
-		return img;
-	}
-	console.log('type', type)
-}
 async function mKeyO(imgKey, d, styles = {}, opts = {}) {
 	styles = jsCopy(styles);
 	let type = opts.prefer;
@@ -972,7 +938,7 @@ function mStyle(elem, styles = {}, opts = {}) {
 		bgSrc: (elem, v) => elem.style.backgroundImage = `url(${v})`,
 		gridRows: (elem, v) => elem.style.gridTemplateRows = isNumber(v) ? `repeat(${v},1fr)` : v,
 		gridCols: (elem, v) => elem.style.gridTemplateColumns = isNumber(v) ? `repeat(${v},1fr)` : v,
-		hCenter: elem => elem.style.alignContent = 'center',
+		hCenter: elem => elem.style.justifyContent = 'center',
 		h100: elem => elem.style.height = '100%',
 		hEnd: elem => elem.style.alignContent = 'center',
 		hMargin: (elem, v) => elem.style.margin = `0 ${v}px`,

@@ -68,6 +68,15 @@ async function showGamesAndTables() {
 	showGames(dParent);
 }
 async function showMenuButtons(){
+	let d = mBy('dTopLeft'); mStyle(d, { display:'flex',vStretch:true,gap:10,padding:10,box:true }); //, box:true, vStretch:true, hCenter: true, padding: 10, gap: 10 }) //mClass(d,'flex')
+
+	let bStyles = { hPadding:10, h:25, wmin:70,vPadding:6,rounding:10, cursor:'pointer',className:'hover', vCenter:true, display:'flex',hCenter:true };
+	mDom(d, bStyles, { html: 'games', onclick: onclickTest, menu: 'top', key:'games' });
+	mDom(d, bStyles, { html: 'table', onclick: onclickTest, menu: 'top', key:'table' });
+	// mDom(d, bStyles, { html: 'Lop', onclick: onclickTest, menu: 'top' });
+	// mDom(d, bStyles, { html: 'Miq', onclick: onclickTest, menu: 'top' });
+	let b=await mKey('watch', d, bStyles, { onclick: onclickTest, menu: 'top', key:'watch' }); 
+
 }
 async function showTestButtons(){
 	let d=mBy('dTestLeft');

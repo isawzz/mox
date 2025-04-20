@@ -1,7 +1,46 @@
 onload = start;
 
-async function start() { await test0_flex(); }
+async function start() { await test0_game0(); }
 
+async function test0_game0() {
+	await DAInit(true);
+	let isTest = true;
+
+	let username = localStorage.getItem('username') ?? 'hans';
+	if (isTest) {
+		let names = ['amanda', 'felix', 'lauren', 'mimi', 'gul'];
+		let d = mBy('dTestRight'); mFlex(d);
+		for (const name of names) { let b = mDom(d, { className: 'button' }, { tag: 'button', html: name, onclick: async (ev) => await switchToUser(name) }); }
+		username = rChoose(names); //['felix','lauren','diana','mimi','amanda','guest','gul']); //localStorage.getItem('username') ?? 'hans'; 
+	}
+
+	//if (isTest) await showTestButtons();
+	await showMenuButtons();
+
+	await switchToMenu('games');
+	await switchToUser('felix');
+	mStyle('dPage', { bg: 'green', fg: 'white' });
+	
+	return;
+
+	await switchToUser(username);
+
+	//showTestButtons();
+
+}
+async function test0_buttons() {
+	await DAInit(true);
+	let isTest = true;
+	mStyle('dPage', { bg: 'green', fg: 'white' });
+	let d = mBy('dTopLeft'); mStyle(d, { display:'flex',vStretch:true,gap:10,padding:10,box:true }); //, box:true, vStretch:true, hCenter: true, padding: 10, gap: 10 }) //mClass(d,'flex')
+
+	let bStyles = { hPadding:10, h:25, wmin:70,vPadding:6,rounding:10, cursor:'pointer',className:'hover', vCenter:true, display:'flex',hCenter:true };
+	mDom(d, bStyles, { html: 'game', onclick: onclickTest, menu: 'top' });
+	mDom(d, bStyles, { html: 'An', onclick: onclickTest, menu: 'top' });
+	mDom(d, bStyles, { html: 'Lop', onclick: onclickTest, menu: 'top' });
+	mDom(d, bStyles, { html: 'Miq', onclick: onclickTest, menu: 'top' });
+	let b=mKey('watch', d, bStyles, { onclick: onclickTest, menu: 'top' }); 
+}
 async function test0_flex() {
 	let d = mDom('dPage', { display: 'flex', vStretch: true, bg: 'blue', fg: 'white', gap: 10, padding: 10, box: true, h: 75 });
 	let b = mDom(d, { className: 'vert_align_button', alignSelf: 'baseline', bg: 'red' }, { html: 'Help' });
@@ -15,36 +54,6 @@ async function test0_flex() {
 	b = mDom(d, { alignSelf: 'center', bg: 'green' }, { html: 'Help' });
 	b = mDom(d, { alignSelf: 'start', bg: 'green' }, { html: 'Help' });
 	b = mDom(d, { alignSelf: 'end', bg: 'green' }, { html: 'Help' });
-}
-async function test0_game0() {
-	await DAInit(true);
-	let isTest = true;
-
-	//if (isTest) await showTestButtons();
-	// await showMenuButtons();
-
-	//await switchToMenu('games');
-	let styles = { className: 'vert_align_button', h: 30 };
-	let d = mBy('dTopLeft'); mFlex(d); mStyle(d, { padding: 10, gap: 10 }) //mClass(d,'flex')
-	mDom(d, styles, { html: 'game', onclick: onclickTest, menu: 'top' });
-	let d1 = mDom(d, { h: 30 }, { html: 'An', onclick: onclickTest, menu: 'top' });
-	mClass(d1, 'vert_align_button align_baseline');
-	mDom(d, styles, { html: 'Lop', onclick: onclickTest, menu: 'top' });
-	mDom(d, styles, { html: 'Miq', onclick: onclickTest, menu: 'top' });
-	mKey('watch', d, styles, { onclick: onclickTest, menu: 'top' }); return;
-	// let d2 = mKey('game', d, {cursor:'pointer',h100:true}, { onclick: onclickTest, menu: 'top' });
-
-	let username = localStorage.getItem('username') ?? 'hans';
-	if (isTest) {
-		let names = ['amanda', 'felix', 'lauren', 'mimi', 'gul'];
-		let d = mBy('dTestRight'); mFlex(d);
-		for (const name of names) { let b = mDom(d, { className: 'button' }, { tag: 'button', html: name, onclick: async (ev) => await switchToUser(name) }); }
-		username = rChoose(names); //['felix','lauren','diana','mimi','amanda','guest','gul']); //localStorage.getItem('username') ?? 'hans'; 
-	}
-	await switchToUser(username);
-
-	//showTestButtons();
-
 }
 async function test0_save_state() {
 	await DAInit(true);

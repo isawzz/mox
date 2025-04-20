@@ -124,13 +124,28 @@ function arrMinMax(arr, func) {
 	}
 	return { min: min, imin: imin, max: max, imax: imax, elmin: arr[imin], elmax: arr[imax] };
 }
-function arrMinus(arr, b) { if (isList(b)) return arr.filter(x => !b.includes(x)); else return arr.filter(x => x != b); }
+function arrMinus(arr, b) {
+	if (isList(arr)) {
+		if (isList(b)) return arr.filter(x => !b.includes(x)); else return arr.filter(x => x != b);
+	} else {
+		let dinew = {};
+		let keys = isList(b) ? Object.keys(arr).filter(x => !b.includes(x)) : Object.keys(arr).filter(x => x != b);
+		for (const k of keys) dinew[k] = arr[k];
+		return dinew;
+
+	}
+}
 function arrNext(list, el) {
 	let iturn = list.indexOf(el);
 	let elnext = list[(iturn + 1) % list.length];
 	return elnext;
 }
 function arrNoDuplicates(arr) { return [...new Set(arr)]; }
+function arrPlus(arr, b) {
+	if (isList(arr)) {
+		if (isList(b)) return arr.concat(b); else return arr.concat([b]);
+	} else return dictMerge(b, arr);
+}
 function arrRange(from = 1, to = 10, step = 1) { let res = []; for (let i = from; i <= to; i += step)res.push(i); return res; }
 function arrRemoveDuplicates(arr) { return Array.from(new Set(arr)); }
 function arrRemovip(arr, el) {
@@ -2736,19 +2751,6 @@ function hPrepUi(ev, areas, cols, rows, bg, dParent) {
 	let names = mAreas(d, areas, cols, rows);
 	M.divNames = Array.from(new Set(M.divNames.concat(names))); console.log(M.divNames);
 	mStyle('dPage', { bg });
-}
-function hToggleClassMenu(ev) {
-	let elem = findAncestorWith(ev.target, { attribute: 'menu' });
-	if (mHasClass(elem, 'active')) return [elem, elem];
-	let menu = elem.getAttribute('menu');
-	let others = mBy(`[menu='${menu}']`, 'query').filter(x => x != elem);
-	let prev = null;
-	for (const o of others) {
-		assertion(o != elem);
-		if (mHasClass(o, 'active')) { prev = o; mClassRemove(o, 'active'); }
-	}
-	mClass(elem, 'active');
-	return [prev, elem];
 }
 function handleVisibilityChange() {
 	if (DA.polling == false) return;

@@ -9,6 +9,7 @@ body {
   font-family: opensans;
 }
 
+/* #region tags */
 input {
   caret-color: black;
 }
@@ -26,6 +27,17 @@ select {
   border: none;
   box-shadow: none;
   cursor: pointer;
+}
+
+a:hover,
+button:hover {
+  background: #ffffff80 !important;
+}
+
+a:active,
+button:active {
+  background: white !important;
+  color: black !important;
 }
 
 legend {
@@ -52,33 +64,18 @@ fieldset .disabled {
   opacity: 0.3;
   cursor: default;
 }
+/* #endregion classes */
 
-.active {
-  background: #00000040;
-  color: white;
-}
-
+/* #region classes */
 .button {
   padding: 2px 10px;
   margin: 4px 10px 2px 0px;
   border-radius: 10px;
 }
 
-a:hover,
-button:hover {
-  background: #ffffff80 !important;
-}
-
-a:active,
-button:active {
-  background: white !important;
-  color: black !important;
-}
-
 [contenteditable]:focus {
   border: 2px solid white;
 }
-
 
 .centerCentered {
   margin: 0;
@@ -133,6 +130,21 @@ button:active {
 .hop1:hover {
   color: 'red';
   background: 'white';
+}
+
+.active{
+  background: #00000080 !important;
+  color:white !important;
+}
+.hover{
+  background-color: #ffffffAA;
+  color: black;
+}
+.hover:hover{
+  background-color: #ffffff60;
+}
+.hover:active, .hover:focus{
+  background-color: #ffffffBB;
 }
 
 .no_outline {
@@ -242,54 +254,7 @@ button:active {
   z-index: 100000;
 }
 
-.vert_align {
-  display: flex;
-  align-items: center;
-  /* Vertical alignment */
-  justify-content: center;
-  /* Optional: horizontal alignment */
-  /* Or any fixed height */
-}
-
-.vert_align_button {
-  padding: 4px 10px;
-  cursor: pointer;
-  background-color: #00000080;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-}
-.align_baseline{
-  align-self: baseline;
-}
-.align_center{
-  align-self: center;
-}
-.align_stretch{
-  align-self: stretch;
-}
-.align_start{
-  align-self: start;
-}
-.align_end{
-  align-self: end;
-}
-.hover_darker:hover{
-  background-color: #00000060;
-}
-.hover_lighter:hover{
-  background-color: #ffffff60;
-}
-.vert_align_button:hover {
-  background-color: #00000060;
-}
-.vert_align_button:active {
-  background-color: #00000020;
-}
-.vert_align_button.active {
-  background-color: red;
-}
+/* #endregion classes */
 
 /*#region hex zeug*/
 .hex_NO::after {
