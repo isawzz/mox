@@ -17,16 +17,12 @@ async function test0_game0() {
 	//if (isTest) await showTestButtons();
 	await showMenuButtons();
 
-	await switchToMenu('games');
-	await switchToUser('felix');
-	mStyle('dPage', { bg: 'green', fg: 'white' });
-	
-	return;
+	await clickOn('games');
+	await clickOn('gul');
 
-	await switchToUser(username);
-
-	//showTestButtons();
-
+	// await switchToMenu('games');
+	// await switchToUser('felix');
+	// mStyle('dPage', { bg: 'green', fg: 'white' });
 }
 async function test0_buttons() {
 	await DAInit(true);
