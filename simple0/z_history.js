@@ -1,3 +1,25 @@
+async function switchToMenu(menu) {
+
+	let button = getElementWithAttribute('key', menu);
+	hToggleClassMenu({ target: button });
+	menu = valf(menu, DA.menu, localStorage.getItem('menu'), 'games');
+
+	DA.pollCounter = 0;
+	DA.menu = menu;
+	switch (menu) {
+		case 'games': await showGamesAndTables(true); DA.pollCounter = 0; DA.pollInterval = 3000; break;
+		case 'table': await showTable(); DA.pollCounter = 0; DA.pollInterval = 1000; break;
+	}
+	localStorage.setItem('menu', menu);
+}
+async function onclickTest(ev) {
+	let [prevElem, elem] = hToggleClassMenu(ev);
+	if (prevElem == elem) { ifVerbose('same!!!'); return; }
+	ifVerbose('different', prevElem, elem);
+
+	await switchToMenu(elem.getAttribute('key'));
+
+}
 function onclickStopwatch(ev) {
 	let [prevElem, elem] = hToggleClassMenu(ev);
 	if (prevElem == elem) {console.log('same!!!');return;}

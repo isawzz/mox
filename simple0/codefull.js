@@ -316,7 +316,7 @@ function calcClipPoints(x0, y0, w, h, clipPath) {
 	return pixelPoints;
 }
 function calcHexCorners(center, width, height) {
-	const [cx, cy] = [center.cx, center.cy]; console.log('center', center)
+	const [cx, cy] = [center.cx, center.cy]; ifVerbose('center', center)
 	const points = [];
 	const angleStep = (2 * Math.PI) / 6;
 	const rx = width / 2;
@@ -355,16 +355,16 @@ async function cleanupOldActionIfAny(ev) {
 	if (w.key && secs > 0) {
 		w.stop();
 		let s = `${getNow()}: ${w.key}, ${secs}`;
-		let res = await mPhpPostLine(s, '../../zdata/action.txt'); //console.log(res);
+		let res = await mPhpPostLine(s, '../../zdata/action.txt'); 
 		w.reset();
 		elem = findAncestorWith(ev.target, { attribute: 'key' });
-		console.log(elem);
+		ifVerbose(elem);
 	}
 }
 function clearEvents() {
 	for (const k in TO) { clearTimeout(TO[k]); TO[k] = null; }
 	for (const k in ANIM) { if (isdef(ANIM[k])) ANIM[k].cancel(); ANIM[k] = null; }
-	if (SLEEP_WATCHER) { SLEEP_WATCHER.cancel(); console.log('clearEvents: ACHTUNG SLEEP_WATCHER!!!') }
+	if (SLEEP_WATCHER) { SLEEP_WATCHER.cancel(); ifVerbose('clearEvents: ACHTUNG SLEEP_WATCHER!!!') }
 }
 function clearMain() { UI.commands = {}; staticTitle(); clearEvents(); mClear('dMain'); mClear('dTitle'); clearMessage(); }
 function clearMessage(remove = false) { if (remove) mRemove('dMessage'); else mStyle('dMessage', { h: 0 }); }
@@ -694,7 +694,7 @@ function colorFromNat(ncol, wPercent, bPercent) {
 	return colorFromNcol(ncol, wPercent, bPercent);
 }
 function colorFromNcol(ncol, wPercent, bPercent) {
-	let h = colorNcolToHue(ncol); console.log('hue', h);
+	let h = colorNcolToHue(ncol); ifVerbose('hue', h);
 	return colorFromHwb(h, wPercent, bPercent);
 }
 function colorFromRgb(r, g, b) { return colorFrom({ r, g, b }); }
@@ -766,7 +766,7 @@ function colorGradient(sColors, type = 'linear', param = null) {
 	if (param) param = `${param},`; else param = '';
 	if (nundef(sColors)) sColors = `${rColor()},${rColor()}`;
 	else if (!sColors.includes('#')) {
-		let list = toWords(sColors, true); console.log(list);
+		let list = toWords(sColors, true); ifVerbose(list);
 		sColors = list.map(x => colorFrom(x)).join(', ');
 	}
 	return `${type}-gradient(${param}${sColors})`;
@@ -1019,10 +1019,10 @@ function colorSample(d, color) {
 function colorSchemeRYB() {
 	let ryb = ['#FE2712', '#FC600A', '#FB9902', '#FCCC1A', '#FEFE33', '#B2D732', '#66B032', '#347C98', '#0247FE', '#4424D6', '#8601AF', '#C21460'];
 	return ryb;
-	console.log('w3color', w3color('deeppink'))
+	ifVerbose('w3color', w3color('deeppink'))
 	for (const c of ryb) {
 		let cw = w3color(c);
-		console.log(cw.hue, cw.sat, cw.lightness, cw.ncol);
+		ifVerbose(cw.hue, cw.sat, cw.lightness, cw.ncol);
 	}
 }
 function colorShades(color) {
@@ -1058,7 +1058,7 @@ function colorToHex79(c) {
 	else if (tString) { ensureColorDict(); let c1 = ColorDi[c]; assertion(isdef(c1), `UNKNOWN color ${c}`); return c1.hex; }
 	else if (tArr && (c.length == 3 || c.length == 4) && isNumber(c[0])) return colorRgbArrayToHex79(c);
 	else if (tArr) return colorToHex79(rChoose(tArr));
-	else if (tObj && 'h' in c && c.h > 1) { return colorHsl360ObjectToHex79(c); } //console.log('!!!');
+	else if (tObj && 'h' in c && c.h > 1) { return colorHsl360ObjectToHex79(c); } 
 	else if (tObj && 'h' in c) return colorHsl01ObjectToHex79(c);
 	else if (tObj && 'r' in c) return colorRgbArgsToHex79(c.r, c.g, c.b, c.a);
 	assertion(false, `NO COLOR FOUND FOR ${c}`);
@@ -1445,7 +1445,7 @@ function createLineBetweenPoints(dboard, pointA, pointB, thickness = 10) {
 }
 function createOpenTable(gamename, players, options) {
 	let me = UGetName();
-	let playerNames = [me]; console.log('me', me)
+	let playerNames = [me]; ifVerbose('me', me)
 	assertion(me in players, "_createOpenTable without owner!!!!!")
 	for (const name in players) { addIf(playerNames, name); }
 	let table = {
@@ -1812,9 +1812,9 @@ function enableDataDrop(elem, onDropCallback) {
 	elem.addEventListener('drop', ev => {
 		ev.preventDefault();
 		elem.style.border = originalBorderStyle;
-		console.log('dropped onto', elem)
-		console.log(ev.target);
-		console.log(ev.dataTransfer.types);
+		ifVerbose('dropped onto', elem)
+		ifVerbose(ev.target);
+		ifVerbose(ev.dataTransfer.types);
 	});
 }
 function enableImageDrop(element, onDropCallback) {
@@ -2749,7 +2749,7 @@ function hPrepUi(ev, areas, cols, rows, bg, dParent) {
 	hToggleClassMenu(ev); mClear(dParent);
 	let d = mDom(dParent, { w: '100%', h: '100%' });
 	let names = mAreas(d, areas, cols, rows);
-	M.divNames = Array.from(new Set(M.divNames.concat(names))); console.log(M.divNames);
+	M.divNames = Array.from(new Set(M.divNames.concat(names))); ifVerbose(M.divNames);
 	mStyle('dPage', { bg });
 }
 function handleVisibilityChange() {
@@ -3148,7 +3148,7 @@ function normalizeString(s, opts = {}) {
 }
 function nundef(x) { return x === null || x === undefined || x === 'undefined'; }
 async function onEventEdited(id, text, time) {
-	console.log('onEventEdited', id, text, time)
+	ifVerbose('onEventEdited', id, text, time)
 	let e = Items[id];
 	if (nundef(time)) {
 		[time, text] = extractTime(text);
@@ -3156,7 +3156,7 @@ async function onEventEdited(id, text, time) {
 	e.time = time;
 	e.text = text;
 	let result = await simpleUpload('postUpdateEvent', e);
-	console.log('result', result)
+	ifVerbose('result', result)
 	Items[id] = lookupSetOverride(Serverdata, ['events', id], e);
 	mBy(id).firstChild.value = getEventValue(e);
 	closePopup();
@@ -3191,7 +3191,7 @@ function onHoverTooltip(d, text, controlkey = null, ms = 2000, xfactor = 0.7, yf
 }
 function onMouseMoveLine(ev) {
 	let d = mBy('dCanvas'); //ev.target;
-	let b = mGetStyle(d, 'border-width'); //console.log(b);
+	let b = mGetStyle(d, 'border-width'); //ifVerbose(b);
 	const mouseX = ev.clientX - d.offsetLeft - b;
 	const mouseY = ev.clientY + 2 - d.offsetTop - b;
 	B.lines.forEach(line => {
@@ -3226,13 +3226,13 @@ async function onchangeBotSwitch(ev) {
 	let id = T.id;
 	let playmode = (elem.checked) ? 'bot' : 'human';
 	let olist = [{ keys: ['players', name, 'playmode'], val: playmode }];
-	let res = await mPostRoute(`olist`, { id, name, olist }); //console.log(res)
+	let res = await mPostRoute(`olist`, { id, name, olist }); 
 }
 async function onclickAction(ev) {
 	assertion(isdef(DA.stopwatch), 'NO STOPWATCH!!!!!!!!!!!!!!!')
 	let [prevElem, elem] = hToggleClassMenu(ev);
 	let prevKey = prevElem ? prevElem.getAttribute('key') : null;
-	let key = elem.getAttribute('key'); console.log('keys', prevKey, key);
+	let key = elem.getAttribute('key'); ifVerbose('keys', prevKey, key);
 	let a = DA.action;
 	let w = DA.stopwatch;
 	if (!a) {
@@ -3243,7 +3243,7 @@ async function onclickAction(ev) {
 		DA.action = { key, elem, prevElem, prevKey, status: 'started' };
 		let s = `${key}:${getNow()}`;
 		let res = await mPhpPostText(s, 'zdata/action.txt'); //,{ text:`${getNow()}: ${w.key}, ${secs}`,time:getNow(),key:w.key,secs });
-		console.log(res);
+		ifVerbose(res);
 	} else if (a.key == key && a.status == 'started') {
 		a.status = 'paused';
 		a.prevElem = elem;
@@ -3756,9 +3756,6 @@ async function onclickStartGame() {
 	let players = collectPlayers();
 	let table = await startGame(DA.gamename, players, options);
 	sysIdle();
-}
-async function onclickTable(id) {
-	showTable(id);
 }
 async function onclickTableDelete(id) {
 	sysBusy();

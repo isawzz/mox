@@ -29,3 +29,5 @@ options:
   use_level: 'yes'
   numCards: 12
   gamemode: multi
+prior: 0
+game_friendly: Set

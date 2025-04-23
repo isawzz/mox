@@ -1,13 +1,31 @@
-async function onclickTest(ev) {
-  let [prevElem, elem] = hToggleClassMenu(ev);
-  if (prevElem == elem) { console.log('same!!!'); return; }
-  console.log('different', prevElem, elem);
-
-  await switchToMenu(elem.getAttribute('key'));
+function ifVerbose(){
+	if (!VERBOSE) return;
+	let {functionName,file,line} = getCallerInfo();
+	console.log(`==>${functionName}:${line}\n`, ...arguments);
 
 }
+function findElementBy(value,key='html') {
+  const all = document.querySelectorAll('*');
+  for (const el of all) {
+    // Check property
+    if (el[key] === value) return el;
 
+    // Check attribute
+    if (el.hasAttribute(key) && el.getAttribute(key) === value) return el;
 
+    // Check innerHTML or textContent
+		let di={html:'innerHTML', text:'textContent', caption:'innerHTML'};
+		key=valf(di[key],key);
+    if ((key === 'innerHTML' || key === 'textContent') && el[key] === value) return el;
+  }
+  return null;
+}
+async function clickOn(prop,val){
+	let elem = findElementBy(prop,val);
+	ifVerbose('elem', elem);
+	elem.click();	
+
+}
 
 async function pollAndShow() {
 
@@ -23,18 +41,18 @@ function pollStart() {
   TO.poll = setInterval(pollAndShow, DA.pollInterval);
 }
 async function pollStop() {
-  clearInterval(TO.poll); console.log('polling stopped', TO.poll);
+  clearInterval(TO.poll); ifVerbose('polling stopped', TO.poll);
   await mSleep(100);
-  TO.poll = null; console.log('interval reset!', TO.poll);
+  TO.poll = null; ifVerbose('interval reset!', TO.poll);
   await mSleep(400);
-  console.log('all clear');
+  ifVerbose('all clear');
 
 }
 
-async function DAInit(isTest = false) {
-	if (isTest) VERBOSE = true;
+async function DAInit(TESTING = false) {
 	DA.backendURL = getServer(true) + 'simple0/php'; //'https://moxito.online/mox/simple0/php';
-	if (VERBOSE) console.log('backendURL', DA.backendURL);
+	ifVerbose('backendURL', DA.backendURL);
+	
 	DA.gamelist = ['setgame', 'button96']; //'accuse aristo bluff ferro fishgame fritz huti lacuna nations setgame sheriff spotit wise'; if (DA.TEST0) gamelist += ' a_game'; gamelist = toWords(gamelist);
 	DA.funcs = { setgame: setgame(), button96: button96() }; //implemented games!
 	for (const gname in DA.gamelist) {
@@ -44,15 +62,19 @@ async function DAInit(isTest = false) {
 	DA.evList = [];
 	await loadAssetsStatic();
 	await loadTables();
-	if (VERBOSE) console.log('M', M);
+	ifVerbose('M', M);
 
 	let elems = mLayoutTM('dPage'); mStyle('dMain', { overy: 'auto' }); mCenterFlex('dMain');
 	mLayoutTopTestExtraMessageTitle('dTop');
 
-
-
-
-
+	let username = localStorage.getItem('username') ?? 'hans';
+	if (TESTING) {
+		let names = ['amanda', 'felix', 'lauren', 'mimi', 'gul'];
+		let d = mBy('dTestRight'); mFlex(d);
+		for (const name of names) { let b = mDom(d, { className: 'button' }, { tag: 'button', html: name, onclick: async (ev) => await switchToUser(name) }); }
+		username = rChoose(names); //['felix','lauren','diana','mimi','amanda','guest','gul']); //localStorage.getItem('username') ?? 'hans'; 
+	}
+	await showMenuButtons();
 }
 
 async function switchToUser(username) {
@@ -68,33 +90,12 @@ async function switchToUser(username) {
 	setTheme(U);
 	// await forceUpdate();
 }
-async function showTable() {
-	function updateUI() {
-		const area = mBy('dMain');
-		area.innerHTML = '<pre>' + JSON.stringify(DA.gameState, null, 2) + '</pre>';
-		console.log("UI updated:", DA.gameState);
-	}
-
-	let res = await fetch(`${DA.backendURL}/get_state.php`);
-	if (!res.ok) {
-		console.error('Error fetching game state:', res.statusText);
-		return null;
-	} //else { res = await res.text(); console.log(res) }
-	let state = await res.json();
-	if (JSON.stringify(state) !== JSON.stringify(DA.gameState)) {
-		DA.gameState = state;
-		updateUI();
-		if (VERBOSE) console.log('Game state updated:', state);
-	}
-	return DA.gameState;
-
-}
 async function MPollTables() {
-	let files = await mGetFilenames('tables'); //console.log('files', files);
+	let files = await mGetFilenames('tables'); //ifVerbose('files', files);
 	M.tableFilenames = files.map(x => x.split('.')[0]);
 	M.tables = {};
 	for (const f of M.tableFilenames) {
-		let t = await loadStaticYaml(`y/tables/${f}.yaml`); //console.log(t);
+		let t = await loadStaticYaml(`y/tables/${f}.yaml`); //ifVerbose(t);
 		M.tables[f] = t;
 	}
 	return M.tables;
@@ -107,7 +108,7 @@ async function DASaveState(state) {
 		body: JSON.stringify(DA.gameState)
 	});
 	let data = await res.json();
-	if (VERBOSE) console.log('Game state saved:', data, DA.gameState);
+	if (VERBOSE) ifVerbose('Game state saved:', data, DA.gameState);
 
 	return data;
 }
@@ -171,22 +172,22 @@ async function showGamesAndTables(force = false) {
 	let changes = deepCompare(DA.tableList, tables);
 	DA.tableList = tables;
 	if (changes || force) {
-		console.log('force',force,'changes', changes);
+		ifVerbose('force',force,'changes', changes);
 		mClear(dParent);
 		showTables(dParent, tables, me);
 		dParent = mBy('dGameList');
 		if (isdef(dParent)) { mClear(dParent); }
 		else { dParent = mDom('dMain', {}, { className: 'section', id: 'dGameList' }); }
 		showGames(dParent);
-	} else console.log('games & tables: no changes', changes);
+	} else ifVerbose('games & tables: no changes', changes);
 }
 async function showMenuButtons() {
 	let d = mBy('dTopLeft'); mStyle(d, { display: 'flex', vStretch: true, gap: 10, padding: 10, box: true }); //, box:true, vStretch:true, hCenter: true, padding: 10, gap: 10 }) //mClass(d,'flex')
 
 	let bStyles = { hPadding: 10, h: 25, wmin: 70, vPadding: 6, rounding: 10, cursor: 'pointer', className: 'hover', vCenter: true, display: 'flex', hCenter: true };
-	mDom(d, bStyles, { html: 'games', onclick: onclickTest, menu: 'top', key: 'games' });
-	mDom(d, bStyles, { html: 'table', onclick: onclickTest, menu: 'top', key: 'table' });
-	let b = await mKey('watch', d, bStyles, { onclick: onclickTest, menu: 'top', key: 'watch' });
+	mDom(d, bStyles, { html: 'games', onclick: switchToMenu, menu: 'top', key: 'games' });
+	mDom(d, bStyles, { html: 'table', onclick: switchToMenu, menu: 'top', key: 'table' });
+	if (TESTING) await mKey('watch', d, bStyles, { onclick: onclickWatch, menu: 'top', key: 'watch' });
 
 }
 async function showTestButtons() {
@@ -215,7 +216,7 @@ async function mKey(imgKey, d, styles = {}, opts = {}) {
   else if (isdef(o) && (type == 'img' || type == 'photo') && isdef(o[type])) src = o[type];
   else if (isdef(o) && isdef(o.img)) src = o.img;
   if (isdef(src)) {
-    //console.log('have source!!!!', styles)
+    //ifVerbose('have source!!!!', styles)
     let d0 = mDom(d, styles, opts);
     mCenterCenterFlex(d0);
     let [w, h] = mSizeSuccession(styles, 40);
@@ -235,7 +236,7 @@ async function mKey(imgKey, d, styles = {}, opts = {}) {
     [w, h] = [r.w, r.h];
     return d0;
   } else {
-    //console.log('styles',styles)
+    //ifVerbose('styles',styles)
     addKeys({ html: imgKey }, opts)
     let img = mDom(d, styles, opts);
     return img;
