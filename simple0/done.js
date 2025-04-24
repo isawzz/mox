@@ -1,101 +1,111 @@
-function ifVerbose(){
-	if (!VERBOSE) return;
-	let {functionName,file,line} = getCallerInfo();
-	console.log(`==>${functionName}:${line}\n`, ...arguments);
+async function showTable(force = false) {
+	function updateUI() {
+		const area = mBy('dMain');
+		area.innerHTML = '<pre>' + JSON.stringify(DA.gameState, null, 2) + '</pre>';
+		if (VERBOSE) console.log("UI updated:", DA.gameState);
+	}
+
+	let res = await fetch(`${DA.backendURL}/get_state.php`);
+	if (!res.ok) {
+		console.error('Error fetching game state:', res.statusText);
+		return null;
+	} //else { res = await res.text(); if (VERBOSE) console.log(res) }
+	let state = await res.json();
+	if (force || JSON.stringify(state) !== JSON.stringify(DA.gameState)) {
+		DA.gameState = state;
+		updateUI();
+		if (VERBOSE) if (VERBOSE) console.log('Game state updated:', state);
+	}
+	return DA.gameState;
 
 }
-function findElementBy(value,key='html') {
-  const all = document.querySelectorAll('*');
-  for (const el of all) {
-    // Check property
-    if (el[key] === value) return el;
-
-    // Check attribute
-    if (el.hasAttribute(key) && el.getAttribute(key) === value) return el;
-
-    // Check innerHTML or textContent
-		let di={html:'innerHTML', text:'textContent', caption:'innerHTML'};
-		key=valf(di[key],key);
-    if ((key === 'innerHTML' || key === 'textContent') && el[key] === value) return el;
-  }
-  return null;
+async function onclickTable(id) {
+	DA.id = id;
+	await switchToMenu('table');
 }
-async function clickOn(prop,val){
-	let elem = findElementBy(prop,val);
-	ifVerbose('elem', elem);
-	elem.click();	
+
+async function onclickWatch() { }
+function getCallerInfo() {
+	const err = new Error();
+	const stack = err.stack?.split('\n');
+
+	if (!stack || stack.length < 4) {
+		return { functionName: null, file: null, line: null };
+	}
+
+	// The 3rd item (index 2) is the current function, 4th (index 3) is the caller
+	const callerLine = stack[3] || '';
+	const match = callerLine.match(/at\s+(.*)\s+\((.*):(\d+):(\d+)\)/) ||
+		callerLine.match(/at\s+(.*):(\d+):(\d+)/);
+
+	if (match) {
+		return match.length === 5
+			? {
+				functionName: match[1],
+				file: match[2],
+				line: parseInt(match[3]),
+			}
+			: {
+				functionName: null,
+				file: match[1],
+				line: parseInt(match[2]),
+			};
+	}
+
+	return { functionName: null, file: null, line: null };
+}
+function findElementBy(value, key = 'html') {
+	const all = document.querySelectorAll('*');
+	for (const el of all) {
+		// Check property
+		if (el[key] === value) return el;
+
+		// Check attribute
+		if (el.hasAttribute(key) && el.getAttribute(key) === value) return el;
+
+		// Check innerHTML or textContent
+		let di = { html: 'innerHTML', text: 'textContent', caption: 'innerHTML' };
+		key = valf(di[key], key);
+		if ((key === 'innerHTML' || key === 'textContent') && el[key] === value) return el;
+	}
+	return null;
+}
+async function clickOn(prop, val) {
+	let elem = findElementBy(prop, val);
+	//if (VERBOSE) console.log('elem', elem);
+	elem.click();
 
 }
 
 async function pollAndShow() {
 
-  if (DA.menu == 'games') {
-    await showGamesAndTables();
-  } else if (DA.menu == 'table') {
+	if (DA.menu == 'games') {
+		await showGamesAndTables();
+	} else if (DA.menu == 'table') {
 
-  }
+	}
 
 }
 function pollStart() {
-  if (isdef(TO.poll)) return;
-  TO.poll = setInterval(pollAndShow, DA.pollInterval);
+	if (isdef(TO.poll)) return;
+	TO.poll = setInterval(pollAndShow, DA.pollInterval);
 }
 async function pollStop() {
-  clearInterval(TO.poll); ifVerbose('polling stopped', TO.poll);
-  await mSleep(100);
-  TO.poll = null; ifVerbose('interval reset!', TO.poll);
-  await mSleep(400);
-  ifVerbose('all clear');
+	clearInterval(TO.poll); if (VERBOSE) console.log('polling stopped', TO.poll);
+	await mSleep(100);
+	TO.poll = null; if (VERBOSE) console.log('interval reset!', TO.poll);
+	await mSleep(400);
+	if (VERBOSE) console.log('all clear');
 
 }
 
-async function DAInit(TESTING = false) {
-	DA.backendURL = getServer(true) + 'simple0/php'; //'https://moxito.online/mox/simple0/php';
-	ifVerbose('backendURL', DA.backendURL);
-	
-	DA.gamelist = ['setgame', 'button96']; //'accuse aristo bluff ferro fishgame fritz huti lacuna nations setgame sheriff spotit wise'; if (DA.TEST0) gamelist += ' a_game'; gamelist = toWords(gamelist);
-	DA.funcs = { setgame: setgame(), button96: button96() }; //implemented games!
-	for (const gname in DA.gamelist) {
-		if (isdef(DA.funcs[gname])) continue;
-		DA.funcs[gname] = defaultGameFunc();
-	}
-	DA.evList = [];
-	await loadAssetsStatic();
-	await loadTables();
-	ifVerbose('M', M);
 
-	let elems = mLayoutTM('dPage'); mStyle('dMain', { overy: 'auto' }); mCenterFlex('dMain');
-	mLayoutTopTestExtraMessageTitle('dTop');
-
-	let username = localStorage.getItem('username') ?? 'hans';
-	if (TESTING) {
-		let names = ['amanda', 'felix', 'lauren', 'mimi', 'gul'];
-		let d = mBy('dTestRight'); mFlex(d);
-		for (const name of names) { let b = mDom(d, { className: 'button' }, { tag: 'button', html: name, onclick: async (ev) => await switchToUser(name) }); }
-		username = rChoose(names); //['felix','lauren','diana','mimi','amanda','guest','gul']); //localStorage.getItem('username') ?? 'hans'; 
-	}
-	await showMenuButtons();
-}
-
-async function switchToUser(username) {
-	if (!isEmpty(username)) username = normalizeString(username);
-	if (isEmpty(username)) username = 'guest';
-	let res = await mPhpPost('all', { username, action: 'login' });
-	U = res.userdata;
-	DA.tid = localStorage.getItem('tid');
-	let bg = U.color;
-	let fg = U.fg ?? colorIdealText(bg);
-	mStyle('dTopRight', { className: 'button', display: 'inline', h: '80%', bg, fg }, { html: `${username}` });
-	localStorage.setItem('username', username);
-	setTheme(U);
-	// await forceUpdate();
-}
 async function MPollTables() {
-	let files = await mGetFilenames('tables'); //ifVerbose('files', files);
+	let files = await mGetFilenames('tables'); //if (VERBOSE) console.log('files', files);
 	M.tableFilenames = files.map(x => x.split('.')[0]);
 	M.tables = {};
 	for (const f of M.tableFilenames) {
-		let t = await loadStaticYaml(`y/tables/${f}.yaml`); //ifVerbose(t);
+		let t = await loadStaticYaml(`y/tables/${f}.yaml`); //if (VERBOSE) console.log(t);
 		M.tables[f] = t;
 	}
 	return M.tables;
@@ -108,7 +118,7 @@ async function DASaveState(state) {
 		body: JSON.stringify(DA.gameState)
 	});
 	let data = await res.json();
-	if (VERBOSE) ifVerbose('Game state saved:', data, DA.gameState);
+	if (VERBOSE) if (VERBOSE) console.log('Game state saved:', data, DA.gameState);
 
 	return data;
 }
@@ -172,30 +182,14 @@ async function showGamesAndTables(force = false) {
 	let changes = deepCompare(DA.tableList, tables);
 	DA.tableList = tables;
 	if (changes || force) {
-		ifVerbose('force',force,'changes', changes);
+		if (VERBOSE) console.log('force', force, 'changes', changes);
 		mClear(dParent);
 		showTables(dParent, tables, me);
 		dParent = mBy('dGameList');
 		if (isdef(dParent)) { mClear(dParent); }
 		else { dParent = mDom('dMain', {}, { className: 'section', id: 'dGameList' }); }
 		showGames(dParent);
-	} else ifVerbose('games & tables: no changes', changes);
-}
-async function showMenuButtons() {
-	let d = mBy('dTopLeft'); mStyle(d, { display: 'flex', vStretch: true, gap: 10, padding: 10, box: true }); //, box:true, vStretch:true, hCenter: true, padding: 10, gap: 10 }) //mClass(d,'flex')
-
-	let bStyles = { hPadding: 10, h: 25, wmin: 70, vPadding: 6, rounding: 10, cursor: 'pointer', className: 'hover', vCenter: true, display: 'flex', hCenter: true };
-	mDom(d, bStyles, { html: 'games', onclick: switchToMenu, menu: 'top', key: 'games' });
-	mDom(d, bStyles, { html: 'table', onclick: switchToMenu, menu: 'top', key: 'table' });
-	if (TESTING) await mKey('watch', d, bStyles, { onclick: onclickWatch, menu: 'top', key: 'watch' });
-
-}
-async function showTestButtons() {
-	let d = mBy('dTestLeft');
-	let styles = { rounding: 6, maleft: 10, h: 24, bg: 'dimgray', fg: 'white', padding: 5 };
-	let label = 'polling:';
-	DA.dControlUiState = await mToggleButton(d, styles, { label, key: 'hand', onclick: onclickHand }, { label, key: 'display', onclick: onclickDisplay })
-
+	} else if (VERBOSE) console.log('games & tables: no changes', changes);
 }
 async function onclickHand() {
 	await pollStop();
@@ -205,53 +199,53 @@ async function onclickDisplay() {
 }
 
 function getElementWithAttribute(key, val) {
-  return document.querySelector(`[${key}="${val}"]`);
+	return document.querySelector(`[${key}="${val}"]`);
 }
 async function mKey(imgKey, d, styles = {}, opts = {}) {
-  styles = jsCopy(styles);
-  let type = opts.prefer;
-  let o = type != 'plain' ? lookup(M.superdi, [imgKey]) : null;
-  let src;
-  if (nundef(o) && imgKey.includes('.')) src = imgKey;
-  else if (isdef(o) && (type == 'img' || type == 'photo') && isdef(o[type])) src = o[type];
-  else if (isdef(o) && isdef(o.img)) src = o.img;
-  if (isdef(src)) {
-    //ifVerbose('have source!!!!', styles)
-    let d0 = mDom(d, styles, opts);
-    mCenterCenterFlex(d0);
-    let [w, h] = mSizeSuccession(styles, 40);
-    let imgStyles = { h }, imgOpts = { tag: 'img', src }
-    // addKeys({ w, h }, styles); addKeys({ tag: 'img', src }, opts);
-    let img = await mImgAsync(d0, imgStyles, imgOpts, roundIfTransparentCorner);
-    return d0;
-  } else if (isdef(o)) {
-    if (nundef(type)) type = isdef(o.text) ? 'text' : isdef(o.fa6) ? 'fa6' : isdef(o.fa) ? 'fa' : isdef(o.ga) ? 'ga' : null;
-    let family = type == 'text' ? 'emoNoto' : type == 'fa6' ? 'fa6' : type == 'fa' ? 'pictoFa' : 'pictoGame';
-    let html = type == 'text' ? o.text : String.fromCharCode('0x' + o[type]);
-    addKeys({ family }, styles);
-    let d0 = mDom(d, styles, opts);
-    mCenterCenterFlex(d0);
-    let d1 = mDom(d0, {}, { html });
-    let r = getRect(d1);
-    [w, h] = [r.w, r.h];
-    return d0;
-  } else {
-    //ifVerbose('styles',styles)
-    addKeys({ html: imgKey }, opts)
-    let img = mDom(d, styles, opts);
-    return img;
-  }
+	styles = jsCopy(styles);
+	let type = opts.prefer;
+	let o = type != 'plain' ? lookup(M.superdi, [imgKey]) : null;
+	let src;
+	if (nundef(o) && imgKey.includes('.')) src = imgKey;
+	else if (isdef(o) && (type == 'img' || type == 'photo') && isdef(o[type])) src = o[type];
+	else if (isdef(o) && isdef(o.img)) src = o.img;
+	if (isdef(src)) {
+		//if (VERBOSE) console.log('have source!!!!', styles)
+		let d0 = mDom(d, styles, opts);
+		mCenterCenterFlex(d0);
+		let [w, h] = mSizeSuccession(styles, 40);
+		let imgStyles = { h }, imgOpts = { tag: 'img', src }
+		// addKeys({ w, h }, styles); addKeys({ tag: 'img', src }, opts);
+		let img = await mImgAsync(d0, imgStyles, imgOpts, roundIfTransparentCorner);
+		return d0;
+	} else if (isdef(o)) {
+		if (nundef(type)) type = isdef(o.text) ? 'text' : isdef(o.fa6) ? 'fa6' : isdef(o.fa) ? 'fa' : isdef(o.ga) ? 'ga' : null;
+		let family = type == 'text' ? 'emoNoto' : type == 'fa6' ? 'fa6' : type == 'fa' ? 'pictoFa' : 'pictoGame';
+		let html = type == 'text' ? o.text : String.fromCharCode('0x' + o[type]);
+		addKeys({ family }, styles);
+		let d0 = mDom(d, styles, opts);
+		mCenterCenterFlex(d0);
+		let d1 = mDom(d0, {}, { html });
+		let r = getRect(d1);
+		[w, h] = [r.w, r.h];
+		return d0;
+	} else {
+		//if (VERBOSE) console.log('styles',styles)
+		addKeys({ html: imgKey }, opts)
+		let img = mDom(d, styles, opts);
+		return img;
+	}
 }
 function hToggleClassMenu(ev) {
-  let elem = findAncestorWith(ev.target, { attribute: 'menu' });
-  if (mHasClass(elem, 'active')) return [elem, elem];
-  let menu = elem.getAttribute('menu');
-  let others = mBy(`[menu='${menu}']`, 'query').filter(x => x != elem);
-  let prev = null;
-  for (const o of others) {
-    assertion(o != elem);
-    if (mHasClass(o, 'active')) { prev = o; mClassRemove(o, 'active'); }
-  }
-  mClass(elem, 'active');
-  return [prev, elem];
+	let elem = findAncestorWith(ev.target, { attribute: 'menu' });
+	if (mHasClass(elem, 'active')) return [elem, elem];
+	let menu = elem.getAttribute('menu');
+	let others = mBy(`[menu='${menu}']`, 'query').filter(x => x != elem);
+	let prev = null;
+	for (const o of others) {
+		assertion(o != elem);
+		if (mHasClass(o, 'active')) { prev = o; mClassRemove(o, 'active'); }
+	}
+	mClass(elem, 'active');
+	return [prev, elem];
 }

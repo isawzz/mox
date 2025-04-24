@@ -1,50 +1,31 @@
-async function showTable(force=false) {
-	function updateUI() {
-		const area = mBy('dMain');
-		area.innerHTML = '<pre>' + JSON.stringify(DA.gameState, null, 2) + '</pre>';
-		ifVerbose("UI updated:", DA.gameState);
+
+async function DAInit(TESTING = false) {
+	DA.backendURL = getServer(true) + 'simple0/php'; //'https://moxito.online/mox/simple0/php';
+	if (VERBOSE) console.log('backendURL', DA.backendURL);
+
+	DA.gamelist = ['setgame', 'button96']; //'accuse aristo bluff ferro fishgame fritz huti lacuna nations setgame sheriff spotit wise'; if (DA.TEST0) gamelist += ' a_game'; gamelist = toWords(gamelist);
+	DA.funcs = { setgame: setgame(), button96: button96() }; //implemented games!
+	for (const gname in DA.gamelist) {
+		if (isdef(DA.funcs[gname])) continue;
+		DA.funcs[gname] = defaultGameFunc();
 	}
+	DA.evList = [];
+	await loadAssetsStatic();
+	await loadTables();
+	if (VERBOSE) console.log('M', M);
 
-	let res = await fetch(`${DA.backendURL}/get_state.php`);
-	if (!res.ok) {
-		console.error('Error fetching game state:', res.statusText);
-		return null;
-	} //else { res = await res.text(); ifVerbose(res) }
-	let state = await res.json();
-	if (force || JSON.stringify(state) !== JSON.stringify(DA.gameState)) {
-		DA.gameState = state;
-		updateUI();
-		if (VERBOSE) ifVerbose('Game state updated:', state);
+	let elems = mLayoutTM('dPage'); mStyle('dMain', { overy: 'auto', fg:'inherit' }); mCenterFlex('dMain');
+	mLayoutTopTestExtraMessageTitle('dTop');
+	let username = localStorage.getItem('username') ?? 'hans';
+	if (TESTING) {
+		let names = ['amanda', 'felix', 'lauren', 'mimi', 'gul'];
+		let d = mBy('dTestRight'); mClass(d,'button_container'); //mFlex(d);
+		for (const name of names) { let b = mDom(d, { }, { tag: 'button', html: name, onclick: async (ev) => await switchToUser(name) }); }
+		username = rChoose(names); //['felix','lauren','diana','mimi','amanda','guest','gul']); //localStorage.getItem('username') ?? 'hans'; 
 	}
-	return DA.gameState;
-
-}
-async function switchToMenu(evOrMenu) {
-
-	let ev = evOrMenu, menu = null;
-	if (isString(evOrMenu)) {
-		ev = { target: getElementWithAttribute('key', evOrMenu) };
-		menu = evOrMenu;
-	}
-	let [prevElem, elem] = hToggleClassMenu(ev);
-	if (prevElem == elem) { ifVerbose('same!!!'); return; }
-	//ifVerbose('different', prevElem, elem);
-
-	menu = valf(menu,elem.getAttribute('key'), DA.menu, localStorage.getItem('menu'), 'games');
-
-	ifVerbose('menu',menu); //ifVerbose('evOrMenu',evOrMenu,'\nmenu',menu,'\nev',ev);
-
-	DA.pollCounter = 0;
-	DA.menu = menu;
-	switch (menu) {
-		case 'games': await showGamesAndTables(true); DA.pollCounter = 0; DA.pollInterval = 3000; break;
-		case 'table': await showTable(true); DA.pollCounter = 0; DA.pollInterval = 1000; break;
-	}
-	localStorage.setItem('menu', menu);
-}
-async function onclickTable(id) {
-	DA.id = id;
-	await switchToMenu('table');
+	await showMenuButtons();
+	await showTestButtons();
 }
 
-async function onclickWatch() {}
+
+

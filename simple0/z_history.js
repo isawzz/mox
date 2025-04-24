@@ -1,3 +1,9 @@
+function ifVerbose(){
+	if (!VERBOSE) return;
+	let {functionName,file,line} = getCallerInfo();
+	console.log(`==>${stringAfterLast(file,'/')}:${line}\n`, ...arguments);
+
+}
 async function switchToMenu(menu) {
 
 	let button = getElementWithAttribute('key', menu);

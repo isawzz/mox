@@ -8,7 +8,7 @@ async function test0_game0() {
 	await clickOn('games');
 	if (TESTING) await clickOn(rChoose(['gul','felix','amanda','lauren','mimi']));
 }
-async function test0_buttons() {
+async function test0_buttons_NO() {
 	await DAInit(true);
 	let TESTING = true;
 	mStyle('dPage', { bg: 'green', fg: 'white' });
@@ -37,11 +37,11 @@ async function test0_flex() {
 }
 async function test0_save_state() {
 	await DAInit(true);
-	let state = await showTable(); //ifVerbose('vorher', jsCopy(state));
+	let state = await showTable(); //if (VERBOSE) console.log('vorher', jsCopy(state));
 
 	state.num = rNumber();
 
-	let res = await DASaveState(state); //ifVerbose('nachher', res);
+	let res = await DASaveState(state); //if (VERBOSE) console.log('nachher', res);
 
 }
 async function test0_get_state() {
@@ -49,15 +49,15 @@ async function test0_get_state() {
 	await DAInit();
 	let state = await showTable();
 
-	ifVerbose('DONE!', state);
+	if (VERBOSE) console.log('DONE!', state);
 }
 async function test0_php0() {
 	await loadAssetsStatic();
-	// let res = await mPhpPost('all', { action: 'dir', dir:'tables' },'simple0',true); ifVerbose('res', res)
-	// let files = await mGetFilenames('tables'); //ifVerbose('files', files);
+	// let res = await mPhpPost('all', { action: 'dir', dir:'tables' },'simple0',true); if (VERBOSE) console.log('res', res)
+	// let files = await mGetFilenames('tables'); //if (VERBOSE) console.log('files', files);
 	await loadTables();
-	ifVerbose('M', M)
+	if (VERBOSE) console.log('M', M)
 }
 async function test0() {
-	ifVerbose('YEAH!');
+	if (VERBOSE) console.log('YEAH!');
 }	

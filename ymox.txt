@@ -1,11 +1,17 @@
 alles ist fuer immer ok - I have left this plane.
 
-___ 6:11 AM 4/23/2025 airport lib 28.4. 40000 K
+___ 5:30 AM 4/24/2025 airport lib 28.4. 41000 K4
+7:06 AM 4/24/2025
+convert userbutton to editable!
+5:40 AM 4/24/2025
+einheitliche buttons
+'#d4aa70' #
+___ 6:11 AM 4/23/2025 airport lib 28.4. 40000 K5vok
 wenn schon ein menu habe, dann muss ich den button finden dazu und hToggle
 wenn noch keines habe dann muss ich von dem ev das toggle machen um den key zu finden
 7:04 AM 4/23/2025
 1 tag pausieren, dann wait for fe deadline, dann flug buchen falls fe
-___ 6:11 AM 4/22/2025 airport lib 28.4. 39000 xv v*
+___ 6:11 AM 4/22/2025 airport lib 28.4. 39000 xvv*
 ___ 6:11 AM 4/21/2025 airport lib 22.4. 38000
 6:54 AM 4/21/2025
 rem cons

@@ -54,13 +54,14 @@ guest:
       handicap: 3
 gul:
   name: gul
-  color: '#e6be8a'
+  color: '#283618'
   texture: ../assets/textures/marble_beige1.jpeg
-  blendMode: normal
+  blendMode: luminosity
   imgKey: leopard
   games:
     setgame:
       level: 1
+  fg: '#000000'
 lauren:
   name: lauren
   color: '#006c7f'

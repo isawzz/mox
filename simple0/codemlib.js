@@ -488,7 +488,7 @@ function mLayout(dParent, rowlist, colt, rowt, styles = {}, opts = {}) {
 	if (dParent.id == 'dPage') M.divNames = [];
 	let newNames = mAreas(dParent, areas, colt, rowt);
 	let names = M.divNames = Array.from(new Set(M.divNames.concat(newNames)));
-	if (nundef(styles.bgSrc)) mShade(newNames);
+	if (nundef(styles.bgSrc)) mShade(newNames, 2, 1);
 	return names.map(x => mBy(x));
 }
 function mLayoutLMR(dParent, styles = {}, opts = {}) {
@@ -561,9 +561,9 @@ function mLayoutTopExtraSpaceBetween(dParent) {
 }
 function mLayoutTopTestExtraMessageTitle(dParent) {
 	dParent = toElem(dParent);
-	mStyle(dParent, {}, { id: 'dOuterTop' });
+	mStyle(dParent, { hPadding: 10, vPadding: 2 }, { id: 'dOuterTop' });
 	let dTop = mDom(dParent, { display: 'flex', justifyContent: 'space-between' }, { id: 'dTop' });
-	let dTest = mDom(dParent, { display: 'flex', justifyContent: 'space-between', hPadding: 10 }, { id: 'dTest' });
+	let dTest = mDom(dParent, { display: 'flex', justifyContent: 'space-between' }, { id: 'dTest' });
 	let dExtra = mDom(dParent, { display: 'flex', justifyContent: 'space-between' }, { id: 'dExtra' });
 	let dMessage = mDom(dParent, { h: 0, bg: 'red', fg: 'yellow' }, { id: 'dMessage' });
 	let [dTopLeft, dTopMiddle, dTopRight] = [mDom('dTop', {}, { id: 'dTopLeft' }), mDom('dTop', {}, { id: 'dTopMiddle' }), mDom('dTop', {}, { id: 'dTopRight' })]

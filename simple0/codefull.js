@@ -316,7 +316,7 @@ function calcClipPoints(x0, y0, w, h, clipPath) {
 	return pixelPoints;
 }
 function calcHexCorners(center, width, height) {
-	const [cx, cy] = [center.cx, center.cy]; ifVerbose('center', center)
+	const [cx, cy] = [center.cx, center.cy]; if (VERBOSE) console.log('center', center)
 	const points = [];
 	const angleStep = (2 * Math.PI) / 6;
 	const rx = width / 2;
@@ -358,13 +358,13 @@ async function cleanupOldActionIfAny(ev) {
 		let res = await mPhpPostLine(s, '../../zdata/action.txt'); 
 		w.reset();
 		elem = findAncestorWith(ev.target, { attribute: 'key' });
-		ifVerbose(elem);
+		if (VERBOSE) console.log(elem);
 	}
 }
 function clearEvents() {
 	for (const k in TO) { clearTimeout(TO[k]); TO[k] = null; }
 	for (const k in ANIM) { if (isdef(ANIM[k])) ANIM[k].cancel(); ANIM[k] = null; }
-	if (SLEEP_WATCHER) { SLEEP_WATCHER.cancel(); ifVerbose('clearEvents: ACHTUNG SLEEP_WATCHER!!!') }
+	if (SLEEP_WATCHER) { SLEEP_WATCHER.cancel(); if (VERBOSE) console.log('clearEvents: ACHTUNG SLEEP_WATCHER!!!') }
 }
 function clearMain() { UI.commands = {}; staticTitle(); clearEvents(); mClear('dMain'); mClear('dTitle'); clearMessage(); }
 function clearMessage(remove = false) { if (remove) mRemove('dMessage'); else mStyle('dMessage', { h: 0 }); }
@@ -694,7 +694,7 @@ function colorFromNat(ncol, wPercent, bPercent) {
 	return colorFromNcol(ncol, wPercent, bPercent);
 }
 function colorFromNcol(ncol, wPercent, bPercent) {
-	let h = colorNcolToHue(ncol); ifVerbose('hue', h);
+	let h = colorNcolToHue(ncol); if (VERBOSE) console.log('hue', h);
 	return colorFromHwb(h, wPercent, bPercent);
 }
 function colorFromRgb(r, g, b) { return colorFrom({ r, g, b }); }
@@ -766,7 +766,7 @@ function colorGradient(sColors, type = 'linear', param = null) {
 	if (param) param = `${param},`; else param = '';
 	if (nundef(sColors)) sColors = `${rColor()},${rColor()}`;
 	else if (!sColors.includes('#')) {
-		let list = toWords(sColors, true); ifVerbose(list);
+		let list = toWords(sColors, true); if (VERBOSE) console.log(list);
 		sColors = list.map(x => colorFrom(x)).join(', ');
 	}
 	return `${type}-gradient(${param}${sColors})`;
@@ -1019,10 +1019,10 @@ function colorSample(d, color) {
 function colorSchemeRYB() {
 	let ryb = ['#FE2712', '#FC600A', '#FB9902', '#FCCC1A', '#FEFE33', '#B2D732', '#66B032', '#347C98', '#0247FE', '#4424D6', '#8601AF', '#C21460'];
 	return ryb;
-	ifVerbose('w3color', w3color('deeppink'))
+	if (VERBOSE) console.log('w3color', w3color('deeppink'))
 	for (const c of ryb) {
 		let cw = w3color(c);
-		ifVerbose(cw.hue, cw.sat, cw.lightness, cw.ncol);
+		if (VERBOSE) console.log(cw.hue, cw.sat, cw.lightness, cw.ncol);
 	}
 }
 function colorShades(color) {
@@ -1445,7 +1445,7 @@ function createLineBetweenPoints(dboard, pointA, pointB, thickness = 10) {
 }
 function createOpenTable(gamename, players, options) {
 	let me = UGetName();
-	let playerNames = [me]; ifVerbose('me', me)
+	let playerNames = [me]; if (VERBOSE) console.log('me', me)
 	assertion(me in players, "_createOpenTable without owner!!!!!")
 	for (const name in players) { addIf(playerNames, name); }
 	let table = {
@@ -1812,9 +1812,9 @@ function enableDataDrop(elem, onDropCallback) {
 	elem.addEventListener('drop', ev => {
 		ev.preventDefault();
 		elem.style.border = originalBorderStyle;
-		ifVerbose('dropped onto', elem)
-		ifVerbose(ev.target);
-		ifVerbose(ev.dataTransfer.types);
+		if (VERBOSE) console.log('dropped onto', elem)
+		if (VERBOSE) console.log(ev.target);
+		if (VERBOSE) console.log(ev.dataTransfer.types);
 	});
 }
 function enableImageDrop(element, onDropCallback) {
@@ -2749,7 +2749,7 @@ function hPrepUi(ev, areas, cols, rows, bg, dParent) {
 	hToggleClassMenu(ev); mClear(dParent);
 	let d = mDom(dParent, { w: '100%', h: '100%' });
 	let names = mAreas(d, areas, cols, rows);
-	M.divNames = Array.from(new Set(M.divNames.concat(names))); ifVerbose(M.divNames);
+	M.divNames = Array.from(new Set(M.divNames.concat(names))); if (VERBOSE) console.log(M.divNames);
 	mStyle('dPage', { bg });
 }
 function handleVisibilityChange() {
@@ -3148,7 +3148,7 @@ function normalizeString(s, opts = {}) {
 }
 function nundef(x) { return x === null || x === undefined || x === 'undefined'; }
 async function onEventEdited(id, text, time) {
-	ifVerbose('onEventEdited', id, text, time)
+	if (VERBOSE) console.log('onEventEdited', id, text, time)
 	let e = Items[id];
 	if (nundef(time)) {
 		[time, text] = extractTime(text);
@@ -3156,7 +3156,7 @@ async function onEventEdited(id, text, time) {
 	e.time = time;
 	e.text = text;
 	let result = await simpleUpload('postUpdateEvent', e);
-	ifVerbose('result', result)
+	if (VERBOSE) console.log('result', result)
 	Items[id] = lookupSetOverride(Serverdata, ['events', id], e);
 	mBy(id).firstChild.value = getEventValue(e);
 	closePopup();
@@ -3191,7 +3191,7 @@ function onHoverTooltip(d, text, controlkey = null, ms = 2000, xfactor = 0.7, yf
 }
 function onMouseMoveLine(ev) {
 	let d = mBy('dCanvas'); //ev.target;
-	let b = mGetStyle(d, 'border-width'); //ifVerbose(b);
+	let b = mGetStyle(d, 'border-width'); //if (VERBOSE) console.log(b);
 	const mouseX = ev.clientX - d.offsetLeft - b;
 	const mouseY = ev.clientY + 2 - d.offsetTop - b;
 	B.lines.forEach(line => {
@@ -3232,7 +3232,7 @@ async function onclickAction(ev) {
 	assertion(isdef(DA.stopwatch), 'NO STOPWATCH!!!!!!!!!!!!!!!')
 	let [prevElem, elem] = hToggleClassMenu(ev);
 	let prevKey = prevElem ? prevElem.getAttribute('key') : null;
-	let key = elem.getAttribute('key'); ifVerbose('keys', prevKey, key);
+	let key = elem.getAttribute('key'); if (VERBOSE) console.log('keys', prevKey, key);
 	let a = DA.action;
 	let w = DA.stopwatch;
 	if (!a) {
@@ -3243,7 +3243,7 @@ async function onclickAction(ev) {
 		DA.action = { key, elem, prevElem, prevKey, status: 'started' };
 		let s = `${key}:${getNow()}`;
 		let res = await mPhpPostText(s, 'zdata/action.txt'); //,{ text:`${getNow()}: ${w.key}, ${secs}`,time:getNow(),key:w.key,secs });
-		ifVerbose(res);
+		if (VERBOSE) console.log(res);
 	} else if (a.key == key && a.status == 'started') {
 		a.status = 'paused';
 		a.prevElem = elem;
@@ -4260,11 +4260,6 @@ async function saveDataFromPlayerOptionsUI(gamename) {
 	let dold = mBy(id);
 	if (isdef(dold)) { await saveAndUpdatePlayerOptions(lastAllPl, gamename); dold.remove(); }
 }
-function setColors(item) {
-	let bg = item.color;
-	let fg = item.fg ?? colorIdealText(bg);
-	mStyle('dPage', { bg, fg });
-}
 function setDropPosition(ev, elem, targetElem, dropPos) {
 	if (dropPos == 'mouse') {
 		var elm = $(targetElem);
@@ -4904,7 +4899,7 @@ function showGameover(table, dParent) {
 	let d = showRibbon(dParent, msg);
 	updateTestButtonsLogin(table.playerNames);
 	mDom(d, { h: 12 }, { html: '<br>' })
-	mButton('PLAY AGAIN', () => onclickTableStart(table.id), d, { className: 'button', fz: 24 });
+	mButton('PLAY AGAIN', () => onclickTableStart(table.id), d, { fz: 24 });
 }
 function showImage(key, dParent, styles = {}, useSymbol = false) {
 	let o = M.superdi[key];

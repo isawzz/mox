@@ -18,26 +18,30 @@ button,
 input,
 select {
   padding: 5px 10px;
-  /* margin: 5px 10px; */
   font-size: inherit;
-  /* border: 1px solid #ccc; */
   border-radius: 5px;
-  /* width: 100%; */
   outline: none;
   border: none;
   box-shadow: none;
   cursor: pointer;
 }
-
+button{
+  background-color: #ffffff80;
+}
 a:hover,
 button:hover {
-  background: #ffffff80 !important;
+  /* background: #ffffff80 !important; */
+  background-color: #ffffff;
+  color:black;
 }
 
 a:active,
-button:active {
-  background: white !important;
-  color: black !important;
+button:active,
+.active {
+  /* background: white !important; */
+  /* color: black !important; */
+  background: #00000080 !important;
+  color: white !important;
 }
 
 legend {
@@ -64,13 +68,17 @@ fieldset .disabled {
   opacity: 0.3;
   cursor: default;
 }
+
 /* #endregion classes */
 
 /* #region classes */
-.button {
-  padding: 2px 10px;
-  margin: 4px 10px 2px 0px;
-  border-radius: 10px;
+.button_container {
+  /* background: red; */
+  display: flex;
+  padding: 4px;
+  box-sizing: border-box;
+  gap: 10px;
+  align-items: stretch;
 }
 
 [contenteditable]:focus {
@@ -132,11 +140,7 @@ fieldset .disabled {
   background: 'white';
 }
 
-.active{
-  background: #00000080 !important;
-  color:white !important;
-}
-.hover{
+/* .hover{
   background-color: #ffffffAA;
   color: black;
 }
@@ -145,7 +149,7 @@ fieldset .disabled {
 }
 .hover:active, .hover:focus{
   background-color: #ffffffBB;
-}
+} */
 
 .no_outline {
   border: none;
