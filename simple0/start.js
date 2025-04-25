@@ -1,4 +1,4 @@
-onload = start; VERBOSE = true; TESTING = true;
+onload = start; VERBOSE = false; TESTING = true;
 
 async function start() { await test0_game0(); }
 
@@ -6,7 +6,13 @@ async function test0_game0() {
 	await DAInit(true);
 
 	await clickOn('games');
-	if (TESTING) await clickOn(rChoose(['gul','felix','amanda','lauren','mimi']));
+	if (TESTING) await clickOn(rChoose(['gul', 'felix', 'amanda', 'lauren', 'mimi']));
+
+	let d = mBy('dExtraLeft'); mClass(d, 'button_container');
+
+	let b = mToggleColorButton(d, {}, { html: 'poll:' });
+	clickOn(b);
+
 }
 async function test0_buttons_NO() {
 	await DAInit(true);

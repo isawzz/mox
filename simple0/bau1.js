@@ -1,31 +1,53 @@
 
-async function DAInit(TESTING = false) {
-	DA.backendURL = getServer(true) + 'simple0/php'; //'https://moxito.online/mox/simple0/php';
-	if (VERBOSE) console.log('backendURL', DA.backendURL);
+function onclickBlinker(ev,states){
+	let button = ev.target; //evToAttr('state');
+	let ch=arrChildren(button)
+	console.log('button', button,'\nchildren',ch, '\nstates',states);
+	let elem = ch.find(x=>x.hasAttribute('state')); 
+	console.log('elem',elem);
+	let attr = elem.getAttribute('state');
+	console.log('attr', attr);
+let i=0;//nundef(attr)?0:(Number(attr)+1) % states.length;
+	
+	console.log('i', i);
+	let state = states[i];
+	console.log('state', state);
+	elem.setAttribute('state', i);
 
-	DA.gamelist = ['setgame', 'button96']; //'accuse aristo bluff ferro fishgame fritz huti lacuna nations setgame sheriff spotit wise'; if (DA.TEST0) gamelist += ' a_game'; gamelist = toWords(gamelist);
-	DA.funcs = { setgame: setgame(), button96: button96() }; //implemented games!
-	for (const gname in DA.gamelist) {
-		if (isdef(DA.funcs[gname])) continue;
-		DA.funcs[gname] = defaultGameFunc();
-	}
-	DA.evList = [];
-	await loadAssetsStatic();
-	await loadTables();
-	if (VERBOSE) console.log('M', M);
+	// let key = Object.keys(state)[0];
+	// console.log('key', key);
+	// let val = states[key];
+	// console.log('val', val);
+	//if (key == 'green') mBlinkOn(elem, key, ()=>elem.setAttribute('state', key));
 
-	let elems = mLayoutTM('dPage'); mStyle('dMain', { overy: 'auto', fg:'inherit' }); mCenterFlex('dMain');
-	mLayoutTopTestExtraMessageTitle('dTop');
-	let username = localStorage.getItem('username') ?? 'hans';
-	if (TESTING) {
-		let names = ['amanda', 'felix', 'lauren', 'mimi', 'gul'];
-		let d = mBy('dTestRight'); mClass(d,'button_container'); //mFlex(d);
-		for (const name of names) { let b = mDom(d, { }, { tag: 'button', html: name, onclick: async (ev) => await switchToUser(name) }); }
-		username = rChoose(names); //['felix','lauren','diana','mimi','amanda','guest','gul']); //localStorage.getItem('username') ?? 'hans'; 
-	}
-	await showMenuButtons();
-	await showTestButtons();
 }
+function mBlinkOn(b,bg,callback){
+	mClass(b,'blink');
+	mStyle(b, {bg});	
+	b.setAttribute('state',bg);
+	if (isdef(callback)) callback();
+}
+function mBlinkOff(b,bg,callback){
+	mClassRemove(b,'blink');
+	mStyle(b, {bg});	
+	b.setAttribute('state',bg);
+	if (isdef(callback)) callback();
+}
+function mToggleColorButton(dParent,styles={},opts={},states){
+	addKeys({tag:'button'},opts);
+
+	let b=mDom(dParent,styles,opts);mFlex(b,false,'space-between','baseline',true);
+
+	let sz=16;
+	let c=mDom(b,{w:sz,h:sz,round:true,bg:'blue',position:'relative',top:2,left:3},{state:null});
+	mClass(c,'blink');
+
+	if (nundef(states)) states = [{color:'green',blink:false,f:()=>console.log('callback!')},{color:'red',blink:true,f:()=>console.log('callback!')}];
+
+	b.onclick=ev=>onclickBlinker(ev,states);
+	return b;
+}
+
 
 
 

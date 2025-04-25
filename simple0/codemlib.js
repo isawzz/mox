@@ -1054,15 +1054,16 @@ function mToggle(ev) {
 	if (isdef(t.handler)) t.handler(key, prev, t.state);
 }
 async function mToggleButton(dParent, styles = {}) {
+	// console.log(getCallerInfo(), dParent, styles, ...arguments)
 	addKeys({ display: 'flex', wrap: 'wrap', alignItems: 'center' }, styles)
-	let d1 = mDom(dParent, styles);
-	let list = Array.from(arguments).slice(2);
+	let d1 = mDom(dParent, styles, { tag: 'button' });
+	let list = Array.from(arguments).slice(2); //console.log('list', list)
 	let buttons = [];
 	let style = { className: 'no_select', display: 'flex', 'flex-wrap': 'nowrap', alignItems: 'center', cursor: 'pointer' };
 	let words = list.map(x => x.label);
 	let hasKey = list.some(x => x.key);
-	let w = getMaxWordWidth(words, d1) + (hasKey ? styles.h * 1.35 + 2 : 10); console.log(w);
-	mStyle(d1, { w });
+	let w = getMaxWordWidth(words, d1) + (hasKey ? valf(styles.h, 30) * 1.35 + 2 : 10); //console.log(w);
+	mStyle(d1, { w, justifyContent: 'center' });
 	for (const l of list) {
 		let b = mDom(d1, style, { onclick: l.onclick });
 		mDom(b, { maright: 6, 'white-space': 'nowrap' }, { html: l.label });
