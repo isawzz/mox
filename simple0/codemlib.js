@@ -745,6 +745,7 @@ async function mPhpPost(cmd, o, projectName = 'simple0', verbose = false, jsonRe
 				}
 			}
 		}
+
 		return obj;
 	} catch (e) {
 		return isString(text) ? text : e;

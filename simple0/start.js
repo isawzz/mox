@@ -1,4 +1,4 @@
-onload = start; VERBOSE = false; TESTING = true;
+onload = start; VERBOSE = true; TESTING = true;
 
 async function start() { await test0_game0(); }
 
@@ -8,10 +8,12 @@ async function test0_game0() {
 	await clickOn('games');
 	if (TESTING) await clickOn(rChoose(['gul', 'felix', 'amanda', 'lauren', 'mimi']));
 
-	let d = mBy('dExtraLeft'); mClass(d, 'button_container');
+	clickOn(DA.bPoll);
+	//console.log('....polling started',DA.pollInterval);
 
-	let b = mToggleColorButton(d, {}, { html: 'poll:' });
-	clickOn(b);
+
+	//wenn mPhp... mache soll DA.bPoll ganz rot werden, danach wieder normal
+	//const pulse = b.animate([{ opacity: 1 }, { opacity: 0.3 }, { opacity: 1 }], { duration: 1000, iterations: 1 });
 
 }
 async function test0_buttons_NO() {
@@ -61,7 +63,7 @@ async function test0_php0() {
 	await loadAssetsStatic();
 	// let res = await mPhpPost('all', { action: 'dir', dir:'tables' },'simple0',true); if (VERBOSE) console.log('res', res)
 	// let files = await mGetFilenames('tables'); //if (VERBOSE) console.log('files', files);
-	await loadTables();
+	M.tables = await MPollTables();
 	if (VERBOSE) console.log('M', M)
 }
 async function test0() {

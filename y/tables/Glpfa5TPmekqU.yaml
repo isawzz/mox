@@ -22,9 +22,18 @@ players:
     bg: '#55bc41'
     level: 7
     playmode: human
+  felix:
+    name: felix
+    color: '#0e1e76'
+    texture: ../assets/textures/marble_meer1.jpg
+    blendMode: normal
+    imgKey: felix
+    level: 4
+    playmode: human
 playerNames:
   - mimi
   - guest
+  - felix
 options:
   use_level: 'yes'
   numCards: 12

@@ -1,52 +1,45 @@
 
-function onclickBlinker(ev,states){
-	let button = ev.target; //evToAttr('state');
-	let ch=arrChildren(button)
-	console.log('button', button,'\nchildren',ch, '\nstates',states);
-	let elem = ch.find(x=>x.hasAttribute('state')); 
-	console.log('elem',elem);
-	let attr = elem.getAttribute('state');
-	console.log('attr', attr);
-let i=0;//nundef(attr)?0:(Number(attr)+1) % states.length;
-	
-	console.log('i', i);
-	let state = states[i];
-	console.log('state', state);
-	elem.setAttribute('state', i);
+async function pollAndShow() {
+	if (isdef(DA.bPoll)) {
+		// console.log('', DA.pollCounter++, 'POLLING!!!', DA.pollIntervalChanged,DA.pollInterval);
+		DA.bPoll.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 500 });
+		//mStyle(DA.bPoll, { opacity: .5 }); await mSleep(100);
+	}
 
-	// let key = Object.keys(state)[0];
-	// console.log('key', key);
-	// let val = states[key];
-	// console.log('val', val);
-	//if (key == 'green') mBlinkOn(elem, key, ()=>elem.setAttribute('state', key));
+	let restartAfterPoll = DA.pollIntervalChanged==true;
+	if (DA.pollIntervalChanged) {
+		await pollStop();
+	}
+
+	if (DA.menu == 'games') {
+		await showGamesAndTables();
+	} else if (DA.menu == 'table') {
+		await showTable();
+	}
+
+	if (isdef(DA.bPoll)) DA.bPoll.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500 });
+
+	if (restartAfterPoll) {		pollStart();	}
 
 }
-function mBlinkOn(b,bg,callback){
-	mClass(b,'blink');
-	mStyle(b, {bg});	
-	b.setAttribute('state',bg);
-	if (isdef(callback)) callback();
+function pollStart() {
+	if (isdef(TO.poll)) return;
+	DA.pollIntervalChanged = false;
+	console.log('polling started',DA.pollInterval);
+	TO.poll = setInterval(pollAndShow, DA.pollInterval);
 }
-function mBlinkOff(b,bg,callback){
-	mClassRemove(b,'blink');
-	mStyle(b, {bg});	
-	b.setAttribute('state',bg);
-	if (isdef(callback)) callback();
+async function pollStop() {
+	if (!TO.poll) return;
+	clearInterval(TO.poll); if (VERBOSE) console.log('polling stopped', TO.poll);
+	DA.pollIntervalChanged = false;
+	await mSleep(100);
+	TO.poll = null; // if (VERBOSE) console.log('interval reset!', TO.poll);
+	await mSleep(400);
+	// if (VERBOSE) console.log('all clear');
+
 }
-function mToggleColorButton(dParent,styles={},opts={},states){
-	addKeys({tag:'button'},opts);
 
-	let b=mDom(dParent,styles,opts);mFlex(b,false,'space-between','baseline',true);
 
-	let sz=16;
-	let c=mDom(b,{w:sz,h:sz,round:true,bg:'blue',position:'relative',top:2,left:3},{state:null});
-	mClass(c,'blink');
-
-	if (nundef(states)) states = [{color:'green',blink:false,f:()=>console.log('callback!')},{color:'red',blink:true,f:()=>console.log('callback!')}];
-
-	b.onclick=ev=>onclickBlinker(ev,states);
-	return b;
-}
 
 
 

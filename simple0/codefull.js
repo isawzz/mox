@@ -2880,6 +2880,10 @@ async function loadAssetsStatic() {
 	M.users = await loadStaticYaml('y/users.yaml');
 	loadColors();
 	loadSuperdiAssets();
+	if (nundef(M.asciiCapitals)) {
+		let except = ["Noum", 'Bras', 'Reykja'];
+		M.asciiCapitals = M.capital.filter(x => !x.includes('.') && !except.some(y => x.startsWith(y)));
+	}
 }
 function loadColors(bh = 18, bs = 20, bl = 20) {
 	if (nundef(M.dicolor)) {
@@ -2940,13 +2944,6 @@ function loadSuperdiAssets() {
 	M.collections = Object.keys(byColl); M.collections.sort();
 	M.names = Object.keys(byFriendly); M.names.sort();
 	[M.colorList, M.colorByHex, M.colorByName] = getListAndDictsForDicolors();
-}
-async function loadTables() {
-	if (nundef(M.asciiCapitals)) {
-		let except = ["Noum", 'Bras', 'Reykja'];
-		M.asciiCapitals = M.capital.filter(x => !x.includes('.') && !except.some(y => x.startsWith(y)));
-	}
-	M.tables = await MPollTables();
 }
 function loadUsers() {
 	console.log('hier werden users updated was immer zu tun ist!!!')

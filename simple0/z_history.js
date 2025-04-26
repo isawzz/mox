@@ -1,3 +1,31 @@
+async function showTestButtons() {
+	let d = mBy('dTestLeft'); mClass(d, 'button_container');
+	let styles = { rounding: 6, maleft: 10, h: 24, bg: 'dimgray', fg: 'white', padding: 5 };
+	let label = 'polling:';
+	DA.dControlUiState = await mToggleButton(d, {}, { label, key: 'hand', onclick: onclickHand }, { label, key: 'display', onclick: onclickDisplay })
+
+}
+async function loadTables() {
+	M.tables = await MPollTables();
+}
+async function onclickHand() {
+	await pollStop();
+}
+async function onclickDisplay() {
+	await pollStart();
+}
+function mBlinkOn(b, bg, callback) {
+	mClass(b, 'blink');
+	mStyle(b, { bg });
+	b.setAttribute('state', bg);
+	if (isdef(callback)) callback();
+}
+function mBlinkOff(b, bg, callback) {
+	mClassRemove(b, 'blink');
+	mStyle(b, { bg });
+	b.setAttribute('state', bg);
+	if (isdef(callback)) callback();
+}
 function ifVerbose(){
 	if (!VERBOSE) return;
 	let {functionName,file,line} = getCallerInfo();

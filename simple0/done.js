@@ -1,7 +1,43 @@
 
+function onclickBlinker(ev, states) {
+	let button = ev.target; //evToAttr('state');
+	let ch = arrChildren(button)
+	// console.log('button', button, '\nchildren', ch, '\nstates', states);
+	let elem = ch.find(x => x.hasAttribute('state'));
+	// console.log('elem', elem);
+	let attr = elem.getAttribute('state');
+	// console.log('attr', attr);
+	let i = 0;//nundef(attr)?0:(Number(attr)+1) % states.length;
+	if (!isNumber(attr)) i =0; else i= (Number(attr) + 1) % states.length;
+
+	// console.log('i', i);
+	let state = states[i];
+	// console.log('state', state);
+	elem.setAttribute('state', i);
+
+	mStyle(elem, { bg: state.color });
+	if (state.blink) mClass(elem, 'blink'); else mClassRemove(elem, 'blink');
+	if (isdef(state.f)) state.f();
+}
+function mToggleColorButton(dParent, styles = {}, opts = {}, states) {
+	addKeys({ tag: 'button' }, opts);
+
+	let b = mDom(dParent, styles, opts); mFlex(b, false, 'space-between', 'baseline', true);
+
+	let sz = 16;
+	let c = mDom(b, { w: sz, h: sz, round: true, bg: 'blue', position: 'relative', top: 2, left: 3 }, { state: null });
+	//mClass(c, 'blink');
+
+	if (nundef(states)) states = [{ color: 'green', blink: false, f: () => console.log('callback!') }, { color: 'red', blink: true, f: () => console.log('callback!') }];
+
+	b.onclick = ev => onclickBlinker(ev, states);
+	return b;
+}
 async function DAInit(TESTING = false) {
+	DA.pollInterval = 3000;
+	DA.pollCounter = 0;
 	DA.backendURL = getServer(true) + 'simple0/php'; //'https://moxito.online/mox/simple0/php';
-	if (VERBOSE) console.log('backendURL', DA.backendURL);
+	//if (VERBOSE) console.log('backendURL', DA.backendURL);
 
 	DA.gamelist = ['setgame', 'button96']; //'accuse aristo bluff ferro fishgame fritz huti lacuna nations setgame sheriff spotit wise'; if (DA.TEST0) gamelist += ' a_game'; gamelist = toWords(gamelist);
 	DA.funcs = { setgame: setgame(), button96: button96() }; //implemented games!
@@ -11,27 +47,28 @@ async function DAInit(TESTING = false) {
 	}
 	DA.evList = [];
 	await loadAssetsStatic();
-	await loadTables();
-	if (VERBOSE) console.log('M', M);
+	M.tables = await MPollTables();
+	//if (VERBOSE) console.log('M', M);
 
-	let elems = mLayoutTM('dPage'); mStyle('dMain', { overy: 'auto', fg:'inherit' }); mCenterFlex('dMain');
+	let elems = mLayoutTM('dPage'); mStyle('dMain', { overy: 'auto', fg: 'inherit' }); mCenterFlex('dMain');
 	mLayoutTopTestExtraMessageTitle('dTop');
 	let username = localStorage.getItem('username') ?? 'hans';
 	if (TESTING) {
 		let names = ['amanda', 'felix', 'lauren', 'mimi', 'gul'];
-		let d = mBy('dTestRight'); mClass(d,'button_container'); //mFlex(d);
-		for (const name of names) { let b = mDom(d, { }, { tag: 'button', html: name, onclick: async (ev) => await switchToUser(name) }); }
+		let d = mBy('dTestRight'); mClass(d, 'button_container'); //mFlex(d);
+		for (const name of names) { let b = mDom(d, {}, { tag: 'button', html: name, onclick: async (ev) => await switchToUser(name) }); }
 		username = rChoose(names); //['felix','lauren','diana','mimi','amanda','guest','gul']); //localStorage.getItem('username') ?? 'hans'; 
 	}
 	await showMenuButtons();
-	await showTestButtons();
+	if (TESTING) await showTestButtons();
 }
 async function showTable(force = false) {
 	function updateUI() {
 		const area = mBy('dMain');
 		area.innerHTML = '<pre>' + JSON.stringify(DA.gameState, null, 2) + '</pre>';
-		if (VERBOSE) console.log("UI updated:", DA.gameState);
+		if (VERBOSE) console.log("table UPDATED!!!"); //, DA.gameState);
 	}
+
 
 	let res = await fetch(`${DA.backendURL}/get_state.php`);
 	if (!res.ok) {
@@ -42,8 +79,9 @@ async function showTable(force = false) {
 	if (force || JSON.stringify(state) !== JSON.stringify(DA.gameState)) {
 		DA.gameState = state;
 		updateUI();
-		if (VERBOSE) if (VERBOSE) console.log('Game state updated:', state);
-	}
+		//if (VERBOSE) if (VERBOSE) console.log('Game state updated:', state);
+	} else if (VERBOSE) console.log("table no");
+
 	return DA.gameState;
 
 }
@@ -99,35 +137,14 @@ function findElementBy(value, key = 'html') {
 	return null;
 }
 async function clickOn(prop, val) {
-	let elem=null;
-	if (isDict(prop) && isdef(prop.tag)) elem=prop; else elem = findElementBy(prop, val);
+	let elem = null;
+	if (isDict(prop) && isdef(prop.tag)) elem = prop; else elem = findElementBy(prop, val);
 	//if (VERBOSE) console.log('elem', elem);
-	assertion(elem,`NO elem ${prop} ${val}`);
+	assertion(elem, `NO elem ${prop} ${val}`);
 	elem.click();
 
 }
 
-async function pollAndShow() {
-
-	if (DA.menu == 'games') {
-		await showGamesAndTables();
-	} else if (DA.menu == 'table') {
-
-	}
-
-}
-function pollStart() {
-	if (isdef(TO.poll)) return;
-	TO.poll = setInterval(pollAndShow, DA.pollInterval);
-}
-async function pollStop() {
-	clearInterval(TO.poll); if (VERBOSE) console.log('polling stopped', TO.poll);
-	await mSleep(100);
-	TO.poll = null; if (VERBOSE) console.log('interval reset!', TO.poll);
-	await mSleep(400);
-	if (VERBOSE) console.log('all clear');
-
-}
 
 
 async function MPollTables() {
@@ -203,7 +220,7 @@ async function showGamesAndTables(force = false) {
 	}
 	let dParent = mBy('dTableList');
 	if (nundef(dParent)) { mClear('dMain'); dParent = mDom('dMain', {}, { className: 'section', id: 'dTableList' }); }
-	await loadTables();
+	M.tables = await MPollTables();
 	let tables = dict2list(M.tables);
 	let me = UGetName();
 	tables.map(x => x.prior = x.status == 'open' ? 0 : x.turn.includes(me) ? 1 : x.playerNames.includes(me) ? 2 : 3);
@@ -212,20 +229,15 @@ async function showGamesAndTables(force = false) {
 	let changes = deepCompare(DA.tableList, tables);
 	DA.tableList = tables;
 	if (changes || force) {
-		if (VERBOSE) console.log('force', force, 'changes', changes);
+		//if (VERBOSE) console.log('force', force, 'changes', changes);
 		mClear(dParent);
 		showTables(dParent, tables, me);
 		dParent = mBy('dGameList');
 		if (isdef(dParent)) { mClear(dParent); }
 		else { dParent = mDom('dMain', {}, { className: 'section', id: 'dGameList' }); }
 		showGames(dParent);
-	} else if (VERBOSE) console.log('games & tables: no changes', changes);
-}
-async function onclickHand() {
-	await pollStop();
-}
-async function onclickDisplay() {
-	await pollStart();
+		if (VERBOSE) console.log('games & tables: UPDATED!!!');
+	} else if (VERBOSE) console.log('games & tables: no');
 }
 
 function getElementWithAttribute(key, val) {
