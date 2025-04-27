@@ -1,4 +1,12 @@
 
+function handleVisibilityChange() {
+	if (nundef(DA.pollInterval)) {console.log('no polling');return;}
+	if (document.visibilityState === "hidden") {
+		pollStop();
+	} else {
+		pollStart();
+	}
+}
 async function pollAndShow() {
 	if (isdef(DA.bPoll)) {
 		// console.log('', DA.pollCounter++, 'POLLING!!!', DA.pollIntervalChanged,DA.pollInterval);

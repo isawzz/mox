@@ -2752,14 +2752,6 @@ function hPrepUi(ev, areas, cols, rows, bg, dParent) {
 	M.divNames = Array.from(new Set(M.divNames.concat(names))); if (VERBOSE) console.log(M.divNames);
 	mStyle('dPage', { bg });
 }
-function handleVisibilityChange() {
-	if (DA.polling == false) return;
-	if (document.visibilityState === "hidden") {
-		pollStop();
-	} else {
-		pollResume();
-	}
-}
 function hexBoardCenters(topside, side) {
 	if (nundef(topside)) topside = 4;
 	if (nundef(side)) side = topside;

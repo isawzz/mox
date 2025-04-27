@@ -61,7 +61,7 @@ async function showGamesAndTables() {
 		console.log('changes', changes)
 		mClear(dParent);
 		await showTables(dParent, tables, me);
-	} else console.log('tables: no changes', changes);
+	} else console.log('tables: no change', changes);
 
 	dParent = mBy('dGameList');
 	if (isdef(dParent)) { mClear(dParent); }

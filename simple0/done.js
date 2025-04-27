@@ -34,6 +34,8 @@ function mToggleColorButton(dParent, styles = {}, opts = {}, states) {
 	return b;
 }
 async function DAInit(TESTING = false) {
+	document.addEventListener("visibilitychange", handleVisibilityChange);
+
 	DA.pollInterval = 3000;
 	DA.pollCounter = 0;
 	DA.backendURL = getServer(true) + 'simple0/php'; //'https://moxito.online/mox/simple0/php';
@@ -80,7 +82,7 @@ async function showTable(force = false) {
 		DA.gameState = state;
 		updateUI();
 		//if (VERBOSE) if (VERBOSE) console.log('Game state updated:', state);
-	} else if (VERBOSE) console.log("table no");
+	} else if (VERBOSE) console.log("table no change");
 
 	return DA.gameState;
 
@@ -237,7 +239,7 @@ async function showGamesAndTables(force = false) {
 		else { dParent = mDom('dMain', {}, { className: 'section', id: 'dGameList' }); }
 		showGames(dParent);
 		if (VERBOSE) console.log('games & tables: UPDATED!!!');
-	} else if (VERBOSE) console.log('games & tables: no');
+	} else if (VERBOSE) console.log('games & tables: no change');
 }
 
 function getElementWithAttribute(key, val) {
