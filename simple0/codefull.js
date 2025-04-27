@@ -3738,65 +3738,6 @@ async function onclickSleeping(ev) {
 	clearTimeouts(); mClear('dMain'); DA.stopwatch = null;
 	console.log(res);
 }
-async function onclickStartGame() {
-	sysBusy();
-	await saveDataFromPlayerOptionsUI(DA.gamename);
-	let options = collectOptions();
-	let players = collectPlayers();
-	let table = await startGame(DA.gamename, players, options);
-	sysIdle();
-}
-async function onclickTableDelete(id) {
-	sysBusy();
-	let res = await mPhpPost('all', { action: 'deletey', file: `tables/${id}` });
-	console.log('res', res);
-	sysIdle();
-}
-async function onclickTableJoin(id) {
-	sysBusy();
-	let tData = jsCopy(M.tables[id]);
-	let me = UGetName(); console.log('me', me)
-	assertion(tData.status == 'open', 'too late to join! game has already started!')
-	assertion(!tData.playerNames.includes(me), `${me} already joined!!!`);
-	tData.players[me] = createGamePlayer(me, tData.game);
-	tData.playerNames.push(me);
-	let res = await mPhpPost('all', { action: 'savey', file: `tables/${id}`, o: tData });
-	console.log('res', res);
-	sysIdle();
-}
-async function onclickTableLeave(id) {
-	sysBusy();
-	let tData = jsCopy(M.tables[id]);
-	let me = UGetName();
-	assertion(tData.status == 'open', 'too late to leave! game has already started!')
-	assertion(tData.playerNames.includes(me), `${me} NOT in joined players!!!!`);
-	delete tData.players[me];
-	removeInPlace(tData.playerNames, me);
-	let res = await mPhpPost('all', { action: 'savey', file: `tables/${id}`, o: tData });
-	console.log('res', res);
-	sysIdle();
-}
-async function onclickTableMenu() {
-	let id = getTid();
-	if (nundef(id)) {
-		let me = UGetName();
-		let table = Serverdata.tables.find(x => x.status == 'started' && x.turn.includes(me));
-		if (nundef(table)) table = Serverdata.tables.find(x => x.status == 'started' && x.playerNames.includes(me));
-		if (nundef(table)) table = Serverdata.tables.find(x => x.status != 'open' && x.playerNames.includes(me));
-		if (nundef(table)) table = Serverdata.tables.find(x => x.status != 'open');
-		if (isdef(table)) id = table.id;
-	}
-	if (isdef(id)) { Tid = null; await showTable(id); } else await switchToMainMenu('play');
-}
-async function onclickTableStart(id) {
-	sysBusy();
-	let tData = M.tables[id];
-	if (!tData) { showMessage('table deleted!'); return await showGamesAndTables(); }
-	tData = setTableToStarted(tData);
-	let res = await mPhpPost('all', { action: 'savey', file: `tables/${id}`, o: tData });
-	console.log('res', res);
-	sysIdle();
-}
 async function onclickTextColor(fg) {
 	let hex = colorToHex79(fg);
 	U.fg = hex;
@@ -4835,7 +4776,7 @@ async function showGameMenu(gamename) {
 	DA.lastName = null;
 	await showGamePlayers(dPlayers, users);
 	await showGameOptions(dOptions, gamename);
-	let astart = mButton('Start', onclickStartGame, dButtons, {}, ['button', 'input']);
+	let astart = mButton('Start', onclickGameStart, dButtons, {}, ['button', 'input']);
 	let ajoin = mButton('Open to Join', onclickOpenToJoinGame, dButtons, {}, ['button', 'input']);
 	let acancel = mButton('Cancel', () => mClear(dMenu), dButtons, {}, ['button', 'input']);
 	let bclear = mButton('Clear Players', onclickClearPlayers, dButtons, {}, ['button', 'input']);
@@ -5328,23 +5269,6 @@ function sortDatesDescending(dates) {
 	return dates.sort((a, b) => new Date(b) - new Date(a));
 }
 async function start() { await test0_p5(); }
-async function startGame(gamename, players, options) {
-	let table = createOpenTable(gamename, players, options);
-	table = setTableToStarted(table);
-	let tid = table.id;
-	let tData = table;
-	let res = await mPhpPost('all', { action: 'create', tid, tData });
-	if (res.tid) {
-		console.log("Game Creation:", res.tid);
-		let data = M.tables[tid] = await tableGetDefault(res.tid); console.log(data);
-		M.tableFilenames.push(tid);
-		DA.tid = tid; DA.tData = tData;
-	} else {
-		console.log("Game Creation failed");
-		return null;
-	}
-	return table;
-}
 function startsWith(s, sSub) {
 	return s.substring(0, sSub.length) == sSub;
 }

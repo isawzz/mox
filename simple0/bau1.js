@@ -1,51 +1,76 @@
 
-function handleVisibilityChange() {
-	if (nundef(DA.pollInterval)) {console.log('no polling');return;}
-	if (document.visibilityState === "hidden") {
-		pollStop();
+async function onclickTable(id) { DA.id = id; await switchToMenu('table'); }
+async function startGame(gamename, players, options) {
+	let table = createOpenTable(gamename, players, options);
+	table = setTableToStarted(table);
+	let tid = table.id;
+	let tData = table;
+	let res = await mPhpPost('all', { action: 'create', tid, tData });
+	if (res.tid) {
+		console.log("Game Creation:", res.tid);
+		let data = M.tables[tid] = await tableGetDefault(res.tid); console.log(data);
+		M.tableFilenames.push(tid);
+		DA.tid = tid; DA.tData = tData;
 	} else {
-		pollStart();
+		console.log("Game Creation failed");
+		return null;
 	}
+	return table;
 }
-async function pollAndShow() {
-	if (isdef(DA.bPoll)) {
-		// console.log('', DA.pollCounter++, 'POLLING!!!', DA.pollIntervalChanged,DA.pollInterval);
-		DA.bPoll.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 500 });
-		//mStyle(DA.bPoll, { opacity: .5 }); await mSleep(100);
-	}
-
-	let restartAfterPoll = DA.pollIntervalChanged==true;
-	if (DA.pollIntervalChanged) {
-		await pollStop();
-	}
-
-	if (DA.menu == 'games') {
-		await showGamesAndTables();
-	} else if (DA.menu == 'table') {
-		await showTable();
-	}
-
-	if (isdef(DA.bPoll)) DA.bPoll.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500 });
-
-	if (restartAfterPoll) {		pollStart();	}
+async function onclickGameStart() {
+	await saveDataFromPlayerOptionsUI(DA.gamename);
+	let options = collectOptions();
+	let players = collectPlayers();
+	let table = await startGame(DA.gamename, players, options);
+}
+async function onclickTableStart(id) {
+	console.log(arguments.callee.name, arguments);
+	let tData = M.tables[id];
+	if (!tData) { showMessage('table deleted!'); return await showGamesAndTables(); }
+	tData = setTableToStarted(tData);
+	let res = await mPhpPost('all', { action: 'savey', file: `tables/${id}`, o: tData });
+	console.log('res', res);
 
 }
-function pollStart() {
-	if (isdef(TO.poll)) return;
-	DA.pollIntervalChanged = false;
-	console.log('polling started',DA.pollInterval);
-	TO.poll = setInterval(pollAndShow, DA.pollInterval);
+async function onclickTableDelete(id) {
+	let res = await mPhpPost('all', { action: 'deletey', file: `tables/${id}` });
+	console.log('res', res);
 }
-async function pollStop() {
-	if (!TO.poll) return;
-	clearInterval(TO.poll); if (VERBOSE) console.log('polling stopped', TO.poll);
-	DA.pollIntervalChanged = false;
-	await mSleep(100);
-	TO.poll = null; // if (VERBOSE) console.log('interval reset!', TO.poll);
-	await mSleep(400);
-	// if (VERBOSE) console.log('all clear');
+async function onclickTableJoin(id) {
+	let tData = jsCopy(M.tables[id]);
+	let me = UGetName(); console.log('me', me)
+	assertion(tData.status == 'open', 'too late to join! game has already started!')
+	assertion(!tData.playerNames.includes(me), `${me} already joined!!!`);
+	tData.players[me] = createGamePlayer(me, tData.game);
+	tData.playerNames.push(me);
+	let res = await mPhpPost('all', { action: 'savey', file: `tables/${id}`, o: tData });
+	console.log('res', res);
+}
+async function onclickTableLeave(id) {
+
+	let tData = jsCopy(M.tables[id]);
+	let me = UGetName();
+	assertion(tData.status == 'open', 'too late to leave! game has already started!')
+	assertion(tData.playerNames.includes(me), `${me} NOT in joined players!!!!`);
+	delete tData.players[me];
+	removeInPlace(tData.playerNames, me);
+	let res = await mPhpPost('all', { action: 'savey', file: `tables/${id}`, o: tData });
+	console.log('res', res);
 
 }
+async function onclickTableMenu() {
+	let id = getTid();
+	if (nundef(id)) {
+		let me = UGetName();
+		let table = Serverdata.tables.find(x => x.status == 'started' && x.turn.includes(me));
+		if (nundef(table)) table = Serverdata.tables.find(x => x.status == 'started' && x.playerNames.includes(me));
+		if (nundef(table)) table = Serverdata.tables.find(x => x.status != 'open' && x.playerNames.includes(me));
+		if (nundef(table)) table = Serverdata.tables.find(x => x.status != 'open');
+		if (isdef(table)) id = table.id;
+	}
+	if (isdef(id)) { Tid = null; await showTable(id); } else await switchToMainMenu('play');
+}
+
 
 
 
