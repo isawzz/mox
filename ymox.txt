@@ -1,6 +1,13 @@
 alles ist fuer immer ok - I have left this plane.
 
-___ 6:18 AM 4/27/2025 airport lib 4.5. 44000 K4
+___ 6:22 AM 4/28/2025 airport lib 4.5. 45000 K4
+6:56 AM 4/28/2025
+pip install -e C:\D\videmo\pylibs\humpack\code
+pip install -e C:\D\videmo\pylibs\gsm\code
+
+6:34 AM 4/28/2025
+batch create games
+___ 6:18 AM 4/27/2025 airport lib 4.5. 44000 K4vok
 wenn zu mimi change soll TESTING true setzen!
 8:55 AM 4/27/2025
 wenn ich game start clicke dann soll er zu table menu switchen

@@ -95,6 +95,8 @@ sarah:
   games:
     setgame:
       level: 7
+    button96:
+      handicap: 3
   texture: ../assets/textures/marble_grey1.jpeg
   blendMode: luminosity
 sheeba:

@@ -23,6 +23,9 @@ async function showTestButtons() {
 	//return;
 	DA.pollStates = states = [{ color: 'green', blink: false, f: pollStart }, { color: 'red', blink: false, f: pollStop },];
 	let b = DA.bPoll = mToggleColorButton(d, {}, { html: 'poll:' }, states);
+
+	mDom(d, {}, { tag: 'button', html: 'delete', onclick: tablesDeleteAll });
+
 	//console.log('b', b);
 	pollStart();
 
