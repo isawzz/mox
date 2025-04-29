@@ -1,6 +1,21 @@
 alles ist fuer immer ok - I have left this plane.
 
+___ 5:57 AM 4/29/2025 airport lib 4.5. 46000 K4
+8:24 AM 4/29/2025
+slow down!!!!!!
+delete at0
+source /home3/moxitoon/virtualenv/at0/3.11/bin/activate && cd /home3/moxitoon/at0
+AxRjWn77yRK@s7N
+source /home3/moxitoon/virtualenv/test0/3.11/bin/activate && cd /home3/moxitoon/test0
+ source /home3/moxitoon/virtualenv/rsgtest/3.11/bin/activate && cd /home3/moxitoon/rsgtest
+194.233.96.103
 ___ 6:22 AM 4/28/2025 airport lib 4.5. 45000 K4
+source /home3/moxitoon/virtualenv/rsgtest/3.11/bin/activate && cd /home3/moxitoon/rsgtest
+
+91.115.0.91
+7:53 AM 4/28/2025
+fang mit ludos an
+erst dann ludwig
 6:56 AM 4/28/2025
 pip install -e C:\D\videmo\pylibs\humpack\code
 pip install -e C:\D\videmo\pylibs\gsm\code
