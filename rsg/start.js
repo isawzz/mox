@@ -1,7 +1,11 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_folding(); }
+function start() { test0_delete_and_create(); }
 
+async function test0_delete_and_create() {
+	let res = await deleteGames(); console.log('res', res);
+	res = await pyStartGame(); console.log('res', res);
+}
 async function test0_folding() {
 	// --- Example usage ---
 	const result = testCartesianFunctions();
@@ -15,17 +19,6 @@ async function test0_flask() {
 	if (TESTING) await clickOn(rChoose(['gul', 'felix', 'amanda', 'lauren', 'mimi'])); await mSleep(10);
 	await clickOn(DA.bPoll); //starts
 	await clickOn(DA.bPoll); //stops
-	return;
-	// --- Example UI hook ---
-	document.addEventListener('DOMContentLoaded', () => {
-		document.getElementById('startBtn').addEventListener('click', async () => {
-			const result = await startGame('tictactoe', ['X', 'O']);
-			if (result && result.gameid) {
-				document.getElementById('output').textContent = `Game started: ${result.gameid}`;
-			}
-		});
-	});
-
 }
 async function test0_game0() {
 	await DAInit(true);

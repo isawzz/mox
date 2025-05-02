@@ -41,10 +41,10 @@ async function getTableNames() {
 	console.log(names);
 }
 
-async function startGame(gameName, players, options = {}) {
+async function pyStartGame(gamename, players, options = {}) {
 	const data = {
-		gamename: gameName,
-		players,
+		gamename:valf(gamename,'tictactoe'),
+		players:valf(players,['felix','mimi']),
 		options
 	};
 	return await api('POST', '/start_game', data);
@@ -64,6 +64,10 @@ async function saveGame(gameId, data) {
 
 async function deleteGame(gameId) {
 	return await api('DELETE', `/delete_game/${gameId}`);
+}
+
+async function deleteGames() {
+	return await api('DELETE', `/delete_games`);
 }
 
 async function getGameState(gameId) {
