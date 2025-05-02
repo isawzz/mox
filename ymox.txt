@@ -1,10 +1,46 @@
 alles ist fuer immer ok - I have left this plane.
 
+___ 5:02 AM 5/2/2025 airport lib 4.5. 49000 K4
+
+___ 7:09 AM 5/1/2025 airport lib 4.5. 48000 K4
+7:09 AM 5/1/2025
+- favicon
+neuer plan: zuerst py lernen, das ludos und humpack installieren,
+ludwig mindestens kennenlernen.
+dann mein interface machen
+fastcomet NUR noch <30' pro tag investen bis es funktioniert oder bis ich ein neues hab. dann das fastcomet canceln
+___ 4:39 AM 4/30/2025 airport lib 4.5. 47000 K3
+6:54 AM 4/30/2025
+ok - das loading geht jetzt
+- jetzt brauch ich save at serverr
+4:55 AM 4/30/2025
+ok - simple0 updated!!!! und codebase zu at0 copiert!
+ok - safe ist das workspace
+ok - pylibs fuer fe git zeug
+ok - at0 fuer mein current project
+pylibs libraries die installed werden sollen!
+- open htdocs mach subdirs
+- init safe mit nur den essentials und dem .gitignore
+- was soll es geben in safe?
+- wie soll das rsg workspace ausschauen?
+- ich kann ruhig ein rsg subdir haben in htdocs, aber ich lade das workspace extra. es heisst at0
+das andere workspace fuer mein simple project heisst bet0
+ok - goto github
+mach ein neues github project safe das immer den rest code stored
+4:45 AM 4/30/2025
+list projects to go on hd:
+ludos
+gsm
+humpack
+ludwig?
+rsgLastJoined
+rsgtest
+source /home3/moxitoon/virtualenv/at0/3.11/bin/activate && cd /home3/moxitoon/at0
+
 ___ 5:57 AM 4/29/2025 airport lib 4.5. 46000 K4
 8:24 AM 4/29/2025
 slow down!!!!!!
 delete at0
-source /home3/moxitoon/virtualenv/at0/3.11/bin/activate && cd /home3/moxitoon/at0
 AxRjWn77yRK@s7N
 source /home3/moxitoon/virtualenv/test0/3.11/bin/activate && cd /home3/moxitoon/test0
  source /home3/moxitoon/virtualenv/rsgtest/3.11/bin/activate && cd /home3/moxitoon/rsgtest

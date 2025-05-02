@@ -5309,7 +5309,8 @@ async function showTestButtons() {
 	DA.pollStates = states = [{ color: 'green', blink: false, f: pollStart }, { color: 'red', blink: false, f: pollStop },];
 	let b = DA.bPoll = mToggleColorButton(d, {}, { html: 'poll:' }, states);
 	mDom(d, {}, { tag: 'button', html: 'delete', onclick: tablesDeleteAll });
-	pollStart();
+	mDom(d, {}, { tag: 'button', html: 'flask', onclick: testFlask });
+	//pollStart();
 }
 function showText(dParent, text, bg = 'black') {
 	return mDom(dParent, { align: 'center', wmin: 120, padding: 2, bg, fg: colorIdealText(bg) }, { html: text });
