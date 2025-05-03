@@ -1,6 +1,11 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_delete_and_create(); }
+function start() { test0_c52(); }
+
+async function test0_c52(){
+
+	showDeck(['2D', '3D', '4D', '5D', '6D', '7D', '8D', '9D', 'TD', 'JD', 'QD', 'KD', 'AD'],'dPage','left',100,100);
+}
 
 async function test0_delete_and_create() {
 	let res = await deleteGames(); console.log('res', res);

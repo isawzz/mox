@@ -4876,7 +4876,7 @@ async function showDashboard() {
 	}
 }
 function showDeck(keys, dParent, splay, w, h) {
-	let d = mDiv(dParent);
+	let d = mDom(dParent);
 	mStyle(d, { display: 'block', position: 'relative', bg: 'green', padding: 25 });
 	let gap = 10;
 	let ovPercent = 20;
