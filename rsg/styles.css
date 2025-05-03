@@ -25,14 +25,16 @@ select {
   box-shadow: none;
   cursor: pointer;
 }
-button{
+
+button {
   background-color: #ffffff80;
 }
+
 a:hover,
 button:hover {
   /* background: #ffffff80 !important; */
   background-color: #ffffff;
-  color:black;
+  color: black;
 }
 
 a:active,
@@ -260,6 +262,25 @@ fieldset .disabled {
 
 /* #endregion classes */
 
+/* #region cards */
+.card-symbol {
+  font-size: 3rem;
+  /* Adjust size as needed */
+  line-height: 1;
+}
+
+.card-rank {
+  font-size: 1.5rem;
+  /* Adjust size as needed */
+}
+
+.card-corner {
+  font-size: 1.2rem;
+  /* Adjust size as needed */
+}
+
+/*#endregion */
+
 /*#region hex zeug*/
 .hex_NO::after {
   content: "";
@@ -310,5 +331,6 @@ fieldset .disabled {
   background-size: 100% 100%;
 
 }
+
 
 /*#endregion */

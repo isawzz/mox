@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Playing Card Display</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<style>
+		/* Custom styles for card symbols */
+		.card-symbol {
+			font-size: 3rem;
+			/* Adjust size as needed */
+			line-height: 1;
+		}
+
+		.card-rank {
+			font-size: 1.5rem;
+			/* Adjust size as needed */
+		}
+
+		.card-corner {
+			font-size: 1.2rem;
+			/* Adjust size as needed */
+		}
+	</style>
+</head>
+
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4">
+
+	<div class="mb-6 text-center">
+		<h1 class="text-2xl font-bold mb-4">Enter Card Key (e.g., AS for Ace of Spades)</h1>
+		<input type="text" id="cardKeyInput" class="p-2 border rounded mr-2 uppercase" maxlength="2" placeholder="e.g., KH">
+		<button onclick="displayCard()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+			Display Card
+		</button>
+		<p id="errorMessage" class="text-red-500 mt-2"></p>
+	</div>
+
+	<div id="cardContainer"
+		class="w-48 h-64 bg-white rounded-lg shadow-lg flex flex-col justify-between items-center p-4 border border-gray-300">
+		<p class="text-gray-500">Enter a key to see the card</p>
+	</div>
+
+	<script>
+		// Mapping of rank keys to display values
+		const rankMap = {
+			'2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8',
+			'9': '9', 'T': '10', 'J': 'J', 'Q': 'Q', 'K': 'K', 'A': 'A'
+		};
+
+		// Mapping of suit keys to display symbols and colors
+		const suitMap = {
+			'S': { symbol: '♠', color: 'black' }, // Spades
+			'H': { symbol: '♥', color: 'red' },   // Hearts
+			'D': { symbol: '♦', color: 'red' },   // Diamonds
+			'C': { symbol: '♣', color: 'black' }  // Clubs
+		};
+
+		// Function to display the card based on input
+		function displayCard() {
+			const input = document.getElementById('cardKeyInput');
+			const cardKey = input.value.toUpperCase(); // Get input and convert to uppercase
+			const cardContainer = document.getElementById('cardContainer');
+			const errorMessage = document.getElementById('errorMessage');
+
+			// Clear previous error message
+			errorMessage.textContent = '';
+
+			// Validate input length
+			if (cardKey.length !== 2) {
+				errorMessage.textContent = 'Please enter a 2-letter key.';
+				cardContainer.innerHTML = '<p class="text-gray-500">Enter a key to see the card</p>'; // Reset container
+				return;
+			}
+
+			const rankKey = cardKey[0];
+			const suitKey = cardKey[1];
+
+			// Validate rank and suit
+			if (!rankMap[rankKey] || !suitMap[suitKey]) {
+				errorMessage.textContent = 'Invalid card key. Use format like KH (King of Hearts).';
+				cardContainer.innerHTML = '<p class="text-gray-500">Enter a key to see the card</p>'; // Reset container
+				return;
+			}
+
+			const rank = rankMap[rankKey];
+			const suit = suitMap[suitKey].symbol;
+			const color = suitMap[suitKey].color;
+
+			// Determine text color class based on suit color
+			const textColorClass = color === 'red' ? 'text-red-600' : 'text-black';
+
+			// Generate the HTML for the card
+			// Using flexbox to position elements
+			cardContainer.innerHTML = `
+					<div class="w-full flex justify-between ${textColorClass} card-corner">
+							<span>${rank}</span>
+							<span>${suit}</span>
+					</div>
+					<div class="flex flex-col items-center justify-center flex-grow ${textColorClass}">
+							<span class="card-symbol">${suit}</span>
+							<span class="card-rank font-bold">${rank}</span>
+					</div>
+						<div class="w-full flex justify-between ${textColorClass} card-corner transform rotate-180">
+							<span>${rank}</span>
+							<span>${suit}</span>
+					</div>
+			`;
+
+			// Apply color dynamically
+			cardContainer.querySelectorAll(`.${textColorClass}`).forEach(element => {
+				// Tailwind handles the color classes directly
+			});
+		}
+	</script>
+
+</body>
+
+</html>

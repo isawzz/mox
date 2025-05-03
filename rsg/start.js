@@ -2,9 +2,64 @@ onload = start; VERBOSE = true; TESTING = true;
 
 function start() { test0_c52(); }
 
-async function test0_c52(){
+function replaceFillRedWithParam(svgString, color) {
+	return svgString.replace(/fill=['"]red['"]/g, `fill='${color}'`);
+}
+function replaceStrokeRedWithParam(svgString, color) {
+	return svgString.replace(/stroke=['"]red['"]/g, `stroke='${color}'`);
+}
+function replaceFillBlackWithParam(svgString, color) {
+	return svgString.replace(/fill=['"]black['"]/g, `fill='${color}'`);
+}
+function replaceStrokeBlackWithParam(svgString, color) {
+	return svgString.replace(/stroke=['"]black['"]/g, `stroke='${color}'`);
+}
+function replaceColorsInCard(s, by) {
+	let snew = replaceFillRedWithParam(s, by);
+	snew = replaceStrokeRedWithParam(snew, by);
+	snew = replaceFillBlackWithParam(snew, by);
+	snew = replaceStrokeBlackWithParam(snew, by);
+	return snew;
 
-	showDeck(['2D', '3D', '4D', '5D', '6D', '7D', '8D', '9D', 'TD', 'JD', 'QD', 'KD', 'AD'],'dPage','left',100,100);
+}
+function renderCard(key,color,border){
+	let svg = __cardSvgs[key];
+	let [r,s]=key;
+	if ('0123456789TA'.includes(r)) {
+		let beforeRect = stringBeforeLast(svg, '<rect');
+		let afterRect = stringAfterLast(svg, '/rect>');
+		let between = stringBetween(svg, beforeRect, afterRect); console.log('between', between)
+		svg = replaceColorsInCard(beforeRect, color) + replaceColorsInCard(between, border) + replaceColorsInCard(afterRect, color);
+
+	} else{
+
+	}
+	return svg;
+}
+function renderCard(key,color,border, bg='silver'){
+	let svg = __cardSvgs[key];
+	let [r,s]=key;
+	let parts = svg.split("fill='white' stroke='black'");
+	console.log(parts)
+	svg = replaceColorsInCard(parts[0], color) + ` fill='${bg}' stroke='${border}' ` + + replaceColorsInCard(parts[1], color);
+
+	return svg;
+}
+async function test0_c52() {
+	let d = mBy('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true });
+	for (const r of toWords('2')){//} 3 4 5 6 7 8 9 T J Q K A')) {
+		for (const s of toWords('S')){//} H D C')) {
+			let key = `${r}${s}`;
+			let code = renderCard(key,'green','orange'); console.log(code)
+			let dc = mDom(d, { h: 200, w: 140 }, { html: renderCard(key,'green','orange') });
+			//let dc=mDom(d,{h:200,w:140});
+			//renderCardInContainer(key,rColor(),rColor(),dc)
+
+		}
+	}
+	// let dc = mDom(d, { h: 200, w: 140 }, { html: cardSvgs['0J'] });
+	// dc = mDom(d, { h: 200, w: 140 }, { html: cardSvgs['1J'] });
+	//showDeck(['2D', '3D', '4D', '5D', '6D', '7D', '8D', '9D', 'TD', 'JD', 'QD', 'KD', 'AD'],'dPage','left',100,100);
 }
 
 async function test0_delete_and_create() {
