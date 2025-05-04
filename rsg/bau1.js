@@ -16,7 +16,7 @@ function generateSvgWithImage(imageSrc, width = 100, height = 100) {
 function _filterKeys(collection,cat,func){
 	let keys = isdef(collection)?M.byCollection[collection]:M.names;
 	if (isdef(cat)) {
-		let catKeys = M.byCat[cat]; console.log(catKeys)
+		let catKeys = M.byCat[cat]; //console.log(catKeys)
 		keys=keys.filter(x=>catKeys.includes(x));
 	}
 	if (isdef(func)) keys=keys.filter(x=>func(M.superdi[x]));

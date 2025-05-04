@@ -4,7 +4,7 @@ function start() { test0_displayEmoAsSymbol(); }
 
 async function test0_displayEmoAsSymbol() {
 	await loadAssetsStatic();
-	let dict = M.c52Symbols = await loadStaticYaml('assets/c52Symbols.yaml');
+	let dict = M.c52Symbols = await loadStaticYaml('assets/c52symbols.yaml');
 	//console.log('c52Symbols', M.c52Symbols);
 	//console.log(M)
 	let d = mDom('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true, padding: 10 });
