@@ -1,3 +1,45 @@
+function replaceFillRedWithParam(svgString, color) {
+	return svgString.replace(/fill=['"]red['"]/g, `fill='${color}'`);
+}
+function replaceStrokeRedWithParam(svgString, color) {
+	return svgString.replace(/stroke=['"]red['"]/g, `stroke='${color}'`);
+}
+function replaceFillBlackWithParam(svgString, color) {
+	return svgString.replace(/fill=['"]black['"]/g, `fill='${color}'`);
+}
+function replaceStrokeBlackWithParam(svgString, color) {
+	return svgString.replace(/stroke=['"]black['"]/g, `stroke='${color}'`);
+}
+function replaceColorsInCard(s, by) {
+	let snew = replaceFillRedWithParam(s, by);
+	snew = replaceStrokeRedWithParam(snew, by);
+	snew = replaceFillBlackWithParam(snew, by);
+	snew = replaceStrokeBlackWithParam(snew, by);
+	return snew;
+
+}
+function renderCard(key,color,border){
+	let svg = __cardSvgs[key];
+	let [r,s]=key;
+	if ('0123456789TA'.includes(r)) {
+		let beforeRect = stringBeforeLast(svg, '<rect');
+		let afterRect = stringAfterLast(svg, '/rect>');
+		let between = stringBetween(svg, beforeRect, afterRect); console.log('between', between)
+		svg = replaceColorsInCard(beforeRect, color) + replaceColorsInCard(between, border) + replaceColorsInCard(afterRect, color);
+
+	} else{
+
+	}
+	return svg;
+}
+function renderCard(cardKey, targetDiv) {
+	if (!targetDiv || !(targetDiv instanceof HTMLElement)) {
+		throw new Error("Invalid target element.");
+	}
+
+	const svgHtml = getCardSvg(cardKey);
+	targetDiv.innerHTML = svgHtml;
+}
 
 async function mToggleButton(dParent, styles = {}) {
 	addKeys({ display: 'flex', wrap: 'wrap', aitems: 'center' }, styles)

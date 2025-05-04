@@ -4,10 +4,10 @@
     "target": "es6"
   },
   "include": [
-    "simple0",
+    "rsg",
   ],
   "exclude": [
-    "**/codebig.js",
+    "**/CODE.js",
     "**/_*.js",
     "**/_*/*",
     "**/z_*.js",

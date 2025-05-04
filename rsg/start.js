@@ -1,57 +1,82 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_c52(); }
+function start() { test0_displayEmoAsSymbol(); }
 
-function replaceFillRedWithParam(svgString, color) {
-	return svgString.replace(/fill=['"]red['"]/g, `fill='${color}'`);
-}
-function replaceStrokeRedWithParam(svgString, color) {
-	return svgString.replace(/stroke=['"]red['"]/g, `stroke='${color}'`);
-}
-function replaceFillBlackWithParam(svgString, color) {
-	return svgString.replace(/fill=['"]black['"]/g, `fill='${color}'`);
-}
-function replaceStrokeBlackWithParam(svgString, color) {
-	return svgString.replace(/stroke=['"]black['"]/g, `stroke='${color}'`);
-}
-function replaceColorsInCard(s, by) {
-	let snew = replaceFillRedWithParam(s, by);
-	snew = replaceStrokeRedWithParam(snew, by);
-	snew = replaceFillBlackWithParam(snew, by);
-	snew = replaceStrokeBlackWithParam(snew, by);
-	return snew;
-
-}
-function renderCard(key,color,border){
-	let svg = __cardSvgs[key];
-	let [r,s]=key;
-	if ('0123456789TA'.includes(r)) {
-		let beforeRect = stringBeforeLast(svg, '<rect');
-		let afterRect = stringAfterLast(svg, '/rect>');
-		let between = stringBetween(svg, beforeRect, afterRect); console.log('between', between)
-		svg = replaceColorsInCard(beforeRect, color) + replaceColorsInCard(between, border) + replaceColorsInCard(afterRect, color);
-
-	} else{
-
+async function test0_displayEmoAsSymbol() {
+	await loadAssetsStatic();
+	let dict = M.c52Symbols = await loadStaticYaml('assets/c52Symbols.yaml');
+	//console.log('c52Symbols', M.c52Symbols);
+	//console.log(M)
+	let d = mDom('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true, padding: 10 });
+	let keys = _filterKeys('emo', 'sport', x => x.img && x.img.includes('emo'));// console.log(keys); //return;
+	for (const i of range(30)) {
+		let sym = M.superdi[rChoose(keys)];// console.log(sym);
+		let src = sym.img;
+		let svg = generateSvgWithImage(src, 200, 200)
+		let d1 = mDom(d, { h: 200, w: 200, display: 'grid' });
+		mDom(d1, {}, { html: svg });
 	}
-	return svg;
 }
-function renderCard(key,color,border, bg='silver'){
-	let svg = __cardSvgs[key];
-	let [r,s]=key;
-	let parts = svg.split("fill='white' stroke='black'");
-	console.log(parts)
-	svg = replaceColorsInCard(parts[0], color) + ` fill='${bg}' stroke='${border}' ` + + replaceColorsInCard(parts[1], color);
-
-	return svg;
+async function test0_displayImgAsSymbol() {
+	await loadAssetsStatic();
+	let dict = M.c52Symbols = await loadStaticYaml('assets/c52Symbols.yaml');
+	//console.log('c52Symbols', M.c52Symbols);
+	//console.log(M)
+	let d = mDom('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true, padding: 10 });
+	for (const i of range(3)) {
+		let src = rChoose(Object.values(M.allImages)); console.log(src);
+		let svg = generateSvgWithImage(src.path, 200, 200)
+		let d1 = mDom(d, { h: 200, w: 200, display: 'grid' });
+		mDom(d1, {}, { html: svg });
+	}
+}
+async function test0_displaySymbols() {
+	await loadAssetsStatic();
+	let dict = M.c52Symbols = await loadStaticYaml('assets/c52Symbols.yaml');
+	//console.log('c52Symbols', M.c52Symbols);
+	console.log(M)
+	let d = mDom('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true, padding: 10 });
+	for (const s in dict) {
+		//console.log(s, dict[s]);
+		let d1 = mDom(d, { h: 200, w: 200, display: 'grid' });
+		displaySymbol(dict[s], d1); //return;
+		mDom(d1, {}, { html: s });
+	}
+}
+async function test0_symbols() {
+	let d = mDom('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true, padding: 10 });
+	let dict = {};
+	for (const key in __cardSvgs) {
+		let svg = __cardSvgs[key];
+		extractSymbols(svg, dict);
+		//let dc = mDom(d, { h: 200, w: 140 }, { html: svg });
+	}
+	console.log('dict', dict);
+	downloadAsYaml(dict, 'symbols');
+}
+async function test0_svgcard() {
+	//await DAInit();
+	let d = mDom('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true, padding: 10 });
+	for (const key of ['2H', 'KS', 'TC']) {
+		let svg = __cardSvgs[key];
+		svg = updateSuit(svg, 'H');
+		let dc = mDom(d, { h: 200, w: 140 }, { html: svg });
+	}
 }
 async function test0_c52() {
-	let d = mBy('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true });
-	for (const r of toWords('2')){//} 3 4 5 6 7 8 9 T J Q K A')) {
-		for (const s of toWords('S')){//} H D C')) {
+	//await DAInit();
+	let d = mDom('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true, padding: 10 });
+	for (const r of toWords('2 3 4 5 6 7 8 9 T J Q K A')) {
+		for (const s of toWords('S H D C')) {
 			let key = `${r}${s}`;
-			let code = renderCard(key,'green','orange'); console.log(code)
-			let dc = mDom(d, { h: 200, w: 140 }, { html: renderCard(key,'green','orange') });
+			let svg = __cardSvgs[key];
+			svg = replaceCardLabel(svg, 'H');
+
+			// let parts = svg.split("fill='white' stroke='black'");
+			// svg = replaceColorsInCard(parts[0], color) + ` fill='${bg}' stroke='${border}' ` + replaceColorsInCard(parts[1], color);
+
+			//let code = renderCard(key,'green','orange'); console.log(code)
+			let dc = mDom(d, { h: 200, w: 140 }, { html: svg });
 			//let dc=mDom(d,{h:200,w:140});
 			//renderCardInContainer(key,rColor(),rColor(),dc)
 

@@ -5554,7 +5554,6 @@ blossom:
   img: ../assets/img/emo/blossom.png
   text: '&#127804;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -6202,7 +6201,6 @@ bouquet:
   img: ../assets/img/emo/bouquet.png
   text: '&#128144;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -7420,7 +7418,6 @@ cactus:
   ga: EA14
   text: '&#127797;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -9247,7 +9244,6 @@ cherry_blossom:
   img: ../assets/img/emo/cherry-blossom.png
   text: '&#127800;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -12476,7 +12472,6 @@ deciduous_tree:
   img: ../assets/img/emo/deciduous-tree.png
   text: '&#127795;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -14439,14 +14434,9 @@ eight_ball:
   cats: []
   colls:
     - icon
-eight_o'clock:
-  friendly: eight_o_clock
-  text: '&#128343;'
-  cats: []
-  colls:
-    - emo
 eight_oclock:
   friendly: eight_oclock
+  text: '&#128343;'
   img: ../assets/img/emo/eight-oclock.png
   cats: []
   colls:
@@ -18062,7 +18052,6 @@ four_leaf_clover:
   img: ../assets/img/emo/four-leaf-clover.png
   text: '&#127808;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -24533,7 +24522,6 @@ leaf_fluttering_in_wind:
   img: ../assets/img/emo/leaf-fluttering-in-wind.png
   text: '&#127811;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -26326,7 +26314,6 @@ maple_leaf:
   ga: E73E
   text: '&#127809;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -30266,7 +30253,6 @@ palm_tree:
   ga: E722
   text: '&#127796;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -32696,7 +32682,6 @@ potted_plant:
   img: ../assets/img/emo/potted-plant.png
   text: '&#129716;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -34796,7 +34781,6 @@ rose:
   ga: EAC1
   text: '&#127801;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -34805,7 +34789,6 @@ rosette:
   img: ../assets/img/emo/rosette.png
   text: '&#127989;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -35946,7 +35929,6 @@ seedling:
   fa: f4d8
   text: '&#127793;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -36173,7 +36155,6 @@ shamrock:
   ga: EAB0
   text: '&#9752;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -36342,7 +36323,6 @@ sheaf_of_rice:
   img: ../assets/img/emo/sheaf-of-rice.png
   text: '&#127806;'
   cats:
-    - animal
     - plant
     - food
   colls:
@@ -40328,7 +40308,6 @@ sunflower:
   ga: EA75
   text: '&#127803;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -43290,7 +43269,6 @@ tulip:
   img: ../assets/img/emo/tulip.png
   text: '&#127799;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -45616,7 +45594,6 @@ white_flower:
   img: ../assets/img/emo/white-flower.png
   text: '&#128174;'
   cats:
-    - animal
     - plant
   colls:
     - emo
@@ -45726,7 +45703,6 @@ wilted_flower:
   img: ../assets/img/emo/wilted-flower.png
   text: '&#129344;'
   cats:
-    - animal
     - plant
   colls:
     - emo
