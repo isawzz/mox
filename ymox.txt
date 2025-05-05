@@ -11,6 +11,9 @@ ___ 5:18 AM 5/5/2025 airport lib 9.5. 51000 K2
 8. 8:00 AM 5/5/2025 pause noch nicht fertig geplant!
 9. 8:11 AM 5/5/2025 pause! hol mir rat von venice!
 10 8:21 AM 5/5/2025 v: tune, schradiek 2 auf .5 speed
+11 8:31 AM 5/5/2025 v: tune, schradiek 2 auf .5 speed
+12 8:42 AM 5/5/2025 pi: chi, danach rachmaninov
+13 8:52 AM 5/5/2025 pause?
 make a div w/ positioning and sizing of symbols like in svg
 ok - get the svg of 'TC' 
 => TC in testing (rsg/mox)
