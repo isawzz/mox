@@ -1,6 +1,6 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_createCard(); }
+function start() { test0_imageSymbols(); }
 
 async function test0_imageSymbols() {
 	await loadAssetsStatic();
@@ -8,10 +8,26 @@ async function test0_imageSymbols() {
 	//console.log('c52Symbols', M.c52Symbols);
 	//console.log(M)
 	let d = mDom('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true, padding: 10 });
+
+	mDom(d, { h: 200, w: 140 },{html:__cardSvgs['TC']});
+
+	// Example usage:
+	d.appendChild(createCard("10", "♣", 240, 336));
+
+	// Example usage
+	d.appendChild(createCard3("10", "♣", 240, 336));
+
+	// Example usage:
+	d.appendChild(createCard2("10", "♣", 240, 336)); return;
+
+	// Example usage:
+	d.appendChild(createCard("10", "♣", 240, 336)); return;
+
+
 	let keys = _filterKeys('emo', 'sport', x => x.img && x.img.includes('emo'));// console.log(keys); //return;
 	for (const i of range(30)) {
 		svg = createCardSVG("2H", "VC2", "SC2"); console.log(svg)
-		let d1=mDom(d);
+		let d1 = mDom(d);
 		mAppend(d1, svg); //return;
 
 		// let sym = M.superdi[rChoose(keys)];// console.log(sym);
@@ -30,7 +46,7 @@ async function test0_createCard() {
 	let keys = _filterKeys('emo', 'sport', x => x.img && x.img.includes('emo'));// console.log(keys); //return;
 	for (const i of range(30)) {
 		svg = createCardSVG("2H", "VC2", "SC2"); console.log(svg)
-		let d1=mDom(d);
+		let d1 = mDom(d);
 		mAppend(d1, svg); //return;
 
 		// let sym = M.superdi[rChoose(keys)];// console.log(sym);
@@ -111,7 +127,7 @@ async function test0_c52() {
 			svg = replaceCardLabel(svg, 'H');
 
 			let parts = svg.split("fill='white' stroke='black'");
-			let [color,bg,border]=[rColor(),rColor(),rColor()];
+			let [color, bg, border] = [rColor(), rColor(), rColor()];
 			svg = replaceColorsInCard(parts[0], color) + ` fill='${bg}' stroke='${border}' ` + replaceColorsInCard(parts[1], color);
 
 			//let code = renderCard(key,'green','orange'); console.log(code)

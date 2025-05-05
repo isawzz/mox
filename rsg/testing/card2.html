@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+
+<body>
+	<!DOCTYPE html>
+	<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<title>10 of Clubs</title>
+		<style>
+			.card {
+				position: relative;
+				width: 240px;
+				height: 336px;
+				border: 1px solid black;
+				border-radius: 12px;
+				background: white;
+				font-family: Arial, sans-serif;
+			}
+
+			.corner {
+				position: absolute;
+				width: 32px;
+				text-align: center;
+				line-height: 1;
+			}
+
+			.top-left {
+				top: 8px;
+				left: 8px;
+			}
+
+			.bottom-right {
+				bottom: 8px;
+				right: 8px;
+				transform: rotate(180deg);
+			}
+
+			.rank {
+				font-size: 26px;
+				font-weight: bold;
+			}
+
+			.suit-icon {
+				width: 26px;
+				height: 26px;
+				display: block;
+				margin: 2px auto 0 auto;
+			}
+
+			.pip {
+				position: absolute;
+				width: 30px;
+				height: 30px;
+			}
+
+			.pip svg {
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div class="card">
+			<!-- Corners -->
+			<div class="corner top-left">
+				<div class="rank">10</div>
+				<svg class="suit-icon" viewBox="0 0 100 100">
+					<use href="#club" />
+				</svg>
+			</div>
+			<div class="corner bottom-right">
+				<div class="rank">10</div>
+				<svg class="suit-icon" viewBox="0 0 100 100">
+					<use href="#club" />
+				</svg>
+			</div>
+
+			<!-- Left Column (4 pips) -->
+			<div class="pip" style="top: 35px; left: 45px;"><svg viewBox="0 0 100 100">
+					<use href="#club" />
+				</svg></div>
+			<div class="pip" style="top: 95px; left: 45px;"><svg viewBox="0 0 100 100">
+					<use href="#club" />
+				</svg></div>
+			<div class="pip" style="top: 195px; left: 45px;"><svg viewBox="0 0 100 100">
+					<use href="#club" />
+				</svg></div>
+			<div class="pip" style="top: 255px; left: 45px;"><svg viewBox="0 0 100 100">
+					<use href="#club" />
+				</svg></div>
+
+			<!-- Center Column (3 pips) -->
+			<div class="pip" style="top: 75px; left: 105px;"><svg viewBox="0 0 100 100">
+					<use href="#club" />
+				</svg></div>
+			<div class="pip" style="top: 153px; left: 105px;"><svg viewBox="0 0 100 100">
+					<use href="#club" />
+				</svg></div>
+			<div class="pip" style="top: 231px; left: 105px;"><svg viewBox="0 0 100 100">
+					<use href="#club" />
+				</svg></div>
+
+			<!-- Right Column (4 pips) -->
+			<div class="pip" style="top: 35px; left: 165px;"><svg viewBox="0 0 100 100">
+					<use href="#club" />
+				</svg></div>
+			<div class="pip" style="top: 95px; left: 165px;"><svg viewBox="0 0 100 100">
+					<use href="#club" />
+				</svg></div>
+			<div class="pip" style="top: 195px; left: 165px;"><svg viewBox="0 0 100 100">
+					<use href="#club" />
+				</svg></div>
+			<div class="pip" style="top: 255px; left: 165px;"><svg viewBox="0 0 100 100">
+					<use href="#club" />
+				</svg></div>
+		</div>
+
+		<!-- SVG Symbols -->
+		<svg style="display: none;">
+			<symbol id="club" viewBox="-600 -600 1200 1200">
+				<path d="M30 150C35 385 85 400 130 500L-130 500C-85 400 -35 385 -30 150
+             A10 10 0 0 0 -50 150
+             A210 210 0 1 1 -124 -51
+             A10 10 0 0 0 -110 -65
+             A230 230 0 1 1 110 -65
+             A10 10 0 0 0 124 -51
+             A210 210 0 1 1 50 150
+             A10 10 0 0 0 30 150Z" fill="black" />
+			</symbol>
+		</svg>
+
+	</body>
+
+	</html>
+
+</body>
+
+</html>
