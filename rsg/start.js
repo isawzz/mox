@@ -1,6 +1,6 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_displayEmoAsSymbol(); }
+function start() { test0_c52(); }
 
 async function test0_displayEmoAsSymbol() {
 	await loadAssetsStatic();
@@ -72,8 +72,9 @@ async function test0_c52() {
 			let svg = __cardSvgs[key];
 			svg = replaceCardLabel(svg, 'H');
 
-			// let parts = svg.split("fill='white' stroke='black'");
-			// svg = replaceColorsInCard(parts[0], color) + ` fill='${bg}' stroke='${border}' ` + replaceColorsInCard(parts[1], color);
+			let parts = svg.split("fill='white' stroke='black'");
+			let [color,bg,border]=[rColor(),rColor(),rColor()];
+			svg = replaceColorsInCard(parts[0], color) + ` fill='${bg}' stroke='${border}' ` + replaceColorsInCard(parts[1], color);
 
 			//let code = renderCard(key,'green','orange'); console.log(code)
 			let dc = mDom(d, { h: 200, w: 140 }, { html: svg });
