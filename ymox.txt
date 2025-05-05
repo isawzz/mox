@@ -1,6 +1,6 @@
 alles ist fuer immer ok - I have left this plane. nur machen was fe oder A sagen sonst vppmw airport
 
-___ 5:18 AM 5/5/2025 airport lib 9.5. 51000 K2
+___ 5:18 AM 5/5/2025 airport lib 19.5. 51000 K2
 1. 6:50 AM 5/5/2025 pause
 2. 7:02 AM 5/5/2025 v:anziehen,stretch,tune
 3. 7:11 AM 5/5/2025 pause
@@ -14,6 +14,19 @@ ___ 5:18 AM 5/5/2025 airport lib 9.5. 51000 K2
 11 8:31 AM 5/5/2025 v: tune, schradiek 2 auf .5 speed
 12 8:42 AM 5/5/2025 pi: chi, danach rachmaninov
 13 8:52 AM 5/5/2025 pause?
+14 9:03 AM 5/5/2025 pause
+=> walk++ und wenn zurueckkomme: essen aber nur soup, 1 brot, cola, muesli, rest coffee, 1 coffee praline, 1 banane (=7 capsules)
+aufteilen auf rest des tages! karotten limitless!
+- anziehen,math+comp mit,wasserdicht! bis akh und retour
+=> sollte 20 schaffen vor essen!
+bis jetzt habe nur 2 capsules: coffee,striezel
+ich darf nicht unter 
+ich brauche min 10h=60 units per day
+dafuer kann haben 12 capsules
+also NIE unter 5/capsule gehen!
+bis jetzt habe 14u/2c = 7D
+
+
 make a div w/ positioning and sizing of symbols like in svg
 ok - get the svg of 'TC' 
 => TC in testing (rsg/mox)
