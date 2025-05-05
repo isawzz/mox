@@ -1,4 +1,78 @@
 
+function createImageSymbol(src,id){
+	return `
+			<symbol id="${id}" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+				<image href="${src}" x="0" y="0" width="100" height="100" />
+			</symbol>
+		`;
+}
+
+function createCardSVG(face, valueSymbolId, suitSymbolId) {
+  const xmlns = "http://www.w3.org/2000/svg";
+  const xlink = "http://www.w3.org/1999/xlink";
+
+  const svg = document.createElementNS(xmlns, "svg");
+  svg.setAttribute("class", "card");
+  svg.setAttribute("face", face);
+  svg.setAttribute("viewBox", "-120 -168 240 336");
+  svg.setAttribute("width", "100%");
+  svg.setAttribute("height", "100%");
+  svg.setAttribute("preserveAspectRatio", "none");
+  svg.setAttribute("xmlns", xmlns);
+  svg.setAttribute("xmlns:xlink", xlink);
+
+  // Background rect
+  const rect = document.createElementNS(xmlns, "rect");
+  rect.setAttribute("x", "-119.5");
+  rect.setAttribute("y", "-167.5");
+  rect.setAttribute("width", "239");
+  rect.setAttribute("height", "335");
+  rect.setAttribute("rx", "12");
+  rect.setAttribute("ry", "12");
+  rect.setAttribute("fill", "white");
+  rect.setAttribute("stroke", "black");
+  svg.appendChild(rect);
+
+  // Top left value
+  const valueUse = document.createElementNS(xmlns, "use");
+  valueUse.setAttributeNS(xlink, "xlink:href", `#${valueSymbolId}`);
+  valueUse.setAttribute("x", "-114.4");
+  valueUse.setAttribute("y", "-156");
+  valueUse.setAttribute("height", "32");
+  svg.appendChild(valueUse);
+
+  // Top left suit
+  const suitUse = document.createElementNS(xmlns, "use");
+  suitUse.setAttributeNS(xlink, "xlink:href", `#${suitSymbolId}`);
+  suitUse.setAttribute("x", "-111.784");
+  suitUse.setAttribute("y", "-119");
+  suitUse.setAttribute("height", "26.769");
+  svg.appendChild(suitUse);
+
+  // Center pip
+  const centerUse = document.createElementNS(xmlns, "use");
+  centerUse.setAttributeNS(xlink, "xlink:href", `#${suitSymbolId}`);
+  centerUse.setAttribute("x", "-35");
+  centerUse.setAttribute("y", "-135.501");
+  centerUse.setAttribute("height", "70");
+  svg.appendChild(centerUse);
+
+  // Mirrored bottom
+  const g = document.createElementNS(xmlns, "g");
+  g.setAttribute("transform", "rotate(180)");
+
+  const valueUse2 = valueUse.cloneNode();
+  const suitUse2 = suitUse.cloneNode();
+  const centerUse2 = centerUse.cloneNode();
+
+  g.appendChild(valueUse2);
+  g.appendChild(suitUse2);
+  g.appendChild(centerUse2);
+  svg.appendChild(g);
+
+  return svg;
+}
+
 function generateSvgWithImage(imageSrc, width = 100, height = 100) {
 	if (!imageSrc || typeof imageSrc !== 'string') {
 			console.error("Invalid image source provided to generateSvgWithImage.");

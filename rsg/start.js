@@ -1,7 +1,45 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_c52(); }
+function start() { test0_createCard(); }
 
+async function test0_imageSymbols() {
+	await loadAssetsStatic();
+	let dict = M.c52Symbols = await loadStaticYaml('assets/c52symbols.yaml');
+	//console.log('c52Symbols', M.c52Symbols);
+	//console.log(M)
+	let d = mDom('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true, padding: 10 });
+	let keys = _filterKeys('emo', 'sport', x => x.img && x.img.includes('emo'));// console.log(keys); //return;
+	for (const i of range(30)) {
+		svg = createCardSVG("2H", "VC2", "SC2"); console.log(svg)
+		let d1=mDom(d);
+		mAppend(d1, svg); //return;
+
+		// let sym = M.superdi[rChoose(keys)];// console.log(sym);
+		// let src = sym.img;
+		// let svg = generateSvgWithImage(src, 200, 200)
+		// let d1 = mDom(d, { h: 200, w: 200, display: 'grid' });
+		//mDom(d1, {}, { html: svg }); return;
+	}
+}
+async function test0_createCard() {
+	await loadAssetsStatic();
+	let dict = M.c52Symbols = await loadStaticYaml('assets/c52symbols.yaml');
+	//console.log('c52Symbols', M.c52Symbols);
+	//console.log(M)
+	let d = mDom('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true, padding: 10 });
+	let keys = _filterKeys('emo', 'sport', x => x.img && x.img.includes('emo'));// console.log(keys); //return;
+	for (const i of range(30)) {
+		svg = createCardSVG("2H", "VC2", "SC2"); console.log(svg)
+		let d1=mDom(d);
+		mAppend(d1, svg); //return;
+
+		// let sym = M.superdi[rChoose(keys)];// console.log(sym);
+		// let src = sym.img;
+		// let svg = generateSvgWithImage(src, 200, 200)
+		// let d1 = mDom(d, { h: 200, w: 200, display: 'grid' });
+		//mDom(d1, {}, { html: svg }); return;
+	}
+}
 async function test0_displayEmoAsSymbol() {
 	await loadAssetsStatic();
 	let dict = M.c52Symbols = await loadStaticYaml('assets/c52symbols.yaml');
