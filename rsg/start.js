@@ -9,22 +9,22 @@ async function test0_imageSymbols() {
 	//console.log(M)
 	let d = mDom('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true, padding: 10 });
 
-	mDom(d, { h: 200, w: 140 },{html:__cardSvgs['TC']});
+	mDom(d, { h: 200, w: 140 }, { html: __cardSvgs['TC'] });
 
-	// Example usage:
-	d.appendChild(createCard("10", "♣", 240, 336));
+	for(const rank of range(1,11)){
+		d.appendChild(createCard(''+rank, "♣", 240, 336));
+	}
 
-	// Example usage
-	d.appendChild(createCard3("10", "♣", 240, 336));
+// 	// Example usage:
+// 	d.appendChild(createCard("10", "♣", 240, 336));
+// 	d.appendChild(createCard1("10", "♣", 240, 336));
+// //	d.appendChild(createCard2("10", "♣", 240, 336));
+// 	d.appendChild(createCard3("10", "♣", 240, 336));
+// 	d.appendChild(createCard343("10", "♣", 240, 336));
+// 	d.appendChild(createCardGrid("10", "♣", 240, 336));
+	return;
 
-	// Example usage:
-	d.appendChild(createCard2("10", "♣", 240, 336)); return;
-
-	// Example usage:
-	d.appendChild(createCard("10", "♣", 240, 336)); return;
-
-
-	let keys = _filterKeys('emo', 'sport', x => x.img && x.img.includes('emo'));// console.log(keys); //return;
+	let keys = filterKeys('emo', 'sport', x => x.img && x.img.includes('emo'));// console.log(keys); //return;
 	for (const i of range(30)) {
 		svg = createCardSVG("2H", "VC2", "SC2"); console.log(svg)
 		let d1 = mDom(d);
@@ -43,17 +43,11 @@ async function test0_createCard() {
 	//console.log('c52Symbols', M.c52Symbols);
 	//console.log(M)
 	let d = mDom('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true, padding: 10 });
-	let keys = _filterKeys('emo', 'sport', x => x.img && x.img.includes('emo'));// console.log(keys); //return;
+	let keys = filterKeys('emo', 'sport', x => x.img && x.img.includes('emo'));// console.log(keys); //return;
 	for (const i of range(30)) {
 		svg = createCardSVG("2H", "VC2", "SC2"); console.log(svg)
 		let d1 = mDom(d);
-		mAppend(d1, svg); //return;
-
-		// let sym = M.superdi[rChoose(keys)];// console.log(sym);
-		// let src = sym.img;
-		// let svg = generateSvgWithImage(src, 200, 200)
-		// let d1 = mDom(d, { h: 200, w: 200, display: 'grid' });
-		//mDom(d1, {}, { html: svg }); return;
+		mAppend(d1, svg);
 	}
 }
 async function test0_displayEmoAsSymbol() {
@@ -62,7 +56,7 @@ async function test0_displayEmoAsSymbol() {
 	//console.log('c52Symbols', M.c52Symbols);
 	//console.log(M)
 	let d = mDom('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true, padding: 10 });
-	let keys = _filterKeys('emo', 'sport', x => x.img && x.img.includes('emo'));// console.log(keys); //return;
+	let keys = filterKeys('emo', 'sport', x => x.img && x.img.includes('emo'));// console.log(keys); //return;
 	for (const i of range(30)) {
 		let sym = M.superdi[rChoose(keys)];// console.log(sym);
 		let src = sym.img;
