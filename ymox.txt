@@ -1,10 +1,57 @@
 alles ist fuer immer ok - I have left this plane. nur machen was fe oder A sagen sonst vppmw airport
 
 ___ 5:18 AM 5/5/2025 airport lib 9.5. 51000 K2
+1. 6:50 AM 5/5/2025 pause
+- next: v:anziehen,stretch,tune
 
+choices: v,pr,pi,w,m oder rolladie
+capsule boiledegg,handful nuts,bread+cheese,
+eis,cup muesli,cup oatmeal, 1 striezel, 1toast, 1 cake,
+cup soup, cup carrots, cup tomatoes, cup anything
+=>use magic cup!
+=>mag,tee,soda
+slow steps!
+<svg>
+  <symbol id="imgSymbol_card1">...</symbol>
+  <use href="#imgSymbol_card1" ... />
+</svg>
+
+<svg>
+  <symbol id="imgSymbol_card2">...</symbol>
+  <use href="#imgSymbol_card2" ... />
+</svg>
+
+<svg style="display:none">
+  <symbol id="imgSymbol" viewBox="0 0 100 100">
+    <image href="img.png" width="100" height="100" />
+  </symbol>
+</svg>
+
+<svg width="120" height="120">
+  <use href="#imgSymbol" x="10" y="10" width="100" height="100" />
+</svg>
+
+<svg width="60" height="60">
+  <use href="#imgSymbol" x="0" y="0" width="60" height="60" />
+</svg>
+
+- schau was rauskommt wenn man ein symbol als image macht
+<svg style="display: none;">
+  <symbol id="myImageSymbol" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+    <image href="your-image.png" x="0" y="0" width="100" height="100" />
+  </symbol>
+</svg>
+
+<svg width="200" height="200">
+  <use href="#myImageSymbol" x="50" y="50" width="100" height="100" />
+</svg>
+ok - schau wie bei einer echten card das symbol gemacht wird
+1. hol mir 1 symbol
 ___ 5:09 AM 5/3/2025 airport lib 9.5. 50000 K1
 isEmo and hasImage
-SH fuer suit haben fill aber nicht stroke
+suit: SH2 fuer suit haben fill aber nicht stroke
+
+value: VH2
 V fuer value haben stroke und fill none
 2.letter is suit beeinflusst aber nur die farbe!
 3. letter ist val (2..9,T,J,Q,K,A)
