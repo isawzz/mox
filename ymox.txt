@@ -3,7 +3,23 @@ alles ist fuer immer ok - I have left this plane. nur machen was fe oder A sagen
 ___ 5:18 AM 5/5/2025 airport lib 9.5. 51000 K2
 1. 6:50 AM 5/5/2025 pause
 2. 7:02 AM 5/5/2025 v:anziehen,stretch,tune
-
+3. 7:11 AM 5/5/2025 pause
+4. 7:20 AM 5/5/2025 pr
+5. 7:30 AM 5/5/2025 pr (weiter)
+6. 7:41 AM 5/5/2025 pr (weiter)
+7. 7:50 AM 5/5/2025 pause eigentlich bin jetzt muede
+8. 8:00 AM 5/5/2025 pause noch nicht fertig geplant!
+9. 8:11 AM 5/5/2025 pause! hol mir rat von venice!
+10 8:21 AM 5/5/2025 v: tune, schradiek 2 auf .5 speed
+make a div w/ positioning and sizing of symbols like in svg
+ok - get the svg of 'TC' 
+=> TC in testing (rsg/mox)
+ok - copy past into chat
+ok - prompt: can you replace this svg by a div using the text '10' instead of the symbol 'VTC' and the character for 'Club suit' instead of the symbol 'SCT'. replicate the absolute positioning and sizing of the symbols on the card. the div should look almost the same as the card
+=>card.html in testing (rsg/mox)
+ok - what is more efficient in a web app: using svg for cards or divs?
+for dynamic creation, divs are more efficient
+- 
 
 choices: v,pr,pi,w,m oder rolladie
 capsule boiledegg,handful nuts,bread+cheese,
