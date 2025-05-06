@@ -1,7 +1,33 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_imageSymbols(); }
+function start() { test0_showCollections(); }
 
+async function test0_showCollections(){
+	await loadAssetsStatic();
+	//console.log(M.byCollection.unicode); return;
+
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); mCenterFlex('dMain');
+	let dLeft = mBy('dLeft');
+	let family = "'Noto Sans', sans-serif"; // "Arial Unicode MS"; //'"Segoe UI", "DejaVu Sans", "Arial Unicode MS", sans-serif'
+	let styles = { family, fz: 48, sz: 100, bg: 'white', fg: 'black' };
+	let opts =  { prefer: 'text' };
+	for(const k of M.collections){
+		mDom(dLeft,{},{tag:'button','html':k,onclick:ev=>showCollection(k,'dMain',styles, {prefer:ev.target.innerHTML == 'unicode'?'text':null})});mLinebreak(dLeft)
+	}
+
+	await showCollection('unicode','dMain',styles,opts);
+	return;
+	let d = mDom('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true, padding: 10 });
+	let keys = filterKeys('emo', 'sport', x => x.img && x.img.includes('emo'));// console.log(keys); //return;
+	for (const i of range(30)) {
+		let sym = M.superdi[rChoose(keys)];// console.log(sym);
+		let src = sym.img;
+		let svg = generateSvgWithImage(src, 200, 200)
+		let d1 = mDom(d, { h: 200, w: 200, display: 'grid' });
+		mDom(d1, {}, { html: svg }); //return;
+	}
+
+}
 async function test0_imageSymbols() {
 	await loadAssetsStatic();
 	let dict = M.c52Symbols = await loadStaticYaml('assets/c52symbols.yaml');
@@ -12,7 +38,7 @@ async function test0_imageSymbols() {
 	mDom(d, { h: 200, w: 140 }, { html: __cardSvgs['TC'] });
 
 	for(const rank of range(1,11)){
-		d.appendChild(createCard(''+rank, "♣", 240, 336));
+		d.appendChild(createCard(''+rank, "♣", 100));
 	}
 
 // 	// Example usage:

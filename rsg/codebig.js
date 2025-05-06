@@ -3136,6 +3136,7 @@ async function loadAssetsStatic() {
 		let except = ["Noum", 'Bras', 'Reykja'];
 		M.asciiCapitals = M.capital.filter(x => !x.includes('.') && !except.some(y => x.startsWith(y)));
 	}
+	let dict = M.c52Symbols = await loadStaticYaml('assets/c52symbols.yaml');
 }
 function loadColors(bh = 18, bs = 20, bl = 20) {
 	if (nundef(M.dicolor)) {
@@ -3174,6 +3175,21 @@ async function loadStaticYaml(path) {
 }
 function loadSuperdiAssets() {
 	let [di, byColl, byFriendly, byCat, allImages] = [M.superdi, {}, {}, {}, {}];
+	for (const k in Symbols) {
+		let kNew = isdef(di[k]) && isdef(di[k].text)?k+'_uni':k;
+		if (k == 'writing_hand') console.log(k,di[k],kNew)
+		if (isdef(di[k]) && nundef(di[k].text)) {
+			assertion(k!='writing_hand')
+			//console.log('defined!',M.superdi[k]);
+			let o = di[k];
+			if (nundef(o.colls)) o.colls=[];
+			o.colls.push('unicode');
+			//o.cats.push('unicode');
+			if (isdef(o.text)) console.log(':text', k, o.text); 
+			else o.text = Symbols[k];
+			// diDefined.push(k);
+		} else di[kNew] = { key: kNew, friendly: k, text: Symbols[k], colls: ['unicode'], cats: [] };
+	}
 	for (const k in di) {
 		let o = di[k];
 		for (const cat of o.cats) lookupAddIfToList(byCat, [cat], k);
@@ -3716,12 +3732,13 @@ function mInput(dParent, styles = {}, opts = {}) {
 function mInsert(dParent, el, index = 0) { dParent.insertBefore(el, dParent.childNodes[index]); return el; }
 async function mKey(imgKey, d, styles = {}, opts = {}) {
 	styles = jsCopy(styles);
-	let type = opts.prefer;
+	let type = opts.prefer; console.log(type)
 	let o = type != 'plain' ? lookup(M.superdi, [imgKey]) : null;
+	//console.log(imgKey,o)
 	let src;
 	if (nundef(o) && imgKey.includes('.')) src = imgKey;
 	else if (isdef(o) && (type == 'img' || type == 'photo') && isdef(o[type])) src = o[type];
-	else if (isdef(o) && isdef(o.img)) src = o.img;
+	else if (isdef(o) && isdef(o.img) && nundef(type)) src = o.img;
 	if (isdef(src)) {
 		let d0 = mDom(d, styles, opts);
 		mCenterCenterFlex(d0);
@@ -3799,6 +3816,12 @@ function mLayout(dParent, rowlist, colt, rowt, styles = {}, opts = {}) {
 	let names = M.divNames = Array.from(new Set(M.divNames.concat(newNames)));
 	if (nundef(styles.bgSrc)) mShade(newNames, 2, 1);
 	return names.map(x => mBy(x));
+}
+function mLayoutLM(dParent, styles = {}, opts = {}) {
+	let rowlist = [`dLeft@ dMain@`];
+	let colt = `auto 1fr`;
+	let rowt = `1fr`;
+	return mLayout(dParent, rowlist, colt, rowt, styles, opts);
 }
 function mLayoutLMR(dParent, styles = {}, opts = {}) {
 	let rowlist = [`dLeft@ dMain@ dRight@`];

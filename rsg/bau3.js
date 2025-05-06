@@ -1,21 +1,22 @@
 
-function createCard(rank = "10", suit = "♣", width = 240, height = 336) {
+function createCard(rank = "10", suit = "♣", height=200, width) {
+  if (nundef(width)) width=height*.7;
   const card = document.createElement("div");
   card.style.position = "relative";
   card.style.width = width + "px";
   card.style.height = height + "px";
   card.style.border = "1px solid black";
-  card.style.borderRadius = "12px";
+  card.style.borderRadius = Math.max(4,width/20) + 'px';//`${width/20}px;`; //"12px";
   card.style.background = "white";
   card.style.fontFamily = "serif";
   card.style.fontFamily = '"DejaVu Sans", "Arial Unicode MS", sans-serif';
 
   const centerX = width / 2;
-  const colOffset = width * 0.25;
+  const colOffset = width * 0.2;
   const colX = [centerX - colOffset, centerX, centerX + colOffset];
 
   const topMargin = height * 0.12;
-  const pipSpacing = (height - 2 * topMargin) / 3.25;
+  const pipSpacing = (height - 2 * topMargin) / 3.3;
 
   const pipPatterns = {
     1:  [[1, [1.5]]],
@@ -66,17 +67,17 @@ function createCard(rank = "10", suit = "♣", width = 240, height = 336) {
   top.innerHTML = `<div style="line-height:1">${rank}<span style="display:block; line-height:0.9;">${suit}</span></div>`;
 
   top.style.position = "absolute";
-  top.style.left = "6px";
-  top.style.top = "4px";
+  top.style.left = "3px";
+  top.style.top = "3px";
   top.style.fontSize = Math.floor(height * 0.08) + "px";
   card.appendChild(top);
 
   // Bottom-right corner, rotated
   const bottom = top.cloneNode(true);
   bottom.style.left = "";
-  bottom.style.right = "6px";
+  bottom.style.right = "3px";
   bottom.style.top = "";
-  bottom.style.bottom = "4px";
+  bottom.style.bottom = "3px";
   bottom.style.transform = "rotate(180deg)";
   bottom.style.textAlign = "center";
   card.appendChild(bottom);

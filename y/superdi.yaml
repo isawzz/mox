@@ -11643,16 +11643,22 @@ cross_flare:
     - icon
 cross_mark:
   friendly: cross_mark
-  img: ../assets/img/emo/cross-mark.png
-  ga: ED85
-  text: '&#10060;'
+  text: '&#x2718;'
   cats: []
   colls:
-    - emo
+    - unicode
 cross_mark_button:
   friendly: cross_mark_button
   img: ../assets/img/emo/cross-mark-button.png
   text: '&#10062;'
+  cats: []
+  colls:
+    - emo
+cross_mark_red:
+  friendly: cross_mark_red
+  img: ../assets/img/emo/cross-mark.png
+  ga: ED85
+  text: '&#10060;'
   cats: []
   colls:
     - emo
@@ -45240,7 +45246,7 @@ water_wave:
 waterball:
   friendly: waterball
   cats: []
-  img: ../assets/img/hallo/waterball.png
+  img: ../assets/img/extra/waterball.png
   colls:
     - all
 waterfall:

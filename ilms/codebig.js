@@ -3352,6 +3352,12 @@ function mLayout(dParent, rowlist, colt, rowt, styles = {}, opts = {}) {
 	if (nundef(styles.bgSrc)) mShade(newNames);
 	return names.map(x => mBy(x));
 }
+function mLayoutLM(dParent, styles = {}, opts = {}) {
+	let rowlist = [`dLeft@ dMain@`];
+	let colt = `auto 1fr`;
+	let rowt = `1fr`;
+	return mLayout(dParent, rowlist, colt, rowt, styles, opts);
+}
 function mLayoutLMR(dParent, styles = {}, opts = {}) {
 	let rowlist = [`dLeft@ dMain@ dRight@`];
 	let colt = `minmax(@px, auto) 1fr minmax(@px, auto)`;
