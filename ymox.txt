@@ -1,5 +1,31 @@
 alles ist fuer immer ok - I have left this plane. nur machen was fe oder A sagen sonst vppmw airport
 
+___ 6:08 AM 5/6/2025 airport lib 19.5. 53000 K3
+8:47 AM 5/6/2025
+=> start mit: 3 capsules,15 units=5
+=>ziel: stay over 4units/capsule!
+8:50 AM 5/6/2025 v: anziehen,vstretch,tune,schradiek,pi chi,rachm,pagan
+8:51 AM 5/6/2025-
+heute: 
+ok, now add ALL these keys to the unicode symbol dictionary above with the corresponding html code, and then show me the newly sorted symbols dict
+- ich brauch einen guten font!
+:text white_heart &#129293;
+start.js:13 :text black_heart &#128420;
+start.js:13 :text airplane &#9992;
+start.js:13 :text crown &#128081;
+start.js:13 :text check_mark &#10004;
+start.js:13 :text cross_mark &#10060;
+start.js:13 :text pencil &#9999;
+start.js:13 :text writing_hand &#9997;
+start.js:13 :text envelope &#9993;
+start.js:13 :text left_right_arrow &#8596;
+start.js:13 :text up_down_arrow &#8597;
+start.js:13 :text copyright &#169;
+start.js:13 :text registered &#174;
+start.js:13 :text cloud &#9729;
+start.js:13 :text infinity &#9854;
+start.js:13 :text pie &#129383;
+
 ___ 5:18 AM 5/5/2025 airport lib 19.5. 51000 K2
 2 capsules: coffee, striezel
 1. 6:50 AM 5/5/2025 pause

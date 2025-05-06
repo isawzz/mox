@@ -1,9 +1,47 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_showCollections(); }
+function start() { test0_showSymbols(); }
 
+async function test0_showSymbols(){
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); mCenterFlex('dMain');
+	let d=mGrid(null,5,'dMain');
+
+	for(const k in newDict){
+		if (nundef(Symbols[k])) {
+			let text=newDict[k];
+			let d1 = mDom(d, { margin: 10 });
+			//mDom(d1,{},{tag:'pre',html:sym.text});
+			let dSym = mDom(d1,{className:'symbol'},{html: `<div class="symbol">${text}</div>` }); //sym.text
+			let dlabel = mDom(d1, { align: 'center', fz: 12, bg: 'yellow', fg: 'black' }, { html: k });
+	
+		}else if (Symbols[k] != newDict[k]) {
+			let text=newDict[k];
+			let d1 = mDom(d, { margin: 10 });
+			//mDom(d1, {}, {tag:'pre', html:sym.text});
+			let dNew = mDom(d1, {className:'symbol'}, {html: `<div class="symbol">${newDict[k]}</div>` }); //sym.text
+			let dSym = mDom(d1, {className:'symbol'}, {html: `<div class="symbol">${Symbols[k]}</div>` }); //sym.text
+			let dlabel = mDom(d1, { align: 'center', fz: 12, bg: 'yellow', fg: 'black' }, { html: k });
+			//mStyle(dSym, { bg: 'red' });
+		}
+	}
+	
+
+	console.log(arrMinus(Object.keys(newDict),Object.keys(Symbols))); 
+	console.log(arrMinus(Object.values(newDict),Object.values(Symbols))); 
+	// console.log(arrMinus(Object.keys(Symbols),Object.keys(Symbols1))); 
+	return;
+
+}
 async function test0_showCollections(){
+
 	await loadAssetsStatic();
+	M.collections.push('math');
+	M.byCollection.math = MathKeys;
+
+	for(const k of MathKeys) {
+		if (nundef(M.superdi[k])) console.log('missing key', k);
+	}
+	return;
 	//console.log(M.byCollection.unicode); return;
 
 	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); mCenterFlex('dMain');
