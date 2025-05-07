@@ -366,6 +366,11 @@ fieldset .disabled {
   object-fit: cover;
 }
 
-
+.ellipsis {
+  white-space: nowrap;        /* Prevents line breaks */
+  overflow: hidden;           /* Hides overflow text */
+  text-overflow: ellipsis;    /* Displays ellipsis (…) when text is too long */
+  max-width: 100px;
+}
 
 

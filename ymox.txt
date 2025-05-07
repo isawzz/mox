@@ -15,6 +15,8 @@ ___ 5:39 AM 5/7/2025 airport lib 19.5. 54000 K3 v0=>all free!
 +2 capsules um 10:45 AM 5/7/2025
 11,12. 10:45 AM 5/7/2025 v 2 units
 13. 11:10 AM 5/7/2025 pr
+14. 11:34 AM 5/7/2025 pr
+15. 11:54 AM 5/7/2025 wapr
 
 - bessere idee: start from a simple iconviewer
 - open mag
