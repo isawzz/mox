@@ -1,44 +1,92 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_showSymbols(); }
+function start() { test0_showCollections1(); }
 
-async function test0_showSymbols(){
+async function test0_showCollections1() {
+	await loadAssetsStatic();
+
 	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); mCenterFlex('dMain');
-	let d=mGrid(null,5,'dMain');
+	let dLeft = mBy('dLeft');
+	let family = "'Noto Sans', sans-serif"; // "Arial Unicode MS"; //'"Segoe UI", "DejaVu Sans", "Arial Unicode MS", sans-serif'
+	let styles = { family, fz: 48, sz: 100, bg: 'white', fg: 'black' };
 
-	for(const k in newDict){
+	// let dParent = mDom('dMain', { display: 'flex', wrap: true, w:500 }, { id: "table", });
+	let dParent = mDom('dMain', { display: 'flex', wrap: true, w100:true, box:true }, { id: "table", });
+	iconViewer();
+	return;
+
+	// let container = mDom('dMain', { display: 'flex', wrap: true, w100:true, box:true }, { id: "image-container", });
+	let container = mDom('dMain', { display: 'flex', wrap: true, w:500 }, { id: "image-container", });
+
+	// Example usage
+	//const container = document.getElementById("image-container");
+	let images = dict2list(M.allImages).map(x => x.path); console.log(images)
+
+	showCollection(container, index => images[index], { h: 100 });
+	// createLazyImageLoader({
+	// 	container: container,
+	// 	imageUrlCallback: index => images[index], //`https://picsum.photos/300/200?random=${index}`,
+	// 	imageWidth: 100,
+	// 	imageHeight: 100,
+	// 	bufferPages: 1,
+	// 	imagesPerRow: 3
+	// });
+
+	// showCollection();
+
+
+	//collections and categories zeigen
+	//filter zeigen
+	//alles rausfiltern und zeigen
+}
+async function test0_showMathSymbols() {
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); mCenterFlex('dMain');
+	let d = mGrid(null, 5, 'dMain');
+
+	for (const k of MathKeys) {
+		let text = Symbols[k];
+		let d1 = mDom(d, { margin: 10, display: 'grid', bg: 'pink', justify: 'center', align: 'center' });
+		//mDom(d1,{},{tag:'pre',html:sym.text});
+		//let dSym = mDom(d1, {  }, { html: `<div class="symbol">${text}</div>` }); //sym.text
+		let dSym = mDom(d1, { className: 'symbol' }, { html: text }); //sym.text
+		let dlabel = mDom(d1, { align: 'center', fz: 12, bg: 'yellow', fg: 'black' }, { html: k });
+	}
+}
+async function test0_showSymbols() {
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); mCenterFlex('dMain');
+	let d = mGrid(null, 5, 'dMain');
+
+	for (const k in newDict) {
 		if (nundef(Symbols[k])) {
-			let text=newDict[k];
+			let text = newDict[k];
 			let d1 = mDom(d, { margin: 10 });
 			//mDom(d1,{},{tag:'pre',html:sym.text});
-			let dSym = mDom(d1,{className:'symbol'},{html: `<div class="symbol">${text}</div>` }); //sym.text
+			let dSym = mDom(d1, { className: 'symbol' }, { html: `<div class="symbol">${text}</div>` }); //sym.text
 			let dlabel = mDom(d1, { align: 'center', fz: 12, bg: 'yellow', fg: 'black' }, { html: k });
-	
-		}else if (Symbols[k] != newDict[k]) {
-			let text=newDict[k];
+
+		} else if (Symbols[k] != newDict[k]) {
+			let text = newDict[k];
 			let d1 = mDom(d, { margin: 10 });
 			//mDom(d1, {}, {tag:'pre', html:sym.text});
-			let dNew = mDom(d1, {className:'symbol'}, {html: `<div class="symbol">${newDict[k]}</div>` }); //sym.text
-			let dSym = mDom(d1, {className:'symbol'}, {html: `<div class="symbol">${Symbols[k]}</div>` }); //sym.text
+			let dNew = mDom(d1, { className: 'symbol' }, { html: `<div class="symbol">${newDict[k]}</div>` }); //sym.text
+			let dSym = mDom(d1, { className: 'symbol' }, { html: `<div class="symbol">${Symbols[k]}</div>` }); //sym.text
 			let dlabel = mDom(d1, { align: 'center', fz: 12, bg: 'yellow', fg: 'black' }, { html: k });
 			//mStyle(dSym, { bg: 'red' });
 		}
 	}
-	
 
-	console.log(arrMinus(Object.keys(newDict),Object.keys(Symbols))); 
-	console.log(arrMinus(Object.values(newDict),Object.values(Symbols))); 
+
+	console.log(arrMinus(Object.keys(newDict), Object.keys(Symbols)));
+	console.log(arrMinus(Object.values(newDict), Object.values(Symbols)));
 	// console.log(arrMinus(Object.keys(Symbols),Object.keys(Symbols1))); 
 	return;
 
 }
-async function test0_showCollections(){
+async function test0_showCollections() {
 
 	await loadAssetsStatic();
-	M.collections.push('math');
-	M.byCollection.math = MathKeys;
 
-	for(const k of MathKeys) {
+	for (const k of MathKeys) {
 		if (nundef(M.superdi[k])) console.log('missing key', k);
 	}
 	return;
@@ -48,12 +96,12 @@ async function test0_showCollections(){
 	let dLeft = mBy('dLeft');
 	let family = "'Noto Sans', sans-serif"; // "Arial Unicode MS"; //'"Segoe UI", "DejaVu Sans", "Arial Unicode MS", sans-serif'
 	let styles = { family, fz: 48, sz: 100, bg: 'white', fg: 'black' };
-	let opts =  { prefer: 'text' };
-	for(const k of M.collections){
-		mDom(dLeft,{},{tag:'button','html':k,onclick:ev=>showCollection(k,'dMain',styles, {prefer:ev.target.innerHTML == 'unicode'?'text':null})});mLinebreak(dLeft)
+	let opts = { prefer: 'text' };
+	for (const k of M.collections) {
+		mDom(dLeft, {}, { tag: 'button', 'html': k, onclick: ev => showCollection(k, 'dMain', styles, { prefer: ev.target.innerHTML == 'unicode' ? 'text' : null }) }); mLinebreak(dLeft)
 	}
 
-	await showCollection('unicode','dMain',styles,opts);
+	await showCollection('unicode', 'dMain', styles, opts);
 	return;
 	let d = mDom('dPage'); mStyle(d, { gap: 10, display: 'flex', wrap: true, padding: 10 });
 	let keys = filterKeys('emo', 'sport', x => x.img && x.img.includes('emo'));// console.log(keys); //return;
@@ -75,17 +123,17 @@ async function test0_imageSymbols() {
 
 	mDom(d, { h: 200, w: 140 }, { html: __cardSvgs['TC'] });
 
-	for(const rank of range(1,11)){
-		d.appendChild(createCard(''+rank, "♣", 100));
+	for (const rank of range(1, 11)) {
+		d.appendChild(createCard('' + rank, "♣", 100));
 	}
 
-// 	// Example usage:
-// 	d.appendChild(createCard("10", "♣", 240, 336));
-// 	d.appendChild(createCard1("10", "♣", 240, 336));
-// //	d.appendChild(createCard2("10", "♣", 240, 336));
-// 	d.appendChild(createCard3("10", "♣", 240, 336));
-// 	d.appendChild(createCard343("10", "♣", 240, 336));
-// 	d.appendChild(createCardGrid("10", "♣", 240, 336));
+	// 	// Example usage:
+	// 	d.appendChild(createCard("10", "♣", 240, 336));
+	// 	d.appendChild(createCard1("10", "♣", 240, 336));
+	// //	d.appendChild(createCard2("10", "♣", 240, 336));
+	// 	d.appendChild(createCard3("10", "♣", 240, 336));
+	// 	d.appendChild(createCard343("10", "♣", 240, 336));
+	// 	d.appendChild(createCardGrid("10", "♣", 240, 336));
 	return;
 
 	let keys = filterKeys('emo', 'sport', x => x.img && x.img.includes('emo'));// console.log(keys); //return;

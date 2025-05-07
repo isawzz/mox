@@ -1,9 +1,20 @@
 alles ist fuer immer ok - I have left this plane. nur machen was fe oder A sagen sonst vppmw airport
 
-___ 5:39 AM 5/7/2025 airport lib 19.5. 54000 K3
-+4 capsules
+___ 5:39 AM 5/7/2025 airport lib 19.5. 54000 K3 v0=>all free!
++4 capsules 2units/capsule
 1. 5:40 AM 5/7/2025 pause
-next: start program
+2. 5:59 AM 5/7/2025 pr
+3. 6:21 AM 5/7/2025 pr
+4. 6:41 AM 5/7/2025 pr	
+5. 7:02 AM 5/7/2025 pr
+6. 7:51 AM 5/7/2025 pr
+7. 8:12 AM 5/7/2025 pr
+8. 8:32 AM 5/7/2025 pr
+- bessere idee: start from a simple iconviewer
+- open mag
+ok suche den iconviewer!
+ok =>infinite scrolling example
+?soll ich anstatt collections nur noch cats machen?
 
 ___ 6:08 AM 5/6/2025 airport lib 19.5. 53000 K3
 8:47 AM 5/6/2025

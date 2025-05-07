@@ -1,7 +1,10 @@
 onload = start;
 
-async function start() { mlib_rsg(); } //project_ilms(); }//return;mlib_p5();return;project_p5(); }
+async function start() { mclosure_free(); } //project_ilms(); }//return;mlib_p5();return;project_p5(); }
 
+async function mclosure_free(){
+	codePackClosure('../free',['globals','allcode','bau1','bau2','bau3','bau4','start'],['onclickSimple']);
+}
 async function mlib_rsg(){
 	codePackMLib('../rsg',['codefull','codemlib','done','addcode','bau1','bau2','bau3']);
 }
