@@ -1,25 +1,25 @@
 
-function _mSizeSuccession(styles = {}, szDefault = 100, fromWidth = true) {
-  let [w, h] = [styles.w, styles.h];
-  if (fromWidth) {
-    w = valf(w, styles.sz, h, szDefault);
-    h = valf(h, styles.sz, w, szDefault);
-  } else {
-    h = valf(h, styles.sz, w, szDefault);
-    w = valf(w, styles.sz, h, szDefault);
-  }
-  return [w, h];
+function mSizeSuccession(styles = {}, szDefault = 100, fromWidth = true) {
+	let [w, h] = [styles.w, styles.h];
+	if (fromWidth) {
+		w = valf(w, styles.sz, h, szDefault);
+		h = valf(h, styles.sz, w, szDefault);
+	} else {
+		h = valf(h, styles.sz, w, szDefault);
+		w = valf(w, styles.sz, h, szDefault);
+	}
+	return [w, h];
 }
 
 function displayImageGallery(dParent, items, styles = {}, opts = {}) {
 	mClear(dParent);
 
-	sizeSuccession
+	let [w, h] = mSizeSuccession(styles); console.log(w, h)
 	let dGrid = mDom(dParent, { display: 'flex', wrap: true, gap: 10, w100: true, box: true, bg: 'red', padding: 10 });
 
 
 	for (const o of items) {
-		const cell = mDom(dGrid, { display: 'grid', wmax: 100, padding: 4, rounding: 4, border: '2px solid pink' }); // {...styles, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' });
+		const cell = mDom(dGrid, { display: 'grid', box: true, w, h, padding: 4, rounding: 4, border: '2px solid pink' }); // {...styles, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' });
 
 		const dImg = mDom(cell, { display: 'grid', justifyContent: 'center' });
 
@@ -34,7 +34,7 @@ function displayImageGallery(dParent, items, styles = {}, opts = {}) {
 		let symbolBaseStyle = {};
 		let labelStyles = { align: 'center', className: 'ellipsis' };
 		if (srcPath) {
-			el = mDom(dImg, {'object-fit': 'cover'}, { tag: 'img', src: srcPath, alt: o.friendly || o.key || 'image' });
+			el = mDom(dImg, { 'object-fit': 'cover' }, { tag: 'img', src: srcPath, alt: o.friendly || o.key || 'image' });
 		} else if (o.text) {
 			let family = o.colls.includes('unicode') ? "'Noto Sans', sans-serif" : 'emoNoto'; // "Arial Unicode MS"; //'"Segoe UI", "DejaVu Sans", "Arial Unicode MS", sans-serif'
 			el = mDom(dImg, { family }, { html: o.text });
