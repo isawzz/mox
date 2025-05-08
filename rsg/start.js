@@ -1,6 +1,43 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_showCollections1(); }
+function start() { test0_lazyload(); }
+
+async function test0_lazyload() {
+	let t = getNow();
+	t = showTimeSince(t);
+	// await loadAssetsFast();
+	await loadAssetsStatic();
+	t = showTimeSince(t);
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); mCenterFlex('dMain');
+	//let dFilter = mDom('dMain',{bg:'violet'},{html:uiFilterElement()}); //mAppend('dMain', dFilter)
+	for (const k in M.superdi) { M.superdi[k].key = k; }
+	let keys = await uiFilterMenu('dMain', 'fa6'); //console.log(keys)
+	let dParent = mDom('dMain', { display: 'flex', gap: 10, padding: 10, wrap: true, w100: true, box: true }, { id: "table", });
+	//keys = M.byCollection.emo;
+	//let keys = 'turkey turtle twelve_oclock twelve_thirty two_hearts two_hump_camel two_oclock two_thirty umbrella';keys=keys.split(' ');
+	let sz = 200;
+	let style = { fz:sz/1.25, w: sz, h: sz, box: true, padding: 4, fg: 'red' };
+
+	for (const k of keys) {
+		let o = M.superdi[k]; 
+		let d1 = mDom(dParent, { display: 'grid' });
+		await mKey(k, d1, style, { prefer: 'fa6' }); //, html: o.fa6 }); //'data-innerHTML': o.fa6 });
+		mDom(d1, { w100: true, wmax: sz, fg: 'black', 'text-overflow': 'ellipsis', 'white-space': 'nowrap', overflow: 'hidden', fz: 16, align: 'center' }, { html: o.key })
+		console.log(o); return;
+	}
+
+	// let images = keys.map(x => M.superdi[x]).filter(x => isdef(x.img)); //allImages);//.map(x => x.path); console.log(images)
+	// console.log(images[10])
+	// for (const o of images) {
+	// 	let d1 = mDom(dParent, { display: 'grid' });
+	// 	mDom(d1, style, { tag: 'img', 'data-src': o.img })
+	// 	mDom(d1, { w100: true, wmax: sz, fg: 'black', 'text-overflow': 'ellipsis', 'white-space': 'nowrap', overflow: 'hidden', fz: 16, align: 'center' }, { html: o.key })
+	// }
+
+	lazyLoad('innerHTML'); //Images();
+
+	//downloadAsYaml(M, 'm');
+}
 
 async function test0_showCollections1() {
 	await loadAssetsStatic();
@@ -11,12 +48,12 @@ async function test0_showCollections1() {
 	let styles = { family, fz: 48, sz: 100, bg: 'white', fg: 'black' };
 
 	// let dParent = mDom('dMain', { display: 'flex', wrap: true, w:500 }, { id: "table", });
-	let dParent = mDom('dMain', { display: 'flex', wrap: true, w100:true, box:true }, { id: "table", });
+	let dParent = mDom('dMain', { display: 'flex', wrap: true, w100: true, box: true }, { id: "table", });
 	iconViewer();
 	return;
 
 	// let container = mDom('dMain', { display: 'flex', wrap: true, w100:true, box:true }, { id: "image-container", });
-	let container = mDom('dMain', { display: 'flex', wrap: true, w:500 }, { id: "image-container", });
+	let container = mDom('dMain', { display: 'flex', wrap: true, w: 500 }, { id: "image-container", });
 
 	// Example usage
 	//const container = document.getElementById("image-container");

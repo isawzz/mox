@@ -1,4 +1,28 @@
-alles ist fuer immer ok - I have left this plane. nur machen was fe oder A sagen sonst vppmw airport
+alles ist fuer immer ok - I have left this plane. 
+nur machen was fe oder A sagen sonst vppmw airport
+
+___ 5:17 AM 5/8/2025 airport lib 19.5. 55000 K4
+1. 5:19 AM 5/8/2025 pr
+2. 5:39 AM 5/8/2025 pr
+3. 6:06 AM 5/8/2025 pr
+4. 6:27 AM 5/8/2025 pr
+5. 6:44 AM 5/8/2025 pr
+6. 7:08 AM 5/8/2025 pr
+7. 7:28 AM 5/8/2025 pr
+8. 7:48 AM 5/8/2025 pr
+- teste mit html!
+ACHTUNG!!!! alles muss zu codebig.js updated werden!!!!!! in Mox
+=>simple0 is updated!!! can eliminate ilms,free,rsgtest0
+think!
+choices:
+1. styling
+2. andere prefers
+=>3. filter function!
+ok! jetzt hab ich ein wunderschoenes viewer ding!
+dicolor ist in assets/dicolor.yaml!
+wenn ich ein m.yaml mache in assets muesste es gehen!
+=>wenn was veraendere muss ich einfach m.yaml updaten!
+
 
 ___ 5:39 AM 5/7/2025 airport lib 19.5. 54000 K3 v0=>all free!
 +4 capsules 2units/capsule
@@ -17,13 +41,11 @@ ___ 5:39 AM 5/7/2025 airport lib 19.5. 54000 K3 v0=>all free!
 13. 11:10 AM 5/7/2025 pr
 14. 11:34 AM 5/7/2025 pr
 15. 11:54 AM 5/7/2025 wapr
-
 - bessere idee: start from a simple iconviewer
 - open mag
 ok suche den iconviewer!
 ok =>infinite scrolling example
 ?soll ich anstatt collections nur noch cats machen?
-
 ___ 6:08 AM 5/6/2025 airport lib 19.5. 53000 K3
 8:47 AM 5/6/2025
 => start mit: 3 capsules,15 units=5

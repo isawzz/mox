@@ -6953,7 +6953,6 @@ buffalo:
   cats:
     - animal
   colls:
-    - emo
     - tierspiel
   img: ../assets/img/tierspiel/buffalo.png
 buffalo_head:
