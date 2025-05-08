@@ -11,19 +11,22 @@ async function test0_lazyload() {
 	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); mCenterFlex('dMain');
 	//let dFilter = mDom('dMain',{bg:'violet'},{html:uiFilterElement()}); //mAppend('dMain', dFilter)
 	for (const k in M.superdi) { M.superdi[k].key = k; }
-	let keys = await uiFilterMenu('dMain', 'fa6'); //console.log(keys)
+	let keys = await uiFilterMenu('dMain', 'all'); //console.log(keys)
 	let dParent = mDom('dMain', { display: 'flex', gap: 10, padding: 10, wrap: true, w100: true, box: true }, { id: "table", });
 	//keys = M.byCollection.emo;
 	//let keys = 'turkey turtle twelve_oclock twelve_thirty two_hearts two_hump_camel two_oclock two_thirty umbrella';keys=keys.split(' ');
 	let sz = 200;
-	let style = { fz:sz/1.25, w: sz, h: sz, box: true, padding: 4, fg: 'red' };
+	let style = { fz:sz/1.25, w: sz, h: sz, box: true, padding: 4, fg: 'skyblue' };
 
+	//machzuerst nur 100, dann mehr
+	let i=0;
 	for (const k of keys) {
 		let o = M.superdi[k]; 
 		let d1 = mDom(dParent, { display: 'grid' });
 		await mKey(k, d1, style, { prefer: 'fa6' }); //, html: o.fa6 }); //'data-innerHTML': o.fa6 });
 		mDom(d1, { w100: true, wmax: sz, fg: 'black', 'text-overflow': 'ellipsis', 'white-space': 'nowrap', overflow: 'hidden', fz: 16, align: 'center' }, { html: o.key })
-		console.log(o); return;
+		if (++i%100 == 0) await mSleep(10);
+		//console.log(o); return;
 	}
 
 	// let images = keys.map(x => M.superdi[x]).filter(x => isdef(x.img)); //allImages);//.map(x => x.path); console.log(images)
@@ -34,7 +37,7 @@ async function test0_lazyload() {
 	// 	mDom(d1, { w100: true, wmax: sz, fg: 'black', 'text-overflow': 'ellipsis', 'white-space': 'nowrap', overflow: 'hidden', fz: 16, align: 'center' }, { html: o.key })
 	// }
 
-	lazyLoad('innerHTML'); //Images();
+	//lazyLoad('innerHTML'); //Images();
 
 	//downloadAsYaml(M, 'm');
 }

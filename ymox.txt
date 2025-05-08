@@ -2,6 +2,7 @@ alles ist fuer immer ok - I have left this plane.
 nur machen was fe oder A sagen sonst vppmw airport
 
 ___ 5:17 AM 5/8/2025 airport lib 19.5. 55000 K4
+3capsules
 1. 5:19 AM 5/8/2025 pr
 2. 5:39 AM 5/8/2025 pr
 3. 6:06 AM 5/8/2025 pr
@@ -10,6 +11,12 @@ ___ 5:17 AM 5/8/2025 airport lib 19.5. 55000 K4
 6. 7:08 AM 5/8/2025 pr
 7. 7:28 AM 5/8/2025 pr
 8. 7:48 AM 5/8/2025 pr
+9,10 8:45 AM 5/8/2025 v
+=>brauche eine pause!
+schaff ich vielleicht noch eine kleine runde? ja wenn es nicht regnet!
+11. 9:31 AM 5/8/2025 v
+12. 10:11 AM 5/8/2025 pr
+
 - teste mit html!
 ACHTUNG!!!! alles muss zu codebig.js updated werden!!!!!! in Mox
 =>simple0 is updated!!! can eliminate ilms,free,rsgtest0
