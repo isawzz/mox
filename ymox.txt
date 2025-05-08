@@ -16,6 +16,7 @@ ___ 5:17 AM 5/8/2025 airport lib 19.5. 55000 K4
 schaff ich vielleicht noch eine kleine runde? ja wenn es nicht regnet!
 11. 9:31 AM 5/8/2025 v
 12. 10:11 AM 5/8/2025 pr
+13. es geht los! w
 
 - teste mit html!
 ACHTUNG!!!! alles muss zu codebig.js updated werden!!!!!! in Mox
