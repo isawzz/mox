@@ -399,9 +399,12 @@ fieldset .disabled {
 
 .content_area {
 	width: 100%;
-	overflow-y: auto;
+	overflow-y: hidden;
 	box-sizing: border-box;
-	padding: 0 20px 20px 20px;
+	/* padding: 0 20px 20px 20px; */
+  padding: 0;
+  margin: 0;
+  caret-color:#00000000;
 }
 
 

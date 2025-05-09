@@ -1,8 +1,399 @@
 
+async function mKeyO(imgKey, d, styles = {}, opts = {}) {
+	styles = jsCopy(styles);
+	let type = opts.prefer;
+	let o = type != 'plain' ? lookup(M.superdi, [imgKey]) : null;
+	let src;
+	if (nundef(o) && imgKey.includes('.')) src = imgKey;
+	else if (isdef(o) && (type == 'img' || type == 'photo') && isdef(o[type])) src = o[type];
+	else if (isdef(o) && isdef(o.img)) src = o.img;
+	if (isdef(src)) {
+		let [w, h] = mSizeSuccession(styles, 40);
+		addKeys({ w, h }, styles);
+		addKeys({ tag: 'img', src }, opts);
+		let d0 = mDom(d, styles, opts);
+		mCenterCenterFlex(d0);
+		let img = await mImgAsync(d0, styles, opts, roundIfTransparentCorner);
+		return d0;
+	} else if (isdef(o)) {
+		let [w, h] = mSizeSuccession(styles, 40);
+		let sz = h;
+		addKeys({ h }, styles);
+		if (nundef(type)) type = isdef(o.text) ? 'text' : isdef(o.fa6) ? 'fa6' : isdef(o.fa) ? 'fa' : isdef(o.ga) ? 'ga' : null;
+		let family = type == 'text' ? 'emoNoto' : type == 'fa6' ? 'fa6' : type == 'fa' ? 'pictoFa' : 'pictoGame';
+		let html = type == 'text' ? o.text : String.fromCharCode('0x' + o[type]);
+		addKeys({ family }, styles);
+		let d0 = mDom(d, styles, opts);
+		mCenterCenterFlex(d0);
+		let d1 = mDom(d0, {}, { html });
+		let r = getRect(d1);
+		[w, h] = [r.w, r.h];
+		let scale = Math.min(sz / w, sz / h);
+		d1.style.transformOrigin = 'center center';
+		d1.style.transform = `scale(${scale})`;
+		d1.style.transform = `scale(${scale})`;
+		return d0;
+	} else {
+		addKeys({ html: imgKey }, opts)
+		let img = mDom(d, styles, opts);
+		return img;
+	}
+	console.log('type', type)
+}
+async function mKey(imgKey, d, styles = {}, opts = {}) {
+	styles = jsCopy(styles);
+	let type = opts.prefer; console.log(type)
+	let o = type != 'plain' ? lookup(M.superdi, [imgKey]) : null;
+	let src;
+	if (nundef(o) && imgKey.includes('.')) src = imgKey;
+	else if (isdef(o) && (type == 'img' || type == 'photo') && isdef(o[type])) src = o[type];
+	else if (isdef(o) && isdef(o.img) && nundef(type)) src = o.img;
+	if (isdef(src)) {
+		let d0 = mDom(d, styles, opts);
+		mCenterCenterFlex(d0);
+		let [w, h] = mSizeSuccession(styles, 40);
+		let imgStyles = { h }, imgOpts = { tag: 'img', src }
+		let img = await mImgAsync(d0, imgStyles, imgOpts, roundIfTransparentCorner);
+		return d0;
+	} else if (isdef(o)) {
+		if (nundef(type)) type = isdef(o.text) ? 'text' : isdef(o.fa6) ? 'fa6' : isdef(o.fa) ? 'fa' : isdef(o.ga) ? 'ga' : null;
+		let family = type == 'text' ? 'emoNoto' : type == 'fa6' ? 'fa6' : type == 'fa' ? 'pictoFa' : 'pictoGame';
+		let html = type == 'text' ? o.text : String.fromCharCode('0x' + o[type]);
+		addKeys({ family }, styles);
+		let d0 = mDom(d, styles, opts);
+		mCenterCenterFlex(d0);
+		let d1 = mDom(d0, {}, { html });
+		let r = getRect(d1);
+		[w, h] = [r.w, r.h];
+		return d0;
+	} else {
+		addKeys({ html: imgKey }, opts)
+		let img = mDom(d, styles, opts);
+		return img;
+	}
+}
+
+function mKey(imgKey, d, styles = {}, opts = {}) {
+	styles = jsCopy(styles);
+	let type = opts.prefer;
+	let o = type !== 'plain' ? lookup(M.superdi, [imgKey]) : null;
+	let src;
+
+	if (!o) {
+		if (imgKey.includes('.')) {
+			src = imgKey;
+		} else {
+			type = 'plain';
+		}
+	} else if (!type || !o[type]) {
+		type = isdef(o.img) ? 'img' :
+			isdef(o.photo) ? 'photo' :
+				isdef(o.text) ? o.colls.includes('unicode') ? 'uni' : 'text' :
+					isdef(o.fa6) ? 'fa6' :
+						isdef(o.fa) ? 'fa' :
+							isdef(o.ga) ? 'ga' : null;
+		if (type === 'img' || type === 'photo') src = o[type];
+	}
+
+	let d0 = mDom(d, styles, opts);
+	mCenterCenterFlex(d0); // Ensure the container is centered
+
+	if (isdef(src)) {
+		let [w, h] = mSizeSuccession(styles, 40);
+		let imgStyles = { h };
+		let imgOpts = { tag: 'img', src };
+		mImg(src, d0, imgStyles, imgOpts);
+	} else if (type === 'text') {
+		// Center the text inside the container
+		console.log('family', styles.family)
+		let textStyles = {
+			display: 'flex',
+			justifyContent: 'center',
+			alignItems: 'center',
+			textAlign: 'center',
+			width: '100%',
+			height: '100%',
+			fontSize: styles.fz || 'inherit',
+			fontFamily: styles.family || 'inherit'
+		};
+		mDom(d0, textStyles, { html: o.text });
+	} else if (type !== 'plain') {
+		// let family = type === 'fa6' ? 'Font Awesome 6 Free' : 'Font Awesome 5 Free';
+		let family = type == 'uni' ? "'Noto Sans', sans-serif" : type == 'text' ? 'emoNoto' : type == 'fa6' ? 'fa6' : type == 'fa' ? 'pictoFa' : 'pictoGame';
+		//let html = type == 'text' ? o.text : String.fromCharCode('0x' + o[type]);
+		let html = `&#x${o[type]};`;
+		addKeys({ family }, styles);
+		mDom(d0, styles, { html });
+	} else {
+		addKeys({ html: imgKey }, opts);
+		mDom(d0, styles, opts);
+	}
+
+	return d0;
+}
+
+
+function mKey(imgKey, d, styles = {}, opts = {}) {
+	styles = jsCopy(styles);
+	let type = opts.prefer;
+	let o = type !== 'plain' ? lookup(M.superdi, [imgKey]) : null;
+	let src;
+
+	if (!o) {
+		if (imgKey.includes('.')) {
+			src = imgKey;
+		} else {
+			type = 'plain';
+		}
+	} else if (!type || !o[type]) {
+		type = isdef(o.img) ? 'img' :
+			isdef(o.photo) ? 'photo' :
+				isdef(o.text) ? 'text' :
+					isdef(o.fa6) ? 'fa6' :
+						isdef(o.fa) ? 'fa' :
+							isdef(o.ga) ? 'ga' : null;
+		if (type === 'img' || type === 'photo') src = o[type];
+	}
+
+	let d0 = mDom(d, styles, opts);
+	mCenterCenterFlex(d0);
+
+	if (isdef(src)) {
+		let [w, h] = mSizeSuccession(styles, 40);
+		let imgStyles = { h };
+		let imgOpts = { tag: 'img', src };
+		mImg(src, d0, imgStyles, imgOpts); // Use mImg directly for synchronous image creation
+	} else if (type !== 'plain') {
+		let family = type === 'text' ? 'emoNoto' :
+			type === 'fa6' ? 'fa6' :
+				type === 'fa' ? 'pictoFa' : 'pictoGame';
+		// console.log('o', o, 'type', type, 'imgKey', imgKey);
+		//let html = type === 'text' ? o.text : `&#x${o[type]};`;
+		let html = type === 'text' ? o.text : String.fromCharCode('0x' + o[type]);
+		addKeys({ family }, styles);
+		let d1 = mDom(d0, styles, { html });
+		// let r = getRect(d1);
+		// let [w, h] = [r.w, r.h];
+	} else {
+		addKeys({ html: imgKey }, opts);
+		mDom(d0, styles, opts);
+	}
+
+	return d0;
+}
+
+
+async function uiFilter(dParent, filter) {
+	// Create a container for the filter bar
+	let dFilterBar = mDom(dParent, { gap: 10, padding: 12, display: 'flex', alignItems: 'center', flexFlow: 'wrap' });
+
+	// Collection input
+	mDom(dFilterBar, { fontSize: 24, fontWeight: 'bold' }, { html: 'Collection:' });
+	let collectionList = Object.keys(M.byCollection);
+	let dlCollection = mDatalist(dFilterBar, collectionList, { placeholder: "<select from list>" });
+	dlCollection.inpElem.oninput = ev => {
+		console.log('Selected Collection:', ev.target.value);
+		filter.collection = ev.target.value;
+	};
+
+	// Category input
+	mDom(dFilterBar, { fontSize: 24, fontWeight: 'bold' }, { html: 'Category:' });
+	let categoryList = Object.keys(M.byCat);
+	let dlCategory = mDatalist(dFilterBar, categoryList, { placeholder: "<select from list>" });
+	dlCategory.inpElem.oninput = ev => {
+		console.log('Selected Category:', ev.target.value);
+		filter.category = ev.target.value;
+	};
+
+	// Search input
+	mDom(dFilterBar, { fontSize: 24, fontWeight: 'bold' }, { html: 'Search:' });
+	let searchInput = mDom(dFilterBar, { width: 180, marginLeft: 4 }, { tag: 'input', className: 'input', placeholder: "<enter search term>" });
+	searchInput.oninput = ev => {
+		console.log('Search Term:', ev.target.value);
+		filter.search = ev.target.value;
+	};
+}
+async function uiFilter(dParent, filter) {
+	// Create a container for the filter bar
+	let dFilterBar = mDom(dParent, { gap: 10, padding: 12, display: 'flex', alignItems: 'center', flexFlow: 'wrap' });
+
+	// Collection/Category input
+	mDom(dFilterBar, { fontSize: 24, fontWeight: 'bold' }, { html: 'Filter By:' });
+	let optionsList = [...Object.keys(M.byCollection), ...Object.keys(M.byCat)];
+	let dlFilterBy = mDatalist(dFilterBar, optionsList, { placeholder: "<select collection or category>" });
+	dlFilterBy.inpElem.oninput = ev => {
+		console.log('Selected Filter:', ev.target.value);
+		filter.filterBy = ev.target.value;
+	};
+
+	// Search input
+	mDom(dFilterBar, { fontSize: 24, fontWeight: 'bold' }, { html: 'Search:' });
+	let searchInput = mDom(dFilterBar, { width: 180, marginLeft: 4 }, { tag: 'input', className: 'input', placeholder: "<enter search term>" });
+	searchInput.oninput = ev => {
+		console.log('Search Term:', ev.target.value);
+		filter.search = ev.target.value;
+	};
+}
+async function uiFilter(dParent, filter) {
+	// Create a container for the filter bar
+	let dFilterBar = mDom(dParent, { gap: 10, padding: 12, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' });
+
+	// Collection/Category input
+	mDom(dFilterBar, { fontSize: 24, fontWeight: 'bold' }, { html: 'Filter By:' });
+	let optionsList = [...Object.keys(M.byCollection), ...Object.keys(M.byCat)].sort(); // Sort alphabetically
+	let dlFilterBy = mDatalist(dFilterBar, optionsList, { placeholder: "<select collection or category>" });
+	dlFilterBy.inpElem.oninput = ev => {
+		console.log('Selected Filter:', ev.target.value);
+		filter.filterBy = ev.target.value;
+	};
+
+	// Search input
+	mDom(dFilterBar, { fontSize: 24, fontWeight: 'bold', marginTop: 10 }, { html: 'Search:' });
+	let searchInput = mDom(dFilterBar, { width: 180 }, { tag: 'input', className: 'input', placeholder: "<enter search term>" });
+	searchInput.oninput = ev => {
+		console.log('Search Term:', ev.target.value);
+		filter.search = ev.target.value;
+	};
+}
+function enableCustomTooltip() {
+	// Create a tooltip element
+	const tooltip = document.createElement('div');
+	tooltip.style.position = 'absolute';
+	tooltip.style.backgroundColor = 'black';
+	tooltip.style.color = 'white';
+	tooltip.style.padding = '5px';
+	tooltip.style.borderRadius = '4px';
+	tooltip.style.fontSize = '12px';
+	tooltip.style.zIndex = '1000';
+	tooltip.style.display = 'none'; // Initially hidden
+	document.body.appendChild(tooltip);
+
+	// Add event listeners to elements with a title attribute
+	document.querySelectorAll('[title]').forEach(el => {
+		el.addEventListener('mouseover', (event) => {
+			const title = el.getAttribute('title');
+			if (!title) return;
+
+			// Show the tooltip
+			tooltip.textContent = title;
+			tooltip.style.display = 'block';
+
+			// Position the tooltip
+			const rect = el.getBoundingClientRect();
+			const tooltipRect = tooltip.getBoundingClientRect();
+			let top = rect.bottom + window.scrollY + 5; // Below the element
+			let left = rect.left + window.scrollX;
+
+			// Adjust if the tooltip goes out of the viewport
+			if (left + tooltipRect.width > window.innerWidth) {
+				left = window.innerWidth - tooltipRect.width - 5; // Adjust to fit within the viewport
+			}
+			if (top + tooltipRect.height > window.innerHeight) {
+				top = rect.top + window.scrollY - tooltipRect.height - 5; // Place above the element
+			}
+
+			tooltip.style.top = `${top}px`;
+			tooltip.style.left = `${left}px`;
+		});
+
+		el.addEventListener('mouseout', () => {
+			// Hide the tooltip
+			tooltip.style.display = 'none';
+		});
+	});
+}
+document.addEventListener('DOMContentLoaded', enableCustomTooltip);
+
+function uiFilterElement() {
+	let html = `
+		<div class="title" style="gap: 10px; padding: 12px; display: flex; align-items: center; flex-flow: wrap;">
+			<div style="display: flex; align-items: center;">
+				<div style="font-size: 24px; font-weight: bold;">Collection:</div>
+				<div><input class="input" placeholder="&lt;select from list&gt;" list="dl_1" style="width: 180px; margin-left: 4px;"><datalist id="dl_1" class="datalist">
+				<option value="airports"></option>
+				<option value="all"></option>
+				<option value="amanda"></option><option value="birds"></option><option value="emo"></option><option value="fa6"></option><option value="icon"></option><option value="nations"></option><option value="spotit"></option><option value="story"></option><option value="tierspiel"></option><option value="users"></option></datalist></div></div><div style="display: flex; align-items: center;"><div edit="true" style="font-size: 24px; font-weight: bold; width: auto; text-align: right;">Filter:</div><div><input class="input" placeholder="&lt;enter value&gt;" list="dl_2" style="width: 180px; margin-left: 4px;"><datalist id="dl_2" class="datalist"><option value="animal"></option><option value="insect"></option></datalist></div></div><div style="gap: 10px; text-align: right;"><button class="input" id="bPrev" style="width: 70px; margin: 0px 0px 0px 10px;">prev</button><button class="input" id="bNext" style="width: 70px; margin: 0px 0px 0px 10px;">next</button></div></div>
+	`;
+	return html
+}
+async function uiFilterMenu(dParent, name = 'all') {
+	if (nundef(name)) name = 'emo';
+	let list = [];
+	if (name == 'all' || isEmpty(name)) { list = Object.keys(M.superdi); }
+	else if (isdef(M.byCollection[name])) { list = M.byCollection[name]; }
+	else list = [];
+	let dMenu = mDom(dParent)
+	mClear(dMenu);
+	let d = mDom(dMenu); mFlex(d);
+	mDom(d, { fz: 24, weight: 'bold' }, { html: 'Collection:' });
+	let collNames = M.collections;
+	let dlColl = mDatalist(d, collNames, { placeholder: "<select from list>" });
+	dlColl.inpElem.oninput = ev => { console.log(sisi.name, ev.target.value); simpleInit(ev.target.value, sisi); }
+	dlColl.inpElem.value = name;
+	list = sortByFunc(list, x => M.superdi[x].friendly);
+	DA.masterKeys = list;
+	let keys = DA.keys = DA.filter ? collFilterImages(sisi, sisi.filter) : list;
+	let cats = collectCats(keys);
+	cats.sort();
+	d = mDom(dMenu); mFlex(d);
+	let wLabel = 'auto'; //sisi.cols < 6 ? 117 : 'auto';
+	mDom(d, { fz: 24, weight: 'bold', w: wLabel, align: 'right' }, { edit: true, html: 'Filter:' });
+	let dlCat = mDatalist(d, cats, { edit: false, placeholder: "<enter value>", value: DA.filter });
+	dlCat.inpElem.oninput = ev => {
+		let coll = UI.simple;
+		let s = ev.target.value.toLowerCase().trim();
+		let list = collFilterImages(coll, s);
+		coll.keys = list;
+		coll.filter = s;
+		coll.index = 0; coll.pageIndex = 1; simpleClearSelections();
+		simpleShowImageBatch(coll, 0, false);
+	};
+	return keys;
+	// d = mDom(dMenu, { gap: 10, align: 'right' });
+	// mButton('prev', () => simpleShowImageBatch(sisi, -1), d, { w: 70, margin: 0, maleft: 10 }, 'input', 'bPrev');
+	// mButton('next', () => simpleShowImageBatch(sisi, 1), d, { w: 70, margin: 0, maleft: 10 }, 'input', 'bNext');
+	//simpleClearSelections();
+	//simpleShowImageBatch(sisi);
+
+}
+async function _mKey(imgKey, d, styles = {}, opts = {}) {
+	styles = jsCopy(styles);
+	let type = opts.prefer;
+	let o = type != 'plain' ? lookup(M.superdi, [imgKey]) : null;
+	let src;
+	if (nundef(o)) if (imgKey.includes('.')) src = imgKey; else type = 'plain';
+	else if (nundef(type) || nundef(o[type])) {
+		type = isdef(o.img) ? 'img' : isdef(o.photo) ? o.photo : isdef(o.text) ? 'text' : isdef(o.fa6) ? 'fa6' : isdef(o.fa) ? 'fa' : isdef(o.ga) ? 'ga' : null;
+		if (type == 'img' || type == 'photo') src = o[type];
+	}
+	if (isdef(src)) {
+		let d0 = mDom(d, styles, opts);
+		mCenterCenterFlex(d0);
+		let [w, h] = mSizeSuccession(styles, 40);
+		let imgStyles = { h }, imgOpts = { tag: 'img', src }
+		let img = await mImgAsync(d0, imgStyles, imgOpts, roundIfTransparentCorner);
+		return d0;
+	} else if (type != 'plain') {
+		let family = type == 'text' ? 'emoNoto' : type == 'fa6' ? 'fa6' : type == 'fa' ? 'pictoFa' : 'pictoGame';
+		let html = type == 'text' ? o.text : String.fromCharCode('0x' + o[type]);
+		addKeys({ family }, styles);
+		let d0 = mDom(d, styles, opts);
+		mCenterCenterFlex(d0);
+		let d1 = mDom(d0, {}, { html });
+		let r = getRect(d1);
+		[w, h] = [r.w, r.h];
+		return d0;
+	} else {
+		addKeys({ html: imgKey }, opts)
+		let img = mDom(d, styles, opts);
+		return img;
+	}
+}
+
 function createStickyAndContentDivs() {
 
-	let stickyDiv = mDom(document.body,{position:'sticky',top:0,zIndex:1000,padding:10,bg:'#00000080'},{id:'dSticky'});
-	mInsert('dPage',stickyDiv);
+	let stickyDiv = mDom(document.body, { position: 'sticky', top: 0, zIndex: 1000, padding: 10, bg: '#00000080' }, { id: 'dSticky' });
+	mInsert('dPage', stickyDiv);
 	// {box:true,className:'section',position:'sticky',height:'auto',top:0,zIndex:1000,padding:10,bg:'#00000080'},{id:'dSticky'}//const body = document.body;
 
 	// Create the sticky div
@@ -27,14 +418,14 @@ function createStickyAndContentDivs() {
 }
 function createStickyAndContentDivs() {
 	let stickyDiv = mDom(null, {
-			position: 'sticky',
-			top: 0,
-			zIndex: 1000,
-			padding: 10,
-			bg: '#00000080',
-			width: '100%', // Ensure it spans the full viewport width
-			left: 0,        // Align to the left edge
-			right: 0        // Align to the right edge
+		position: 'sticky',
+		top: 0,
+		zIndex: 1000,
+		padding: 10,
+		bg: '#00000080',
+		width: '100%', // Ensure it spans the full viewport width
+		left: 0,        // Align to the left edge
+		right: 0        // Align to the right edge
 	}, { id: 'dSticky' });
 	mInsert('dPage', stickyDiv);
 
@@ -51,510 +442,510 @@ function adjustContentPadding() {
 
 
 function createCard1(rank = "10", suit = "♣", width = 240, height = 336) {
-  const layout = {
-    '2': [[1, 0], [1, 4]],
-    '3': [[1, 0], [1, 2], [1, 4]],
-    '4': [[0, 0], [2, 0], [0, 4], [2, 4]],
-    '5': [[0, 0], [2, 0], [1, 2], [0, 4], [2, 4]],
-    '6': [[0, 0], [2, 0], [0, 2], [2, 2], [0, 4], [2, 4]],
-    '7': [[0, 0], [2, 0], [0, 2], [1, 1], [2, 2], [0, 4], [2, 4]],
-    '8': [[0, 0], [2, 0], [0, 2], [1, 1], [2, 2], [0, 4], [2, 4], [1, 3]],
-    '9': [[0, 0], [2, 0], [0, 2], [1, 1], [2, 2], [0, 4], [2, 4], [1, 3], [1, 2]],
-    '10': [[0, 0], [2, 0], [0, 1.5], [2, 1.5], [1, 1], [1, 2], [1, 3], [0, 3.5], [2, 3.5], [0, 4]],
-  };
+	const layout = {
+		'2': [[1, 0], [1, 4]],
+		'3': [[1, 0], [1, 2], [1, 4]],
+		'4': [[0, 0], [2, 0], [0, 4], [2, 4]],
+		'5': [[0, 0], [2, 0], [1, 2], [0, 4], [2, 4]],
+		'6': [[0, 0], [2, 0], [0, 2], [2, 2], [0, 4], [2, 4]],
+		'7': [[0, 0], [2, 0], [0, 2], [1, 1], [2, 2], [0, 4], [2, 4]],
+		'8': [[0, 0], [2, 0], [0, 2], [1, 1], [2, 2], [0, 4], [2, 4], [1, 3]],
+		'9': [[0, 0], [2, 0], [0, 2], [1, 1], [2, 2], [0, 4], [2, 4], [1, 3], [1, 2]],
+		'10': [[0, 0], [2, 0], [0, 1.5], [2, 1.5], [1, 1], [1, 2], [1, 3], [0, 3.5], [2, 3.5], [0, 4]],
+	};
 
-  const card = document.createElement("div");
-  card.style.position = "relative";
-  card.style.width = width + "px";
-  card.style.height = height + "px";
-  card.style.border = "1px solid black";
-  card.style.borderRadius = "12px";
-  card.style.background = "white";
-  card.style.fontFamily = "serif";
+	const card = document.createElement("div");
+	card.style.position = "relative";
+	card.style.width = width + "px";
+	card.style.height = height + "px";
+	card.style.border = "1px solid black";
+	card.style.borderRadius = "12px";
+	card.style.background = "white";
+	card.style.fontFamily = "serif";
 
-  const colX = [0.2, 0.5, 0.8].map(x => x * width);
-  const rowY = [0.08, 0.23, 0.38, 0.53, 0.68].map(y => y * height);
+	const colX = [0.2, 0.5, 0.8].map(x => x * width);
+	const rowY = [0.08, 0.23, 0.38, 0.53, 0.68].map(y => y * height);
 
-  layout[rank].forEach(([col, row]) => {
-    const pip = document.createElement("div");
-    pip.textContent = suit;
-    pip.style.position = "absolute";
-    pip.style.left = (colX[col] - 10) + "px";
-    pip.style.top = (rowY[row] - 12) + "px";
-    pip.style.fontSize = Math.floor(height * 0.09) + "px";
-    card.appendChild(pip);
-  });
+	layout[rank].forEach(([col, row]) => {
+		const pip = document.createElement("div");
+		pip.textContent = suit;
+		pip.style.position = "absolute";
+		pip.style.left = (colX[col] - 10) + "px";
+		pip.style.top = (rowY[row] - 12) + "px";
+		pip.style.fontSize = Math.floor(height * 0.09) + "px";
+		card.appendChild(pip);
+	});
 
-  // Top-left corner: rank and suit
-  const top = document.createElement("div");
-  top.innerHTML = `<div>${rank}</div><div style="text-align:center">${suit}</div>`;
-  top.style.position = "absolute";
-  top.style.left = "4px";
-  top.style.top = "2px";
-  top.style.fontSize = Math.floor(height * 0.08) + "px";
-  card.appendChild(top);
+	// Top-left corner: rank and suit
+	const top = document.createElement("div");
+	top.innerHTML = `<div>${rank}</div><div style="text-align:center">${suit}</div>`;
+	top.style.position = "absolute";
+	top.style.left = "4px";
+	top.style.top = "2px";
+	top.style.fontSize = Math.floor(height * 0.08) + "px";
+	card.appendChild(top);
 
-  // Bottom-right corner (rotated)
-  const bottom = top.cloneNode(true);
-  bottom.style.left = "";
-  bottom.style.right = "4px";
-  bottom.style.top = "";
-  bottom.style.bottom = "2px";
-  bottom.style.transform = "rotate(180deg)";
-  bottom.style.textAlign = "center";
-  card.appendChild(bottom);
+	// Bottom-right corner (rotated)
+	const bottom = top.cloneNode(true);
+	bottom.style.left = "";
+	bottom.style.right = "4px";
+	bottom.style.top = "";
+	bottom.style.bottom = "2px";
+	bottom.style.transform = "rotate(180deg)";
+	bottom.style.textAlign = "center";
+	card.appendChild(bottom);
 
-  return card;
+	return card;
 }
 function createCard2(rank = "10", suit = "♣", width = 240, height = 336) {
-  const card = document.createElement("div");
-  card.style.position = "relative";
-  card.style.width = width + "px";
-  card.style.height = height + "px";
-  card.style.border = "1px solid black";
-  card.style.borderRadius = "12px";
-  card.style.background = "white";
-  card.style.fontFamily = "serif";
+	const card = document.createElement("div");
+	card.style.position = "relative";
+	card.style.width = width + "px";
+	card.style.height = height + "px";
+	card.style.border = "1px solid black";
+	card.style.borderRadius = "12px";
+	card.style.background = "white";
+	card.style.fontFamily = "serif";
 
-  const centerX = width / 2;
-  const colOffset = width * 0.25; // for left/right columns
-  const colX = [centerX - colOffset, centerX, centerX + colOffset];
+	const centerX = width / 2;
+	const colOffset = width * 0.25; // for left/right columns
+	const colX = [centerX - colOffset, centerX, centerX + colOffset];
 
-  const numRows = 4; // max for side columns
-  const topMargin = height * 0.12;
-  const pipSpacing = (height - 2 * topMargin) / (numRows - 1);
+	const numRows = 4; // max for side columns
+	const topMargin = height * 0.12;
+	const pipSpacing = (height - 2 * topMargin) / (numRows - 1);
 
-  // Pip positions for 10: 4-3-4 in 3 columns
-  const pipData = [
-    [0, [0, 1, 2, 3]],     // left column
-    [1, [0.5, 2, 3.5]],    // center column (slightly staggered)
-    [2, [0, 1, 2, 3]]      // right column
-  ];
+	// Pip positions for 10: 4-3-4 in 3 columns
+	const pipData = [
+		[0, [0, 1, 2, 3]],     // left column
+		[1, [0.5, 2, 3.5]],    // center column (slightly staggered)
+		[2, [0, 1, 2, 3]]      // right column
+	];
 
-  pipData.forEach(([col, rows]) => {
-    rows.forEach(rowIndex => {
-      const pip = document.createElement("div");
-      pip.textContent = suit;
-      pip.style.position = "absolute";
-      pip.style.left = (colX[col] - width * 0.035) + "px";
-      pip.style.top = (topMargin + pipSpacing * rowIndex - height * 0.045) + "px";
-      pip.style.fontSize = Math.floor(height * 0.09) + "px";
-      card.appendChild(pip);
-    });
-  });
+	pipData.forEach(([col, rows]) => {
+		rows.forEach(rowIndex => {
+			const pip = document.createElement("div");
+			pip.textContent = suit;
+			pip.style.position = "absolute";
+			pip.style.left = (colX[col] - width * 0.035) + "px";
+			pip.style.top = (topMargin + pipSpacing * rowIndex - height * 0.045) + "px";
+			pip.style.fontSize = Math.floor(height * 0.09) + "px";
+			card.appendChild(pip);
+		});
+	});
 
-  // Top-left: rank and suit
-  const top = document.createElement("div");
-  top.innerHTML = `<div>${rank}</div><div style="text-align:center">${suit}</div>`;
-  top.style.position = "absolute";
-  top.style.left = "6px";
-  top.style.top = "4px";
-  top.style.fontSize = Math.floor(height * 0.08) + "px";
-  card.appendChild(top);
+	// Top-left: rank and suit
+	const top = document.createElement("div");
+	top.innerHTML = `<div>${rank}</div><div style="text-align:center">${suit}</div>`;
+	top.style.position = "absolute";
+	top.style.left = "6px";
+	top.style.top = "4px";
+	top.style.fontSize = Math.floor(height * 0.08) + "px";
+	card.appendChild(top);
 
-  // Bottom-right: rotated rank and suit
-  const bottom = top.cloneNode(true);
-  bottom.style.left = "";
-  bottom.style.right = "6px";
-  bottom.style.top = "";
-  bottom.style.bottom = "4px";
-  bottom.style.transform = "rotate(180deg)";
-  bottom.style.textAlign = "center";
-  card.appendChild(bottom);
+	// Bottom-right: rotated rank and suit
+	const bottom = top.cloneNode(true);
+	bottom.style.left = "";
+	bottom.style.right = "6px";
+	bottom.style.top = "";
+	bottom.style.bottom = "4px";
+	bottom.style.transform = "rotate(180deg)";
+	bottom.style.textAlign = "center";
+	card.appendChild(bottom);
 
-  return card;
+	return card;
 }
 function createCard3(rank = "10", suit = "♣", width = 240, height = 336) {
-  const card = document.createElement("div");
-  card.style.position = "relative";
-  card.style.width = width + "px";
-  card.style.height = height + "px";
-  card.style.border = "1px solid black";
-  card.style.borderRadius = "12px";
-  card.style.background = "white";
-  card.style.fontFamily = "serif";
+	const card = document.createElement("div");
+	card.style.position = "relative";
+	card.style.width = width + "px";
+	card.style.height = height + "px";
+	card.style.border = "1px solid black";
+	card.style.borderRadius = "12px";
+	card.style.background = "white";
+	card.style.fontFamily = "serif";
 
-  const centerX = width / 2;
-  const colOffset = width * 0.25;
-  const colX = [centerX - colOffset, centerX, centerX + colOffset];
+	const centerX = width / 2;
+	const colOffset = width * 0.25;
+	const colX = [centerX - colOffset, centerX, centerX + colOffset];
 
-  const topMargin = height * 0.12;
-  const pipSpacing = (height - 2 * topMargin) / 3;
+	const topMargin = height * 0.12;
+	const pipSpacing = (height - 2 * topMargin) / 3;
 
-  // Pip patterns for ranks 1 (Ace) to 10
-  const pipPatterns = {
-    1: [[1, [1.5]]],
-    2: [[1, [0, 3]]],
-    3: [[1, [0, 1.5, 3]]],
-    4: [[0, [0, 3]], [2, [0, 3]]],
-    5: [[0, [0, 3]], [1, [1.5]], [2, [0, 3]]],
-    6: [[0, [0, 1.5, 3]], [2, [0, 1.5, 3]]],
-    7: [[0, [0, 1.5, 3]], [1, [0]], [2, [0, 1.5, 3]]],
-    8: [[0, [0, 1.5, 3]], [1, [0.75, 2.25]], [2, [0, 1.5, 3]]],
-    9: [[0, [0, 1.5, 3]], [1, [0.5, 1.5, 2.5]], [2, [0, 1.5, 3]]],
-    10: [[0, [0, 1, 2, 3]], [1, [0.5, 2, 3.5]], [2, [0, 1, 2, 3]]]
-  };
+	// Pip patterns for ranks 1 (Ace) to 10
+	const pipPatterns = {
+		1: [[1, [1.5]]],
+		2: [[1, [0, 3]]],
+		3: [[1, [0, 1.5, 3]]],
+		4: [[0, [0, 3]], [2, [0, 3]]],
+		5: [[0, [0, 3]], [1, [1.5]], [2, [0, 3]]],
+		6: [[0, [0, 1.5, 3]], [2, [0, 1.5, 3]]],
+		7: [[0, [0, 1.5, 3]], [1, [0]], [2, [0, 1.5, 3]]],
+		8: [[0, [0, 1.5, 3]], [1, [0.75, 2.25]], [2, [0, 1.5, 3]]],
+		9: [[0, [0, 1.5, 3]], [1, [0.5, 1.5, 2.5]], [2, [0, 1.5, 3]]],
+		10: [[0, [0, 1, 2, 3]], [1, [0.5, 2, 3.5]], [2, [0, 1, 2, 3]]]
+	};
 
-  const value = parseInt(rank);
-  const pipData = pipPatterns[value];
-  const pipFontSize = height * 0.09;
+	const value = parseInt(rank);
+	const pipData = pipPatterns[value];
+	const pipFontSize = height * 0.09;
 
-  pipData.forEach(([col, rows]) => {
-    rows.forEach(rowIndex => {
-      const pip = document.createElement("div");
-      pip.textContent = suit;
-      pip.style.position = "absolute";
-      pip.style.left = (colX[col] - pipFontSize * 0.35) + "px";
-      pip.style.top = (topMargin + pipSpacing * rowIndex - pipFontSize * 0.5) + "px";
-      pip.style.fontSize = pipFontSize + "px";
-      card.appendChild(pip);
-    });
-  });
+	pipData.forEach(([col, rows]) => {
+		rows.forEach(rowIndex => {
+			const pip = document.createElement("div");
+			pip.textContent = suit;
+			pip.style.position = "absolute";
+			pip.style.left = (colX[col] - pipFontSize * 0.35) + "px";
+			pip.style.top = (topMargin + pipSpacing * rowIndex - pipFontSize * 0.5) + "px";
+			pip.style.fontSize = pipFontSize + "px";
+			card.appendChild(pip);
+		});
+	});
 
-  // Top-left: rank and suit
-  const top = document.createElement("div");
-  top.innerHTML = `<div>${rank}</div><div style="text-align:center">${suit}</div>`;
-  top.style.position = "absolute";
-  top.style.left = "6px";
-  top.style.top = "4px";
-  top.style.fontSize = Math.floor(height * 0.08) + "px";
-  card.appendChild(top);
+	// Top-left: rank and suit
+	const top = document.createElement("div");
+	top.innerHTML = `<div>${rank}</div><div style="text-align:center">${suit}</div>`;
+	top.style.position = "absolute";
+	top.style.left = "6px";
+	top.style.top = "4px";
+	top.style.fontSize = Math.floor(height * 0.08) + "px";
+	card.appendChild(top);
 
-  // Bottom-right: rotated rank and suit
-  const bottom = top.cloneNode(true);
-  bottom.style.left = "";
-  bottom.style.right = "6px";
-  bottom.style.top = "";
-  bottom.style.bottom = "4px";
-  bottom.style.transform = "rotate(180deg)";
-  bottom.style.textAlign = "center";
-  card.appendChild(bottom);
+	// Bottom-right: rotated rank and suit
+	const bottom = top.cloneNode(true);
+	bottom.style.left = "";
+	bottom.style.right = "6px";
+	bottom.style.top = "";
+	bottom.style.bottom = "4px";
+	bottom.style.transform = "rotate(180deg)";
+	bottom.style.textAlign = "center";
+	card.appendChild(bottom);
 
-  return card;
+	return card;
 }
 function createCardGrid(rank = "10", suit = "♣", width = 240, height = 336) {
-  const card = document.createElement("div");
-  card.style.position = "relative";
-  card.style.width = width + "px";
-  card.style.height = height + "px";
-  card.style.border = "1px solid black";
-  card.style.borderRadius = "12px";
-  card.style.background = "white";
-  card.style.fontFamily = "serif";
-  card.style.display = "grid";
-  card.style.gridTemplateColumns = "1fr 1fr 1fr";
-  card.style.gridTemplateRows = "repeat(12, 1fr)";
-  card.style.boxSizing = "border-box";
+	const card = document.createElement("div");
+	card.style.position = "relative";
+	card.style.width = width + "px";
+	card.style.height = height + "px";
+	card.style.border = "1px solid black";
+	card.style.borderRadius = "12px";
+	card.style.background = "white";
+	card.style.fontFamily = "serif";
+	card.style.display = "grid";
+	card.style.gridTemplateColumns = "1fr 1fr 1fr";
+	card.style.gridTemplateRows = "repeat(12, 1fr)";
+	card.style.boxSizing = "border-box";
 
-  const pipFontSize = height * 0.09;
+	const pipFontSize = height * 0.09;
 
-  // Left column (4 pips spanning 3 rows each)
-  [0, 3, 6, 9].forEach(row => {
-    const pip = document.createElement("div");
-    pip.textContent = suit;
-    pip.style.gridColumn = "1";
-    pip.style.gridRow = `${row + 1} / span 3`;
-    pip.style.fontSize = `${pipFontSize}px`;
-    pip.style.display = "flex";
-    pip.style.alignItems = "center";
-    pip.style.justifyContent = "center";
-    card.appendChild(pip);
-  });
+	// Left column (4 pips spanning 3 rows each)
+	[0, 3, 6, 9].forEach(row => {
+		const pip = document.createElement("div");
+		pip.textContent = suit;
+		pip.style.gridColumn = "1";
+		pip.style.gridRow = `${row + 1} / span 3`;
+		pip.style.fontSize = `${pipFontSize}px`;
+		pip.style.display = "flex";
+		pip.style.alignItems = "center";
+		pip.style.justifyContent = "center";
+		card.appendChild(pip);
+	});
 
-  // Right column (4 pips spanning 3 rows each)
-  [0, 3, 6, 9].forEach(row => {
-    const pip = document.createElement("div");
-    pip.textContent = suit;
-    pip.style.gridColumn = "3";
-    pip.style.gridRow = `${row + 1} / span 3`;
-    pip.style.fontSize = `${pipFontSize}px`;
-    pip.style.display = "flex";
-    pip.style.alignItems = "center";
-    pip.style.justifyContent = "center";
-    card.appendChild(pip);
-  });
+	// Right column (4 pips spanning 3 rows each)
+	[0, 3, 6, 9].forEach(row => {
+		const pip = document.createElement("div");
+		pip.textContent = suit;
+		pip.style.gridColumn = "3";
+		pip.style.gridRow = `${row + 1} / span 3`;
+		pip.style.fontSize = `${pipFontSize}px`;
+		pip.style.display = "flex";
+		pip.style.alignItems = "center";
+		pip.style.justifyContent = "center";
+		card.appendChild(pip);
+	});
 
-  // Center column (2 pips spanning 4 rows each, centered vertically)
-  [2, 6].forEach(row => {
-    const pip = document.createElement("div");
-    pip.textContent = suit;
-    pip.style.gridColumn = "2";
-    pip.style.gridRow = `${row + 1} / span 4`;
-    pip.style.fontSize = `${pipFontSize}px`;
-    pip.style.display = "flex";
-    pip.style.alignItems = "center";
-    pip.style.justifyContent = "center";
-    card.appendChild(pip);
-  });
+	// Center column (2 pips spanning 4 rows each, centered vertically)
+	[2, 6].forEach(row => {
+		const pip = document.createElement("div");
+		pip.textContent = suit;
+		pip.style.gridColumn = "2";
+		pip.style.gridRow = `${row + 1} / span 4`;
+		pip.style.fontSize = `${pipFontSize}px`;
+		pip.style.display = "flex";
+		pip.style.alignItems = "center";
+		pip.style.justifyContent = "center";
+		card.appendChild(pip);
+	});
 
-  // Top-left corner: rank and suit
-  const top = document.createElement("div");
-  top.innerHTML = `<div>${rank}</div><div style="text-align:center">${suit}</div>`;
-  top.style.position = "absolute";
-  top.style.left = "6px";
-  top.style.top = "4px";
-  top.style.fontSize = Math.floor(height * 0.08) + "px";
-  card.appendChild(top);
+	// Top-left corner: rank and suit
+	const top = document.createElement("div");
+	top.innerHTML = `<div>${rank}</div><div style="text-align:center">${suit}</div>`;
+	top.style.position = "absolute";
+	top.style.left = "6px";
+	top.style.top = "4px";
+	top.style.fontSize = Math.floor(height * 0.08) + "px";
+	card.appendChild(top);
 
-  // Bottom-right corner: rotated rank and suit
-  const bottom = top.cloneNode(true);
-  bottom.style.left = "";
-  bottom.style.right = "6px";
-  bottom.style.top = "";
-  bottom.style.bottom = "4px";
-  bottom.style.transform = "rotate(180deg)";
-  bottom.style.textAlign = "center";
-  card.appendChild(bottom);
+	// Bottom-right corner: rotated rank and suit
+	const bottom = top.cloneNode(true);
+	bottom.style.left = "";
+	bottom.style.right = "6px";
+	bottom.style.top = "";
+	bottom.style.bottom = "4px";
+	bottom.style.transform = "rotate(180deg)";
+	bottom.style.textAlign = "center";
+	card.appendChild(bottom);
 
-  return card;
+	return card;
 }
 function createCard343(rank = "10", suit = "♣", width = 240, height = 336) {
-  const card = document.createElement("div");
-  card.style.position = "relative";
-  card.style.width = width + "px";
-  card.style.height = height + "px";
-  card.style.border = "1px solid black";
-  card.style.borderRadius = "12px";
-  card.style.background = "white";
-  card.style.fontFamily = "serif";
-  card.style.display = "grid";
-  card.style.gridTemplateColumns = "1fr 1fr 1fr";
-  card.style.gridTemplateRows = "repeat(12, 1fr)";
-  card.style.boxSizing = "border-box";
+	const card = document.createElement("div");
+	card.style.position = "relative";
+	card.style.width = width + "px";
+	card.style.height = height + "px";
+	card.style.border = "1px solid black";
+	card.style.borderRadius = "12px";
+	card.style.background = "white";
+	card.style.fontFamily = "serif";
+	card.style.display = "grid";
+	card.style.gridTemplateColumns = "1fr 1fr 1fr";
+	card.style.gridTemplateRows = "repeat(12, 1fr)";
+	card.style.boxSizing = "border-box";
 
-  const pipFontSize = height * 0.09;
+	const pipFontSize = height * 0.09;
 
-  // Utility to create and place a pip
-  function placePip(col, row, span) {
-    const pip = document.createElement("div");
-    pip.textContent = suit;
-    pip.style.gridColumn = col;
-    pip.style.gridRow = `${row} / span ${span}`;
-    pip.style.fontSize = `${pipFontSize}px`;
-    pip.style.display = "flex";
-    pip.style.alignItems = "center";
-    pip.style.justifyContent = "center";
-    card.appendChild(pip);
-  }
+	// Utility to create and place a pip
+	function placePip(col, row, span) {
+		const pip = document.createElement("div");
+		pip.textContent = suit;
+		pip.style.gridColumn = col;
+		pip.style.gridRow = `${row} / span ${span}`;
+		pip.style.fontSize = `${pipFontSize}px`;
+		pip.style.display = "flex";
+		pip.style.alignItems = "center";
+		pip.style.justifyContent = "center";
+		card.appendChild(pip);
+	}
 
-  // Left column: 3 pips (each spans 3 rows), centered in 12 rows
-  [1, 5, 9].forEach(r => placePip(1, r, 3));
+	// Left column: 3 pips (each spans 3 rows), centered in 12 rows
+	[1, 5, 9].forEach(r => placePip(1, r, 3));
 
-  // Center column: 4 pips (each spans 2 rows), evenly spaced
-  [1, 4, 7, 10].forEach(r => placePip(2, r, 2));
+	// Center column: 4 pips (each spans 2 rows), evenly spaced
+	[1, 4, 7, 10].forEach(r => placePip(2, r, 2));
 
-  // Right column: 3 pips (each spans 3 rows), same as left
-  [1, 5, 9].forEach(r => placePip(3, r, 3));
+	// Right column: 3 pips (each spans 3 rows), same as left
+	[1, 5, 9].forEach(r => placePip(3, r, 3));
 
-  // Top-left corner: rank and suit
-  const top = document.createElement("div");
-  top.innerHTML = `<div>${rank}</div><div style="text-align:center">${suit}</div>`;
-  top.style.position = "absolute";
-  top.style.left = "6px";
-  top.style.top = "4px";
-  top.style.fontSize = Math.floor(height * 0.08) + "px";
-  card.appendChild(top);
+	// Top-left corner: rank and suit
+	const top = document.createElement("div");
+	top.innerHTML = `<div>${rank}</div><div style="text-align:center">${suit}</div>`;
+	top.style.position = "absolute";
+	top.style.left = "6px";
+	top.style.top = "4px";
+	top.style.fontSize = Math.floor(height * 0.08) + "px";
+	card.appendChild(top);
 
-  // Bottom-right corner: rotated rank and suit
-  const bottom = top.cloneNode(true);
-  bottom.style.left = "";
-  bottom.style.right = "6px";
-  bottom.style.top = "";
-  bottom.style.bottom = "4px";
-  bottom.style.transform = "rotate(180deg)";
-  bottom.style.textAlign = "center";
-  card.appendChild(bottom);
+	// Bottom-right corner: rotated rank and suit
+	const bottom = top.cloneNode(true);
+	bottom.style.left = "";
+	bottom.style.right = "6px";
+	bottom.style.top = "";
+	bottom.style.bottom = "4px";
+	bottom.style.transform = "rotate(180deg)";
+	bottom.style.textAlign = "center";
+	card.appendChild(bottom);
 
-  return card;
+	return card;
 }
 
 
-function showCollection(dParent,callback, styles={}){
+function showCollection(dParent, callback, styles = {}) {
 	// {	container,	imageUrlCallback,   // function(index) => url	imageWidth = 300,	imageHeight = 200,	bufferPages = 1,	imagesPerRow = 3}) {
-		let imageHeight = valf(styles.h,100);
-		let imageWidth = valf(styles.w,imageHeight);
-		let bufferPages = 1;
-		let wParent = mGetStyle(dParent,'w'); console.log('parent width',dParent.clientWidth);
-		let imagesPerRow = Math.floor( wParent / imageWidth); console.log(imagesPerRow); //10;
-		let page = 0;
-		let isLoading = false;
-		const imagesPerPage = imagesPerRow * Math.ceil(window.innerHeight / imageHeight);
-	
-		function loadImages() {
-			if (isLoading) return;
-			isLoading = true;
-	
-			const fragment = document.createDocumentFragment();
-			for (let i = 0; i < imagesPerPage * (1 + bufferPages); i++) {
-				const index = page * imagesPerPage + i;
-				const img = document.createElement("img");
-				img.src = callback(index);
-				img.loading = "lazy";
-				img.className = "lazy-img";
-				img.width = imageWidth;
-				img.height = imageHeight;
-				fragment.appendChild(img);
-			}
-			dParent.insertBefore(fragment, sentinel);
-			page++;
-			isLoading = false;
+	let imageHeight = valf(styles.h, 100);
+	let imageWidth = valf(styles.w, imageHeight);
+	let bufferPages = 1;
+	let wParent = mGetStyle(dParent, 'w'); console.log('parent width', dParent.clientWidth);
+	let imagesPerRow = Math.floor(wParent / imageWidth); console.log(imagesPerRow); //10;
+	let page = 0;
+	let isLoading = false;
+	const imagesPerPage = imagesPerRow * Math.ceil(window.innerHeight / imageHeight);
+
+	function loadImages() {
+		if (isLoading) return;
+		isLoading = true;
+
+		const fragment = document.createDocumentFragment();
+		for (let i = 0; i < imagesPerPage * (1 + bufferPages); i++) {
+			const index = page * imagesPerPage + i;
+			const img = document.createElement("img");
+			img.src = callback(index);
+			img.loading = "lazy";
+			img.className = "lazy-img";
+			img.width = imageWidth;
+			img.height = imageHeight;
+			fragment.appendChild(img);
 		}
-	
-		// Sentinel element to observe scrolling near bottom
-		const sentinel = document.createElement("div");
-		sentinel.style.height = "1px";
-		dParent.appendChild(sentinel);
-	
-		const observer = new IntersectionObserver((entries) => {
-			if (entries[0].isIntersecting) {
-				loadImages();
-			}
-		}, {
-			rootMargin: "200px"
-		});
-	
-		observer.observe(sentinel);
-	
-		// Initial load
-		loadImages();
+		dParent.insertBefore(fragment, sentinel);
+		page++;
+		isLoading = false;
 	}
-	
-	
-	function createLazyImageLoader({
-		container,
-		imageUrlCallback,   // function(index) => url
-		imageWidth = 300,
-		imageHeight = 200,
-		bufferPages = 1,
-		imagesPerRow = 3
-	}) {
-		let page = 0;
-		let isLoading = false;
-		const imagesPerPage = imagesPerRow * Math.ceil(window.innerHeight / imageHeight);
-	
-		function loadImages() {
-			if (isLoading) return;
-			isLoading = true;
-	
-			const fragment = document.createDocumentFragment();
-			for (let i = 0; i < imagesPerPage * (1 + bufferPages); i++) {
-				const index = page * imagesPerPage + i;
-				const img = document.createElement("img");
-				img.src = imageUrlCallback(index);
-				img.loading = "lazy";
-				img.className = "lazy-img";
-				img.width = imageWidth;
-				img.height = imageHeight;
-				fragment.appendChild(img);
-			}
-			container.insertBefore(fragment, sentinel);
-			page++;
-			isLoading = false;
+
+	// Sentinel element to observe scrolling near bottom
+	const sentinel = document.createElement("div");
+	sentinel.style.height = "1px";
+	dParent.appendChild(sentinel);
+
+	const observer = new IntersectionObserver((entries) => {
+		if (entries[0].isIntersecting) {
+			loadImages();
 		}
-	
-		// Sentinel element to observe scrolling near bottom
-		const sentinel = document.createElement("div");
-		sentinel.style.height = "1px";
-		container.appendChild(sentinel);
-	
-		const observer = new IntersectionObserver((entries) => {
-			if (entries[0].isIntersecting) {
-				loadImages();
-			}
-		}, {
-			rootMargin: "200px"
-		});
-	
-		observer.observe(sentinel);
-	
-		// Initial load
-		loadImages();
+	}, {
+		rootMargin: "200px"
+	});
+
+	observer.observe(sentinel);
+
+	// Initial load
+	loadImages();
+}
+
+
+function createLazyImageLoader({
+	container,
+	imageUrlCallback,   // function(index) => url
+	imageWidth = 300,
+	imageHeight = 200,
+	bufferPages = 1,
+	imagesPerRow = 3
+}) {
+	let page = 0;
+	let isLoading = false;
+	const imagesPerPage = imagesPerRow * Math.ceil(window.innerHeight / imageHeight);
+
+	function loadImages() {
+		if (isLoading) return;
+		isLoading = true;
+
+		const fragment = document.createDocumentFragment();
+		for (let i = 0; i < imagesPerPage * (1 + bufferPages); i++) {
+			const index = page * imagesPerPage + i;
+			const img = document.createElement("img");
+			img.src = imageUrlCallback(index);
+			img.loading = "lazy";
+			img.className = "lazy-img";
+			img.width = imageWidth;
+			img.height = imageHeight;
+			fragment.appendChild(img);
+		}
+		container.insertBefore(fragment, sentinel);
+		page++;
+		isLoading = false;
 	}
-	
-	function _showCollection(key) {
-		const imageContainer = document.getElementById("image-container");
-		const imagesPerPage = 20; // Adjust depending on image size/layout
-		let page = 0;
-		let isLoading = false;
-	
-		function loadImages(pageNum) {
-			if (isLoading) return;
-			isLoading = true;
-	
-			// Simulated image URLs (replace with real source or API call)
-			const urls = Array.from({ length: imagesPerPage }, (_, i) =>
-				`https://picsum.photos/300/200?random=${pageNum * imagesPerPage + i}`
-			);
-	
-			urls.forEach(url => {
+
+	// Sentinel element to observe scrolling near bottom
+	const sentinel = document.createElement("div");
+	sentinel.style.height = "1px";
+	container.appendChild(sentinel);
+
+	const observer = new IntersectionObserver((entries) => {
+		if (entries[0].isIntersecting) {
+			loadImages();
+		}
+	}, {
+		rootMargin: "200px"
+	});
+
+	observer.observe(sentinel);
+
+	// Initial load
+	loadImages();
+}
+
+function _showCollection(key) {
+	const imageContainer = document.getElementById("image-container");
+	const imagesPerPage = 20; // Adjust depending on image size/layout
+	let page = 0;
+	let isLoading = false;
+
+	function loadImages(pageNum) {
+		if (isLoading) return;
+		isLoading = true;
+
+		// Simulated image URLs (replace with real source or API call)
+		const urls = Array.from({ length: imagesPerPage }, (_, i) =>
+			`https://picsum.photos/300/200?random=${pageNum * imagesPerPage + i}`
+		);
+
+		urls.forEach(url => {
+			const img = document.createElement("img");
+			img.src = url;
+			img.loading = "lazy";
+			img.style = "margin: 4px; width: 300px; height: 200px;";
+			imageContainer.appendChild(img);
+		});
+
+		isLoading = false;
+	}
+
+	// Set up observer for triggering load when nearing bottom
+	const sentinel = document.createElement("div");
+	sentinel.id = "sentinel";
+	imageContainer.appendChild(sentinel);
+
+	const observer = new IntersectionObserver(entries => {
+		if (entries[0].isIntersecting && !isLoading) {
+			page++;
+			loadImages(page);
+		}
+	}, {
+		rootMargin: "100px" // Start loading slightly before reaching the bottom
+	});
+
+	observer.observe(sentinel);
+
+	// Initial load: just enough to fill viewport + one more page
+	function preloadInitial() {
+		const viewportHeight = window.innerHeight;
+		let imagesLoaded = 0;
+
+		const tempImg = document.createElement("img");
+		tempImg.src = "https://picsum.photos/300/200";
+		tempImg.style.display = "none";
+		document.body.appendChild(tempImg);
+
+		tempImg.onload = () => {
+			const imgHeight = tempImg.naturalHeight;
+			const imagesPerViewport = Math.ceil(viewportHeight / imgHeight) * 2;
+
+			for (let i = 0; i < imagesPerViewport; i++) {
+				const url = `https://picsum.photos/300/200?random=${i}`;
 				const img = document.createElement("img");
 				img.src = url;
 				img.loading = "lazy";
 				img.style = "margin: 4px; width: 300px; height: 200px;";
-				imageContainer.appendChild(img);
-			});
-	
-			isLoading = false;
-		}
-	
-		// Set up observer for triggering load when nearing bottom
-		const sentinel = document.createElement("div");
-		sentinel.id = "sentinel";
-		imageContainer.appendChild(sentinel);
-	
-		const observer = new IntersectionObserver(entries => {
-			if (entries[0].isIntersecting && !isLoading) {
-				page++;
-				loadImages(page);
+				imageContainer.insertBefore(img, sentinel);
 			}
-		}, {
-			rootMargin: "100px" // Start loading slightly before reaching the bottom
-		});
-	
-		observer.observe(sentinel);
-	
-		// Initial load: just enough to fill viewport + one more page
-		function preloadInitial() {
-			const viewportHeight = window.innerHeight;
-			let imagesLoaded = 0;
-	
-			const tempImg = document.createElement("img");
-			tempImg.src = "https://picsum.photos/300/200";
-			tempImg.style.display = "none";
-			document.body.appendChild(tempImg);
-	
-			tempImg.onload = () => {
-				const imgHeight = tempImg.naturalHeight;
-				const imagesPerViewport = Math.ceil(viewportHeight / imgHeight) * 2;
-	
-				for (let i = 0; i < imagesPerViewport; i++) {
-					const url = `https://picsum.photos/300/200?random=${i}`;
-					const img = document.createElement("img");
-					img.src = url;
-					img.loading = "lazy";
-					img.style = "margin: 4px; width: 300px; height: 200px;";
-					imageContainer.insertBefore(img, sentinel);
-				}
-	
-				document.body.removeChild(tempImg);
-			};
-		}
-	
-		preloadInitial();
+
+			document.body.removeChild(tempImg);
+		};
 	}
-	
-	
-async function showCollection(key, d, styles={},opts={}) {
+
+	preloadInitial();
+}
+
+
+async function showCollection(key, d, styles = {}, opts = {}) {
 	mClear(d);
-	mClass(d,'symbolContainer');
-	mDom(d,{className:'symbol'},{html:'<div class="symbol">&#x2718;</div>'});
-	mStyle(document.body,{className:'symbolContainer'})
+	mClass(d, 'symbolContainer');
+	mDom(d, { className: 'symbol' }, { html: '<div class="symbol">&#x2718;</div>' });
+	mStyle(document.body, { className: 'symbolContainer' })
 
 	for (const k of M.byCollection[key]) {
 		let sym = M.superdi[k];
 		let d1 = mDom(d, { margin: 10 });
 		//mDom(d1,{},{tag:'pre',html:sym.text});
-		mDom(d1,{className:'symbol'},{html: `<div class="symbol">${sym.text}</div>` }); //sym.text
+		mDom(d1, { className: 'symbol' }, { html: `<div class="symbol">${sym.text}</div>` }); //sym.text
 		let dimg = await mKey(k, d1, styles, opts);
 		let dlabel = mDom(d1, { align: 'center', fz: 12, bg: 'yellow', fg: 'black' }, { html: k });
 	}
@@ -637,16 +1028,16 @@ function replaceColorsInCard(s, by) {
 	return snew;
 
 }
-function renderCard(key,color,border){
+function renderCard(key, color, border) {
 	let svg = __cardSvgs[key];
-	let [r,s]=key;
+	let [r, s] = key;
 	if ('0123456789TA'.includes(r)) {
 		let beforeRect = stringBeforeLast(svg, '<rect');
 		let afterRect = stringAfterLast(svg, '/rect>');
 		let between = stringBetween(svg, beforeRect, afterRect); console.log('between', between)
 		svg = replaceColorsInCard(beforeRect, color) + replaceColorsInCard(between, border) + replaceColorsInCard(afterRect, color);
 
-	} else{
+	} else {
 
 	}
 	return svg;
@@ -674,22 +1065,22 @@ async function mToggleButton(dParent, styles = {}) {
 	}
 	return mToggleCompose(...buttons);
 }
-async function mToggleButton(dParent,styles={}) {
-	addKeys({display: 'flex', wrap: 'wrap', aitems: 'center' },styles)
-	let d1 = mDom(dParent, styles); 
+async function mToggleButton(dParent, styles = {}) {
+	addKeys({ display: 'flex', wrap: 'wrap', aitems: 'center' }, styles)
+	let d1 = mDom(dParent, styles);
 	let list = Array.from(arguments).slice(2);
 	let buttons = [];
-	let style = { display: 'flex', 'flex-wrap':'nowrap', aitems: 'center', cursor: 'pointer' };
+	let style = { display: 'flex', 'flex-wrap': 'nowrap', aitems: 'center', cursor: 'pointer' };
 
 	let words = list.map(x => x.label);
-	let w = getMaxWordWidth(words, d1) + styles.h*1.25 +2; console.log(w);
+	let w = getMaxWordWidth(words, d1) + styles.h * 1.25 + 2; console.log(w);
 	mStyle(d1, { w });
 
 	for (const l of list) {
 
 		let b = mDom(d1, style, { onclick: l.onclick });
-		mDom(b, {maright:6}, { html: l.label });
-		await mKey(l.key, b, { h:styles.h,w:styles.h,fz:styles.h }); //:fz:valf(styles.h,50) });
+		mDom(b, { maright: 6 }, { html: l.label });
+		await mKey(l.key, b, { h: styles.h, w: styles.h, fz: styles.h }); //:fz:valf(styles.h,50) });
 
 		// let dAuto = mDom(d1,{ cursor: 'pointer'}, { onclick: uiAuto });	
 		// mDom(dAuto, {}, { html: 'uiState:' });
