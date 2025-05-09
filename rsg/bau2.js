@@ -30,8 +30,9 @@ function mKey(imgKey, d, styles = {}, opts = {}) {
 		let imgStyles = { h };
 		let imgOpts = { tag: 'img', src };
 		mImg(src, d0, imgStyles, imgOpts);
-	} else if (type === 'text') {
+	} else if (type === 'text' || type === 'uni') {
 		// Center the text inside the container
+		let family = valf(styles.family,type == 'uni'? "'Noto Sans', sans-serif": 'emoNoto';
 		let textStyles = {
 			display: 'flex',
 			justifyContent: 'center',
@@ -40,14 +41,15 @@ function mKey(imgKey, d, styles = {}, opts = {}) {
 			width: '100%',
 			height: '100%',
 			fontSize: styles.fz || 'inherit',
-			fontFamily: styles.family || 'inherit',
+			family,
+			//fontFamily: styles.family || 'inherit',
 			lineHeight: '1', // Ensure consistent vertical alignment
 			verticalAlign: 'middle' // Align text vertically
 		};
 		mDom(d0, textStyles, { html: o.text });
 	} else if (type !== 'plain') {
 		// let family = type === 'fa6' ? 'Font Awesome 6 Free' : 'Font Awesome 5 Free';
-		let family = type == 'uni'? "'Noto Sans', sans-serif": type == 'text' ? 'emoNoto' : type == 'fa6' ? 'fa6' : type == 'fa' ? 'pictoFa' : 'pictoGame';
+		 type == 'fa6' ? 'fa6' : type == 'fa' ? 'pictoFa' : 'pictoGame';
 		let html = `&#x${o[type]};`;
 		addKeys({ family }, styles);
 		mDom(d0, styles, { html });

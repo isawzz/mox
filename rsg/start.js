@@ -1,8 +1,8 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { hallo(); }
+function start() { test0_showCollection(); }
 
-async function hallo() {
+async function test0_showCollection() {
 	await loadAssetsStatic();
 	for (const k in M.superdi) { M.superdi[k].key = k; }
 	stickyHeaderCode();
