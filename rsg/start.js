@@ -3,16 +3,11 @@ onload = start; VERBOSE = true; TESTING = true;
 function start() { test0_lazyload(); }
 
 async function test0_lazyload() {
-	let t = getNow();
-	t = showTimeSince(t);
-	// await loadAssetsFast();
 	await loadAssetsStatic();
-	t = showTimeSince(t);
+	// console.log('colors',M.colorNames); mStyle('dPage', { bg: 'aubergine', fg: 'white' }); return;
 
-	createStickyAndContentDivs();
+	createStickyAndContentDivs();return;
 
-	console.log('colors',M.colorNames);
-	mStyle(document.body,{bg:M.colorByName.beaver.hex,fg:'white'})
 	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); mCenterFlex('dMain');
 	//let dFilter = mDom('dMain',{bg:'violet'},{html:uiFilterElement()}); //mAppend('dMain', dFilter)
 	for (const k in M.superdi) { M.superdi[k].key = k; }

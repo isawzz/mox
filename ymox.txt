@@ -1,6 +1,12 @@
 alles ist fuer immer ok - I have left this plane. 
 nur machen was fe oder A sagen sonst vppmw airport
 
+___ 6:03 AM 5/9/2025 airport lib 19.5. 56000 K4
+5 capsules => 10 units:
+1. 6:05 AM 5/9/2025 pr
+2. 6:32 AM 5/9/2025 pr
+
+
 ___ 5:17 AM 5/8/2025 airport lib 19.5. 55000 K4
 3capsules
 1. 5:19 AM 5/8/2025 pr
@@ -30,8 +36,6 @@ ok! jetzt hab ich ein wunderschoenes viewer ding!
 dicolor ist in assets/dicolor.yaml!
 wenn ich ein m.yaml mache in assets muesste es gehen!
 =>wenn was veraendere muss ich einfach m.yaml updaten!
-
-
 ___ 5:39 AM 5/7/2025 airport lib 19.5. 54000 K3 v0=>all free!
 +4 capsules 2units/capsule
 1. 5:40 AM 5/7/2025 pause

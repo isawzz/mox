@@ -1119,10 +1119,10 @@ function colorSortByLightness(list) {
 }
 function colorToHex79(c) {
 	if (colorIsHex79(c)) return c;
-	ColorDi = M.colorByName;
+	ColorDi = M.colorByName; 
 	let tString = isString(c), tArr = isList(c), tObj = isDict(c);
 	if (tString && c[0] == '#') return colorHex45ToHex79(c);
-	else if (tString && isdef(ColorDi) && lookup(ColorDi, [c])) return ColorDi[c].hex;
+	else if (tString && isdef(ColorDi) && lookup(ColorDi, [c])) {console.log('JA',c);return ColorDi[c].hex;}
 	else if (tString && c.startsWith('rand')) {
 		let spec = capitalize(c.substring(4));
 		let func = window['color' + spec];

@@ -145,7 +145,7 @@ const STYLE_PARAMS_2 = {
   alignItems: 'align-items',
   alignContent: 'align-content',
   alignSelf: 'align-self',
-  bg: 'background-color',
+  // bg: 'background-color',
   aspectRatio: 'aspect-ratio',
   bgAttach: 'background-attachment',
   bgBlend: 'background-blend-mode', //'mix-blend-mode', //

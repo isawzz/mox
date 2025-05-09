@@ -2,7 +2,7 @@
 function createStickyAndContentDivs() {
 
 	let stickyDiv = mDom(document.body,{position:'sticky',top:0,zIndex:1000,padding:10,bg:'#00000080'},{id:'dSticky'});
-	mInsert(document.body,stickyDiv);
+	mInsert('dPage',stickyDiv);
 	// {box:true,className:'section',position:'sticky',height:'auto',top:0,zIndex:1000,padding:10,bg:'#00000080'},{id:'dSticky'}//const body = document.body;
 
 	// Create the sticky div
