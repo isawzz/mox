@@ -9,7 +9,7 @@ ___ 6:03 AM 5/9/2025 airport lib 19.5. 56000 K4
 4. 7:25 AM 5/9/2025 pr
 5. 8:06 AM 5/9/2025 pr
 6. 8:25 AM 5/9/2025 hybrid:start v
-=>fix mKey!!!
+=>fix mKey!!! SUPER gemacht hat das der copilot!
 
 
 ___ 5:17 AM 5/8/2025 airport lib 19.5. 55000 K4
