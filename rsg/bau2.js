@@ -32,7 +32,7 @@ function mKey(imgKey, d, styles = {}, opts = {}) {
 		mImg(src, d0, imgStyles, imgOpts);
 	} else if (type === 'text' || type === 'uni') {
 		// Center the text inside the container
-		let family = valf(styles.family,type == 'uni'? "'Noto Sans', sans-serif": 'emoNoto';
+		let family = valf(styles.family,type == 'uni'? "'Noto Sans', sans-serif": 'emoNoto');
 		let textStyles = {
 			display: 'flex',
 			justifyContent: 'center',
