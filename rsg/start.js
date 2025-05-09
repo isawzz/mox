@@ -1,40 +1,40 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_stickyLAYOUTCHANGE(); }
+function start() { hallo(); }
 
-async function test0_stickyLAYOUTCHANGE() {
+async function hallo() {
 	await loadAssetsStatic();
+	for (const k in M.superdi) { M.superdi[k].key = k; }
 	stickyHeaderCode();
 
-	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mCenterFlex('dMain');
-	let dFilter = mDom('dMain', { w100:true }, { html: uiFilterElement() }); //mAppend('dMain', dFilter)
-	for (const k in M.superdi) { M.superdi[k].key = k; }
+	let elems = mLayoutLM('dPage');
+	mStyle('dMain', { overy: 'auto' });
 
-	let sz = 100,gap=10;
-	let dParent = mDom('dMain', { display: 'flex', gap, padding: gap, wrap: true,box: true }, { id: "table", });
-	mCenterFlex(dParent);
-	let keys=[];
-	keys = 'turkey turtle twelve_oclock twelve_thirty two_hearts two_hump_camel two_oclock two_thirty umbrella';keys=keys.split(' ');
-	keys = M.byCollection.fa6;
-	let style = { fz: sz / 1.25, w: sz, h: sz, box: true, padding: 4, fg: 'skyblue' };
-
-	//machzuerst nur 100, dann mehr
-	let i = 0;
-	//how many items will fit the page at size szxsz + accounting for margins and borders
-	let n = Math.floor(window.innerWidth / (sz+gap)) * Math.floor(window.innerHeight / (sz+gap)); console.log('n',n);
-	for (const k of keys) {
-		let o = M.superdi[k]; //if (nundef(o.img)) continue; //console.log(o); return;
-		let d1 = mDom(dParent, { display: 'grid',border:'solid 1px orange', padding: 10, rounding:10 });
-		//mDom(d1, { h: sz, w: sz, display: 'grid' }, { tag: 'img', src: o.img });
-		mKey(k, d1, style); //, html: o.fa6 }); //'data-innerHTML': o.fa6 });
-		mDom(d1, { w100: true, wmax: sz, fg: 'black', 'text-overflow': 'ellipsis', 'white-space': 'nowrap', overflow: 'hidden', fz: 16, align: 'center' }, { html: o.key })
-		// if (0 === ++i%n) {console.log('DONE',i);return;} //await mSleep(50);
-		if (0 === ++i%n) await mSleep(50);
-		//console.log(o); return;
+	let dLeft = mBy('dLeft'); // Reference to the left sidebar
+	let list = [...Object.keys(M.byCollection), ...Object.keys(M.byCat)].sort();
+	for (const k of list) {
+		mDom(dLeft, {}, { tag: 'button', 'html': k, onclick: ev => showCollection(k, 'dMain') });
+		mLinebreak(dLeft)
 	}
-
 }
-
+async function showCollection(k) {
+	let sz = 100, gap = 10;
+	mClear('dMain')
+	let dParent = mDom('dMain', { display: 'flex', gap, padding: gap, wrap: true, box: true }, { id: "table", });
+	mCenterFlex(dParent);
+	let keys = valf(M.byCollection[k], M.byCat[k]);
+	mClear(dParent);
+	let style = { fz: 100, w: 100, h: 100, box: true, padding: 4, fg: 'skyblue' };
+	let i = 0;
+	let n = Math.floor(window.innerWidth / (100 + 10)) * Math.floor(window.innerHeight / (100 + 10)); console.log('n', n);
+	for (const k of keys) {
+		let o = M.superdi[k]; 
+		let d1 = mDom(dParent, { display: 'grid', border: 'solid 1px orange', padding: 10, rounding: 10 });
+		mKey(k, d1, style); 
+		mDom(d1, { w100: true, wmax: 100, fg: 'black', 'text-overflow': 'ellipsis', 'white-space': 'nowrap', overflow: 'hidden', fz: 16, align: 'center' }, { html: o.key })
+		if (0 === ++i % n) await mSleep(50);
+	}
+}
 
 //*************************** deprecated! *****************************/
 async function test0_lazyload() {
