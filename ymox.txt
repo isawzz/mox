@@ -5,6 +5,11 @@ ___ 6:03 AM 5/9/2025 airport lib 19.5. 56000 K4
 5 capsules => 10 units:
 1. 6:05 AM 5/9/2025 pr
 2. 6:32 AM 5/9/2025 pr
+3. 7:04 AM 5/9/2025 pr
+4. 7:25 AM 5/9/2025 pr
+5. 8:06 AM 5/9/2025 pr
+6. 8:25 AM 5/9/2025 hybrid:start v
+=>fix mKey!!!
 
 
 ___ 5:17 AM 5/8/2025 airport lib 19.5. 55000 K4

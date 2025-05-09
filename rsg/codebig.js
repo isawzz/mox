@@ -1122,7 +1122,7 @@ function colorToHex79(c) {
 	ColorDi = M.colorByName; 
 	let tString = isString(c), tArr = isList(c), tObj = isDict(c);
 	if (tString && c[0] == '#') return colorHex45ToHex79(c);
-	else if (tString && isdef(ColorDi) && lookup(ColorDi, [c])) {console.log('JA',c);return ColorDi[c].hex;}
+	else if (tString && isdef(ColorDi) && lookup(ColorDi, [c])) {return ColorDi[c].hex;}
 	else if (tString && c.startsWith('rand')) {
 		let spec = capitalize(c.substring(4));
 		let func = window['color' + spec];
@@ -3534,12 +3534,12 @@ function mAppend(d, child) { toElem(d).appendChild(child); return child; }
 function mAreas(dParent, areas, gridCols, gridRows) {
 	mClear(dParent); mStyle(dParent, { padding: 0 })
 	let names = arrNoDuplicates(toWords(areas));
-	let dg = mDom(dParent);
+	let dg = mDom(dParent,{w100:true,h100:true,box:true});
 	for (const name of names) {
 		let d = mDom(dg, { family: 'opensans' }, { id: name });
 		d.style.gridArea = name;
 	}
-	mStyle(dg, { display: 'grid', gridCols, gridRows, h: '100%' });
+	mStyle(dg, { display: 'grid', gridCols, gridRows });
 	dg.style.gridTemplateAreas = areas;
 	return names;
 }
@@ -3934,8 +3934,18 @@ function mInput(dParent, styles = {}, opts = {}) {
 	}
 	return d;
 }
-function mInsert(dParent, el, index = 0) { dParent.insertBefore(el, dParent.childNodes[index]); return el; }
-async function mKey(imgKey, d, styles = {}, opts = {}) {
+function mInsert(dParent, elem, index = 0) {
+	dParent = toElem(dParent)
+	if (dParent.childNodes.length <= index) {
+			// If no child nodes exist, append the element
+			dParent.appendChild(elem);
+	} else {
+			// Otherwise, insert the element as needed (e.g., at a specific position)
+			// This is just an example; adjust as per your requirements
+			dParent.insertBefore(elem, dParent.childNodes[index]); //dParent.firstChild);
+	}
+	return elem;
+}async function mKey(imgKey, d, styles = {}, opts = {}) {
 	styles = jsCopy(styles);
 	let type = opts.prefer; console.log(type)
 	let o = type != 'plain' ? lookup(M.superdi, [imgKey]) : null;

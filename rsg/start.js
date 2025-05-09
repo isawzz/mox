@@ -1,18 +1,62 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_lazyload(); }
+function start() { test0_stickyLAYOUTCHANGE(); }
 
+async function test0_stickyLAYOUTCHANGE() {
+	await loadAssetsStatic();
+	stickyHeaderCode();
+
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mCenterFlex('dMain');
+	let dFilter = mDom('dMain', { w100:true }, { html: uiFilterElement() }); //mAppend('dMain', dFilter)
+	for (const k in M.superdi) { M.superdi[k].key = k; }
+
+	let sz = 100,gap=10;
+	let dParent = mDom('dMain', { display: 'flex', gap, padding: gap, wrap: true,box: true }, { id: "table", });
+	mCenterFlex(dParent);
+	let keys=[];
+	keys = 'turkey turtle twelve_oclock twelve_thirty two_hearts two_hump_camel two_oclock two_thirty umbrella';keys=keys.split(' ');
+	keys = M.byCollection.fa6;
+	let style = { fz: sz / 1.25, w: sz, h: sz, box: true, padding: 4, fg: 'skyblue' };
+
+	//machzuerst nur 100, dann mehr
+	let i = 0;
+	//how many items will fit the page at size szxsz + accounting for margins and borders
+	let n = Math.floor(window.innerWidth / (sz+gap)) * Math.floor(window.innerHeight / (sz+gap)); console.log('n',n);
+	for (const k of keys) {
+		let o = M.superdi[k]; //if (nundef(o.img)) continue; //console.log(o); return;
+		let d1 = mDom(dParent, { display: 'grid',border:'solid 1px orange', padding: 10, rounding:10 });
+		//mDom(d1, { h: sz, w: sz, display: 'grid' }, { tag: 'img', src: o.img });
+		mKey(k, d1, style); //, html: o.fa6 }); //'data-innerHTML': o.fa6 });
+		mDom(d1, { w100: true, wmax: sz, fg: 'black', 'text-overflow': 'ellipsis', 'white-space': 'nowrap', overflow: 'hidden', fz: 16, align: 'center' }, { html: o.key })
+		// if (0 === ++i%n) {console.log('DONE',i);return;} //await mSleep(50);
+		if (0 === ++i%n) await mSleep(50);
+		//console.log(o); return;
+	}
+
+}
+
+
+//*************************** deprecated! *****************************/
 async function test0_lazyload() {
 	await loadAssetsStatic();
+
 	// console.log('colors',M.colorNames); mStyle('dPage', { bg: 'aubergine', fg: 'white' }); return;
+	let dPage = mBy('dPage');
+	mStyle(dPage, { matop: 60 });//position:'relative',top:80})
+	let elems = mLayoutLM('dPage');
+	//let d=mDom(dPage, { position:'sticky',bg: 'black', fg: 'white', padding: 10, gap: 10, display: 'flex', wrap: true });
+	//mInsert(dPage,d)
+	let d = mDom(document.body, { top: 0, zIndex: 1000, position: 'sticky', bg: 'black', fg: 'white', padding: 0, margin: 0, gap: 10, display: 'flex', wrap: true });
+	mInsert(dPage, d)
 
-	createStickyAndContentDivs();return;
+	return;
+	//createStickyAndContentDivs();return;
 
-	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); mCenterFlex('dMain');
+	// let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); mCenterFlex('dMain');
 	//let dFilter = mDom('dMain',{bg:'violet'},{html:uiFilterElement()}); //mAppend('dMain', dFilter)
 	for (const k in M.superdi) { M.superdi[k].key = k; }
 
-	let dTop = mDom('dSticky',{bg:'black',fg:'white',w100:true,box:true,padding:10, gap:10, display:'flex', wrap:true}, { id: 'dTop' });
+	let dTop = mDom('dSticky', { bg: 'black', fg: 'white', w100: true, box: true, padding: 10, gap: 10, display: 'flex', wrap: true }, { id: 'dTop' });
 	let keys = await uiFilterMenu('dTop', 'all'); //console.log(keys)
 	let dParent = mDom('dMain', { display: 'flex', gap: 10, padding: 10, wrap: true, w100: true, box: true }, { id: "table", });
 	//keys = M.byCollection.emo;
