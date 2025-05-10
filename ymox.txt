@@ -7,7 +7,14 @@ ___ 6:07 AM 5/10/2025 airport lib 19.5. 57000 K4
 I want you to output the following keys, each with a list of matching categories from the ones I listed, in yaml format:
 
 
-here is a list of categories: accessory, action, animal, building, card, clothing, emotion, event, food(include drink), game, gesture, location, math, music, nature, object, person, plant, role, sport, symbol, technology, tool, transport. for each key of the uploaded file (if the key has _ chars, convert it into a phrase), I want 1-3 matching categories that best relate to that key. then I want you to create a dictionary key:list_of_categories in yaml format and save it to a file cats.yaml 
+here is a list of categories: accessory, action, animal, building, card, clothing, emotion, event, food(include drink), game, gesture, location, math, music, nature, object, person, plant, role, sport, symbol, technology, tool, transport. for each key of the uploaded file (if the key has _ chars, convert it into a phrase), I want 1-3 matching categories that best relate to that key. then I want you to create a dictionary key:list_of_categories in yaml format and save it to a file 
+please categorize the keys again, this time understand a key that contains '_' as a phrase and do your best to assign at least one category to each key! 
+
+no! if the key contains 'abstract' it should be a 'symbol'. and an ardvaark is an animal! look up the word parts in a dictionary to identify animals. an object is NOT a living creature (animal, person). also, add another category 'art' and assign it to all keys that start with 'amanda'.
+
+
+
+cats.yaml 
 categories:
 accessory, action, animal, building, card, clothing, emotion, event, food(include drink), game, gesture, location, math, music, nature, object, person, plant, role, sport, symbol, technology, tool, transport,
 prompt fuer neues superdi:
