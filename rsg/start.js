@@ -1,7 +1,13 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_showCollection(); }
+function start() { test0_listkeys(); }
 
+async function test0_listkeys(){
+	await loadAssetsStatic();
+	let keys = Object.keys(M.superdi);
+	downloadAsText(keys.join('\n'), 'keys');
+
+}
 async function test0_showCollection() {
 	await loadAssetsStatic();
 	for (const k in M.superdi) { M.superdi[k].key = k; }

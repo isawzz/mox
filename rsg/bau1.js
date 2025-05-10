@@ -1,22 +1,38 @@
 
+function mKey2(imgKey, d, styles = {}, opts = {}) {
+	styles = jsCopy(styles);
+	let o = lookup(M.superdi, [imgKey]);
+	let type = determineType(o, opts.prefer);
+	let src = !o ? (imgKey.includes('.') ? imgKey : null) : (type && o[type] ? o[type] : null);
 
-async function showCollection(k) {
-	let sz = 100, gap = 10;
-	mClear('dMain')
-	let dParent = mDom('dMain', { display: 'flex', gap, padding: gap, wrap: true, box: true }, { id: "table", });
-	mCenterFlex(dParent);
-	let keys = valf(M.byCollection[k], M.byCat[k]);
-	mClear(dParent);
-	let style = { fz: 100, w: 150, h: 100, box: true, padding: 4, fg: 'skyblue' };
-	let i = 0;
-	let n = Math.floor(window.innerWidth / (style.w + 10)) * Math.floor(window.innerHeight / (style.h + 10)); console.log('n', n);
-	for (const k of keys) {
-		let o = M.superdi[k];
-		let d1 = mDom(dParent, { display: 'grid', border: 'solid 1px orange', padding: 10, rounding: 10 });
-		mKey(k, d1, style);
-		mDom(d1, { w: style.w, fg: 'black', 'text-overflow': 'ellipsis', 'white-space': 'nowrap', overflow: 'hidden', fz: 16, align: 'center' }, { html: o.key, title: o.key })
-		if (0 === ++i % n) await mSleep(50);
+	if (!o) type = src ? null : 'plain';
+	else if (!type || !o[type]) type = determineType(o);
+
+	let d0 = mDom(d, styles, opts);
+	mCenterCenterFlex(d0);
+
+	if (isdef(src)) {
+		mImg(src, d0, { h: mSizeSuccession(styles, 40)[1] }, { tag: 'img', src });
+	} else if (type === 'text' || type === 'uni') {
+		renderContent(o.text, d0, styles, type === 'uni' ? "'Noto Sans', sans-serif" : 'emoNoto');
+	} else if (type !== 'plain') {
+		renderContent(`&#x${o[type]};`, d0, styles, type === 'fa6' ? 'fa6' : type === 'fa' ? 'pictoFa' : 'pictoGame');
+	} else {
+		mDom(d0, styles, { html: imgKey });
 	}
+
+	return d0;
 }
+function determineType(o, prefer) {
+	return prefer == 'plain' ? prefer :
+		prefer && (!o || o[prefer]) ? prefer :
+			isdef(o.img) ? 'img' :
+				isdef(o.photo) ? 'photo' :
+					isdef(o.text) ? (o.colls.includes('unicode') ? 'uni' : 'text') :
+						isdef(o.fa6) ? 'fa6' :
+							isdef(o.fa) ? 'fa' :
+								isdef(o.ga) ? 'ga' : 'plain';
+}
+
 
 

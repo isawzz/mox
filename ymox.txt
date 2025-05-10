@@ -1,6 +1,21 @@
 alles ist fuer immer ok - I have left this plane. 
 nur machen was fe oder A sagen sonst vppmw airport
 
+___ 6:07 AM 5/10/2025 airport lib 19.5. 57000 K4
+4 capsules
+1. 6:09 AM 5/10/2025 pr
+I want you to output the following keys, each with a list of matching categories from the ones I listed, in yaml format:
+
+
+here is a list of categories: accessory, action, animal, building, card, clothing, emotion, event, food(include drink), game, gesture, location, math, music, nature, object, person, plant, role, sport, symbol, technology, tool, transport. for each key of the uploaded file (if the key has _ chars, convert it into a phrase), I want 1-3 matching categories that best relate to that key. then I want you to create a dictionary key:list_of_categories in yaml format and save it to a file cats.yaml 
+categories:
+accessory, action, animal, building, card, clothing, emotion, event, food(include drink), game, gesture, location, math, music, nature, object, person, plant, role, sport, symbol, technology, tool, transport,
+prompt fuer neues superdi:
+for each of the following words name 3 categories: smiling, baseball, horse, cheese, house, policeman
+eliminate colls und cats
+each object should have: friendly,
+img photo emo fa fa6 ga uni 
+
 ___ 6:03 AM 5/9/2025 airport lib 19.5. 56000 K4
 5 capsules => 10 units:
 1. 6:05 AM 5/9/2025 pr
@@ -10,8 +25,6 @@ ___ 6:03 AM 5/9/2025 airport lib 19.5. 56000 K4
 5. 8:06 AM 5/9/2025 pr
 6. 8:25 AM 5/9/2025 hybrid:start v
 =>fix mKey!!! SUPER gemacht hat das der copilot!
-
-
 ___ 5:17 AM 5/8/2025 airport lib 19.5. 55000 K4
 3capsules
 1. 5:19 AM 5/8/2025 pr
