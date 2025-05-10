@@ -2,6 +2,8 @@ alles ist fuer immer ok - I have left this plane.
 nur machen was fe oder A sagen sonst vppmw airport
 
 ___ 6:07 AM 5/10/2025 airport lib 19.5. 57000 K4
+gelbe brille
+=>A aber vorher sachen rausnehmen
 4 capsules
 1. 6:09 AM 5/10/2025 pr
 I want you to output the following keys, each with a list of matching categories from the ones I listed, in yaml format:
