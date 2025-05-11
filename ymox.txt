@@ -4,7 +4,29 @@ nur machen was fe oder A sagen sonst vppmw airport
 Subject: Re: Ongoing Tasks and Requests
 
 ___ 6:34 AM 5/11/2025 airport lib 19.5. 58000 K4
+=>nimm das cats_final und das superdi, ergaenze cats und schau ob es was aendert!
+was mach ich mit dieser info:
+  lifespan: 13-15 years on average
+  habitat: Domesticated; commonly found in homes, originating from North America
+  weight: 3-7 kg
+  size: 30-38 cm in length excluding tail, 25-30 cm in height at the shoulders
+  food: >-
+    Carnivorous: primarily feeds on commercially prepared cat food, small
+    mammals, and birds
+  species: Felis catus (American Bobtail breed)
+  color: >-
+    Varies widely; common colors include brown, black, white, blue, red, and
+    various patterns such as tabby, calico, and bicolor
+  reproduction: Viviparous
+  offsprings: >-
+    Females give birth to 2-6 kittens per litter after a gestation period of
+    about 64-67 days
+  class: Mammal
 
+
+from the keys.txt file list the keys that are symbols of characters
+ich brauch das erweiterte superdi
+=>programm dass die ganze nacht schoene musik spielt und schoene geschichten erzaehlt oder philosophien und beratung
 ___ 6:07 AM 5/10/2025 airport lib 19.5. 57000 K4
 gelbe sonnenbrille
 =>A aber vorher sachen rausnehmen
