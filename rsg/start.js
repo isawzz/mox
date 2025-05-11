@@ -1,13 +1,58 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_listkeys(); }
+function start() { test0_(); }
 
-async function test0_listkeys(){
+async function test0_() {
+	await loadAssetsStatic();
+	console.log('M', M);
+}
+async function test0_listkeys() {
 	await loadAssetsStatic();
 	let keys = Object.keys(M.superdi);
-	downloadAsText(keys.join('\n'), 'keys');
+	let dinew = {};
+	keys.sort();
+	for (const k of keys) {
+		let o1 = M.superdi[k];
+		let o2 = null, k2 = k;
+
+		if (k.endsWith('_uni')) {
+			console.log('uni', k, o1.text);
+			k2 = k.replace('_uni', '');
+			o2 = M.superdi[k2];
+			assertion(o2, `MISSING KEY ${k2}`);
+			o2.uni = o1.text;
+		} else if (o1.coll2 && o1.colls.includes('unicode')) {
+			assertion(o1.text, `MISSING TEXT ${k}`);
+			o2 = { uni: o1.text };
+		} else if (o1.text && o1.text.startsWith('&')) {
+			o2 = { emo: o1.text };
+		} else o2={};
+		//copy cats
+		if (o1.cats) o2.cats = o1.cats;
+
+		//copy fa,ga,fa6,img,photo
+		if (o1.fa) o2.fa = o1.fa;
+		if (o1.ga) o2.ga = o1.ga;
+		if (o1.fa6) o2.fa6 = o1.fa6;
+		if (o1.img) {
+			o2.img = o1.img;
+			if (o1.img.includes('/cards')) addIf(o2.cats,'card');
+		}
+		if (o1.photo) o2.photo = o1.photo;
+
+		if (o2) dinew[k2] = o2;
+	}
+
+
+
+
+	// downloadAsText(keys.join('\n'), 'keys');
+	downloadAsYaml(dinew, 'superdi');
+
+
 
 }
+//*********** deprecated (o.colls removed in superdi) ************** */
 async function test0_showCollection() {
 	await loadAssetsStatic();
 	for (const k in M.superdi) { M.superdi[k].key = k; }

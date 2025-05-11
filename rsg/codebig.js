@@ -3379,27 +3379,28 @@ async function loadStaticYaml(path) {
 }
 function loadSuperdiAssets() {
 	let [di, byColl, byFriendly, byCat, allImages] = [M.superdi, {}, {}, {}, {}];
-	for (const k in Symbols) {
-		let kNew = isdef(di[k]) && isdef(di[k].text) ? k + '_uni' : k;
-		if (k == 'writing_hand') console.log(k, di[k], kNew)
-		if (isdef(di[k]) && nundef(di[k].text)) {
-			assertion(k != 'writing_hand')
-			let o = di[k];
-			if (nundef(o.colls)) o.colls = [];
-			o.colls.push('unicode');
-			if (isdef(o.text)) console.log(':text', k, o.text);
-			else o.text = Symbols[k];
-		} else di[kNew] = { key: kNew, friendly: k, text: Symbols[k], colls: ['unicode'], cats: [] };
-	}
-	for (const k of MathKeys) {
-		di[k].cats.push('math');
-		lookupAddIfToList(byCat, ['math'], k);
-	}
+	// for (const k in Symbols) {
+	// 	let kNew = isdef(di[k]) && isdef(di[k].text) ? k + '_uni' : k;
+	// 	if (k == 'writing_hand') console.log(k, di[k], kNew)
+	// 	if (isdef(di[k]) && nundef(di[k].text)) {
+	// 		assertion(k != 'writing_hand')
+	// 		let o = di[k];
+	// 		if (nundef(o.colls)) o.colls = [];
+	// 		o.colls.push('unicode');
+	// 		if (isdef(o.text)) console.log(':text', k, o.text);
+	// 		else o.text = Symbols[k];
+	// 	} else di[kNew] = { key: kNew, friendly: k, text: Symbols[k], colls: ['unicode'], cats: [] };
+	// }
+	// for (const k of MathKeys) {
+	// 	di[k].cats.push('math');
+	// 	lookupAddIfToList(byCat, ['math'], k);
+	// }
 	for (const k in di) {
 		let o = di[k];
 		for (const cat of o.cats) lookupAddIfToList(byCat, [cat], k);
-		for (const coll of o.colls) lookupAddIfToList(byColl, [coll], k);
-		lookupAddIfToList(byFriendly, [o.friendly], k)
+		//for (const coll of o.colls) lookupAddIfToList(byColl, [coll], k);
+		//let friendly=
+		//lookupAddIfToList(byFriendly, [o.friendly], k)
 		if (isdef(o.img)) {
 			let fname = stringAfterLast(o.img, '/')
 			allImages[k] = { fname, path: o.img, key: k };
@@ -3411,12 +3412,11 @@ function loadSuperdiAssets() {
 	}
 	M.allImages = allImages;
 	M.byCat = byCat;
-	M.byCollection = byColl;
-	M.byFriendly = byFriendly;
+	//M.byCollection = byColl;
+	//M.byFriendly = byFriendly;
 	M.categories = Object.keys(byCat); M.categories.sort();
-	M.collections = Object.keys(byColl); M.collections.sort();
-	M.names = Object.keys(byFriendly); M.names.sort();
-	[M.colorList, M.colorByHex, M.colorByName] = getListAndDictsForDicolors();
+	//M.collections = Object.keys(byColl); M.collections.sort();
+	//M.names = Object.keys(byFriendly); M.names.sort();
 }
 function loadUsers() {
 	console.log('hier werden users updated was immer zu tun ist!!!')

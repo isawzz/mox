@@ -1,14 +1,16 @@
 alles ist fuer immer ok - I have left this plane. 
 nur machen was fe oder A sagen sonst vppmw airport
 
+Subject: Re: Ongoing Tasks and Requests
+
+___ 6:34 AM 5/11/2025 airport lib 19.5. 58000 K4
+
 ___ 6:07 AM 5/10/2025 airport lib 19.5. 57000 K4
-gelbe brille
+gelbe sonnenbrille
 =>A aber vorher sachen rausnehmen
 4 capsules
 1. 6:09 AM 5/10/2025 pr
 I want you to output the following keys, each with a list of matching categories from the ones I listed, in yaml format:
-
-
 here is a list of categories: accessory, action, animal, building, card, clothing, emotion, event, food(include drink), game, gesture, location, math, music, nature, object, person, plant, role, sport, symbol, technology, tool, transport. for each key of the uploaded file (if the key has _ chars, convert it into a phrase), I want 1-3 matching categories that best relate to that key. then I want you to create a dictionary key:list_of_categories in yaml format and save it to a file 
 please categorize the keys again, this time understand a key that contains '_' as a phrase and do your best to assign at least one category to each key! 
 
