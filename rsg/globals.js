@@ -158,6 +158,7 @@ const STYLE_PARAMS_2 = {
   dir: 'flex-direction',
   editable: 'contenteditable',
   family: 'font-family',
+  fit: 'object-fit',
   fontSize: 'font-size',
   fStyle: 'font-style',
   fz: 'font-size',

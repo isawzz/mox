@@ -3,8 +3,32 @@ onload = start; VERBOSE = true; TESTING = true;
 function start() { test0_(); }
 
 async function test0_() {
-	await loadAssetsStatic();
-	console.log('M', M);
+	await loadAssetsStatic(); console.log('M', M);
+	for (const k in M.superdi) { M.superdi[k].key = k; }
+	stickyHeaderCode();
+
+	let elems = mLayoutLM('dPage');
+	mStyle('dMain', { overy: 'auto' });
+
+	let dLeft = mBy('dLeft');
+	mStyle(dLeft, { overy: 'auto' });
+
+	//mKey('ballet_shoes', dMain, { h: 100, w: 100, box: true, fg: 'black', bg: 'white' }); return;
+	let keys=rChoose(Object.keys(M.superdi),10); //
+	//keys = ['complementary','ballet_shoes']; //[,'ballet_shoes']
+	//showCollection(keys); return;
+	let list = Object.keys(M.byCat).sort();
+	let outerStyles = {}; // {border:'solid 3px silver',bg:'dimgray',fg:'white'};
+	let symbolStyles = {round:true};
+	let labelStyles = {family:'algerian'}
+	let opts = { prefer: 'plain',onclick:toggleSelection };
+	for (const k of list) {
+		mDom(dLeft, {}, { tag: 'button', 'html': k, onclick: ev => showCollection(k, 'dMain',outerStyles,symbolStyles,labelStyles,opts) });
+		//mDom(dLeft, {}, { tag: 'button', 'html': k, onclick: ev => showCollection(k, 'dMain') });
+		mLinebreak(dLeft);
+	}
+	clickOn('user')
+
 }
 async function test0_listkeys() {
 	await loadAssetsStatic();
@@ -26,7 +50,7 @@ async function test0_listkeys() {
 			o2 = { uni: o1.text };
 		} else if (o1.text && o1.text.startsWith('&')) {
 			o2 = { emo: o1.text };
-		} else o2={};
+		} else o2 = {};
 		//copy cats
 		if (o1.cats) o2.cats = o1.cats;
 
@@ -36,20 +60,15 @@ async function test0_listkeys() {
 		if (o1.fa6) o2.fa6 = o1.fa6;
 		if (o1.img) {
 			o2.img = o1.img;
-			if (o1.img.includes('/cards')) addIf(o2.cats,'card');
+			if (o1.img.includes('/cards')) addIf(o2.cats, 'card');
 		}
 		if (o1.photo) o2.photo = o1.photo;
 
 		if (o2) dinew[k2] = o2;
 	}
 
-
-
-
 	// downloadAsText(keys.join('\n'), 'keys');
 	downloadAsYaml(dinew, 'superdi');
-
-
 
 }
 //*********** deprecated (o.colls removed in superdi) ************** */

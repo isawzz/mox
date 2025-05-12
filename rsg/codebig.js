@@ -87,7 +87,7 @@ function actionProcessLine(a, di) {
 async function actionSaveAll() {
 }
 function addIf(arr, el) { if (!arr.includes(el)) arr.push(el); }
-function addKeys(ofrom, oto) { for (const k in ofrom) if (nundef(oto[k])) oto[k] = ofrom[k]; return oto; }
+function addKeys(ofrom, oto) { for (const k in ofrom) if (!oto.hasOwnProperty(k)) oto[k] = ofrom[k]; return oto; }
 function aktivateUpDownIffSelected() {
 	let b = toElem('dMoveUp'); console.log(b);
 	if (isEmpty(DA.selectedPart)) { mClass('dMoveUp', 'disabled'); mClass('dMoveDown', 'disabled'); return; }
