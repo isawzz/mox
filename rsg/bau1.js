@@ -1,38 +1,41 @@
 
-function mKey2(imgKey, d, styles = {}, opts = {}) {
-	styles = jsCopy(styles);
-	let o = lookup(M.superdi, [imgKey]);
-	let type = determineType(o, opts.prefer);
-	let src = !o ? (imgKey.includes('.') ? imgKey : null) : (type && o[type] ? o[type] : null);
+function showItem(key,d){
 
-	if (!o) type = src ? null : 'plain';
-	else if (!type || !o[type]) type = determineType(o);
+	//mClass(d, 'magnifiable')
+	let id = getUID();
+	let dSym = mKey(key,d,{},{prefer:'emo'}); // simpleShowImageInBatch(key, d, {}, { prefer: 'photo' });
+	//return;
 
-	let d0 = mDom(d, styles, opts);
-	mCenterCenterFlex(d0);
+	// mStyle(d,{position:'relative',pabottom:18});
+  let dLabel = mDom(d, { align:'center',fz: 13, cursor: 'pointer' }, { html: key, className: 'ellipsis hoverHue' });
+  dLabel.onclick = simpleOnclickLabel;
+  mStyle(dSym, { cursor: 'pointer' });
+  dSym.onclick = simpleOnclickItem;
+  dSym.setAttribute('key', key);
+  dSym.setAttribute('draggable', true)
+  dSym.ondragstart = ev => { ev.dataTransfer.setData('itemkey', key); }
+  return dSym;
 
-	if (isdef(src)) {
-		mImg(src, d0, { h: mSizeSuccession(styles, 40)[1] }, { tag: 'img', src });
-	} else if (type === 'text' || type === 'uni') {
-		renderContent(o.text, d0, styles, type === 'uni' ? "'Noto Sans', sans-serif" : 'emoNoto');
-	} else if (type !== 'plain') {
-		renderContent(`&#x${o[type]};`, d0, styles, type === 'fa6' ? 'fa6' : type === 'fa' ? 'pictoFa' : 'pictoGame');
-	} else {
-		mDom(d0, styles, { html: imgKey });
-	}
 
-	return d0;
-}
-function determineType(o, prefer) {
-	return prefer == 'plain' ? prefer :
-		prefer && (!o || o[prefer]) ? prefer :
-			isdef(o.img) ? 'img' :
-				isdef(o.photo) ? 'photo' :
-					isdef(o.text) ? (o.colls.includes('unicode') ? 'uni' : 'text') :
-						isdef(o.fa6) ? 'fa6' :
-							isdef(o.fa) ? 'fa' :
-								isdef(o.ga) ? 'ga' : 'plain';
+	d.id = id; //console.log('d1', d1);
+	let item = { div: d, key};
+	DA.items[id] = item;
+	if (isList(DA.selectedImages) && DA.selectedImages.includes(key)) mSelect(d);
+
 }
 
+async function initTest(){
+	DA.items={};
+	DA.selectedImages = [];
+	await loadAssetsStatic(); //console.log('M', M);
+	for (const k in M.superdi) { M.superdi[k].key = k; }
+	stickyHeaderCode();
+
+	let elems = mLayoutLM('dPage');
+	mStyle('dMain', { overy: 'auto' });
+
+	let dLeft = mBy('dLeft');
+	mStyle(dLeft, { overy: 'auto' });
 
 
+}

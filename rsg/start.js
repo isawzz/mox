@@ -1,7 +1,21 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_(); }
+function start() { test0_showItem(); }
 
+async function test0_showItem() {
+	await initTest();
+	let keys = M.byCat.animal; //Object.keys(M.superdi); // M.byCat.animal;
+
+	let [gap,w,h] = [10, 100, 100];
+	let dGrid=mDom('dMain',{ display: 'flex', fg:'black', gap,padding: gap, wrap: true });
+	let i = 0;
+	let n = Math.floor(window.innerWidth / (w + gap)) * Math.floor(window.innerHeight / (h + gap));console.log('n', n);
+	for(const k of keys) {
+		let d=mDom(dGrid,{ w,h,bg:'silver' });
+		showItem(k,d);
+		if (0 === ++i % n) await mSleep(20);
+	}	
+}
 async function test0_() {
 	await loadAssetsStatic(); console.log('M', M);
 	for (const k in M.superdi) { M.superdi[k].key = k; }
@@ -14,16 +28,16 @@ async function test0_() {
 	mStyle(dLeft, { overy: 'auto' });
 
 	//mKey('ballet_shoes', dMain, { h: 100, w: 100, box: true, fg: 'black', bg: 'white' }); return;
-	let keys=rChoose(Object.keys(M.superdi),10); //
+	let keys = rChoose(Object.keys(M.superdi), 10); //
 	//keys = ['complementary','ballet_shoes']; //[,'ballet_shoes']
 	//showCollection(keys); return;
 	let list = Object.keys(M.byCat).sort();
 	let outerStyles = {}; // {border:'solid 3px silver',bg:'dimgray',fg:'white'};
-	let symbolStyles = {round:true};
-	let labelStyles = {family:'algerian'}
-	let opts = { prefer: 'plain',onclick:toggleSelection };
+	let symbolStyles = { round: true };
+	let labelStyles = {}; //family:'algerian'}
+	let opts = { prefer: 'plain', onclick: toggleSelection };
 	for (const k of list) {
-		mDom(dLeft, {}, { tag: 'button', 'html': k, onclick: ev => showCollection(k, 'dMain',outerStyles,symbolStyles,labelStyles,opts) });
+		mDom(dLeft, {}, { tag: 'button', 'html': k, onclick: ev => showCollection(k, 'dMain', outerStyles, symbolStyles, labelStyles, opts) });
 		//mDom(dLeft, {}, { tag: 'button', 'html': k, onclick: ev => showCollection(k, 'dMain') });
 		mLinebreak(dLeft);
 	}
