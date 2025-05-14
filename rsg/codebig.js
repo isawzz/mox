@@ -1119,10 +1119,10 @@ function colorSortByLightness(list) {
 }
 function colorToHex79(c) {
 	if (colorIsHex79(c)) return c;
-	ColorDi = M.colorByName; 
+	ColorDi = M.colorByName;
 	let tString = isString(c), tArr = isList(c), tObj = isDict(c);
 	if (tString && c[0] == '#') return colorHex45ToHex79(c);
-	else if (tString && isdef(ColorDi) && lookup(ColorDi, [c])) {return ColorDi[c].hex;}
+	else if (tString && isdef(ColorDi) && lookup(ColorDi, [c])) { return ColorDi[c].hex; }
 	else if (tString && c.startsWith('rand')) {
 		let spec = capitalize(c.substring(4));
 		let func = window['color' + spec];
@@ -2175,10 +2175,7 @@ function evToElem(ev, attr) {
 	}
 	return null;
 }
-function evToId(ev) {
-	let elem = findAncestorWith(ev.target, { id: true });
-	return elem.id;
-}
+function evToId(ev) { let elem = findAncestorWithAttribute(ev.target, 'id'); return elem.id; }
 function extendRect(r4) { r4.l = r4.x; r4.t = r4.y; r4.r = r4.x + r4.w; r4.b = r4.t + r4.h; }
 function extractSymbols(svgString, symbolDict) {
 	const symbolRegex = /<symbol id='([^']+)'[^>]*>[\s\S]*?<\/symbol>/g;
@@ -2206,13 +2203,10 @@ function filterKeys(collection, cat, func) {
 	if (isdef(func)) keys = keys.filter(x => func(M.superdi[x]));
 	return keys;
 }
-function findAncestorWith(elem, { attribute = null, className = null, id = null }) {
-	elem = toElem(elem);
-	while (elem) {
-		if ((attribute && elem.hasAttribute && elem.hasAttribute(attribute))
-			|| (className && elem.classList && elem.classList.contains(className))
-			|| (id && isdef(elem.id))) { return elem; }
-		elem = elem.parentNode;
+function findAncestorWithAttribute(el, attrName) {
+	while (el) {
+		if (el.hasAttribute && el.hasAttribute(attrName)) return el;
+		el = el.parentElement;
 	}
 	return null;
 }
@@ -3534,7 +3528,7 @@ function mAppend(d, child) { toElem(d).appendChild(child); return child; }
 function mAreas(dParent, areas, gridCols, gridRows) {
 	mClear(dParent); mStyle(dParent, { padding: 0 })
 	let names = arrNoDuplicates(toWords(areas));
-	let dg = mDom(dParent,{w100:true,h100:true,box:true});
+	let dg = mDom(dParent, { w100: true, h100: true, box: true });
 	for (const name of names) {
 		let d = mDom(dg, { family: 'opensans' }, { id: name });
 		d.style.gridArea = name;
@@ -3937,12 +3931,12 @@ function mInput(dParent, styles = {}, opts = {}) {
 function mInsert(dParent, elem, index = 0) {
 	dParent = toElem(dParent)
 	if (dParent.childNodes.length <= index) {
-			// If no child nodes exist, append the element
-			dParent.appendChild(elem);
+		// If no child nodes exist, append the element
+		dParent.appendChild(elem);
 	} else {
-			// Otherwise, insert the element as needed (e.g., at a specific position)
-			// This is just an example; adjust as per your requirements
-			dParent.insertBefore(elem, dParent.childNodes[index]); //dParent.firstChild);
+		// Otherwise, insert the element as needed (e.g., at a specific position)
+		// This is just an example; adjust as per your requirements
+		dParent.insertBefore(elem, dParent.childNodes[index]); //dParent.firstChild);
 	}
 	return elem;
 }
@@ -4408,6 +4402,8 @@ function mStyle(elem, styles = {}, opts = {}) {
 	styles = jsCopy(styles);
 	let noUnit = ['opacity', 'flex', 'grow', 'shrink', 'grid', 'z', 'iteration', 'count', 'orphans', 'widows', 'weight', 'order', 'index'];
 	const STYLE_PARAMS_3 = {
+		border: (elem, v) => elem.style.border = v.includes(' ')?v:`1px solid ${v}`,
+		outline: (elem, v) => elem.style.outline = v.includes(' ')?v:`1px solid ${v}`,
 		box: (elem, v) => elem.style.boxSizing = v ? 'border-box' : 'content-box',
 		bgSrc: (elem, v) => elem.style.backgroundImage = `url(${v})`,
 		gridRows: (elem, v) => elem.style.gridTemplateRows = isNumber(v) ? `repeat(${v},1fr)` : v,
@@ -4451,6 +4447,7 @@ function mStyle(elem, styles = {}, opts = {}) {
 		} else elem.style.setProperty(k, val);
 	}
 	applyOpts(elem, opts);
+
 }
 function mTable(dParent, headers, showheaders, styles = { mabottom: 0 }, className = 'table') {
 	let d = mDom(dParent);

@@ -161,6 +161,7 @@ const STYLE_PARAMS_2 = {
   fit: 'object-fit',
   fontSize: 'font-size',
   fStyle: 'font-style',
+  fontStyle: 'font-style',
   fz: 'font-size',
   grow: 'flex-grow',
   h: 'height',
@@ -172,6 +173,8 @@ const STYLE_PARAMS_2 = {
   justifyContent: 'justify-content',
   justifySelf: 'justify-self',
   l: 'left',
+  letterSpacing: 'letter-spacing',
+  lineHeight: 'line-height',
   lspace: 'letter-spacing',
   lheight: 'line-height',
   m: 'margin',
@@ -195,9 +198,11 @@ const STYLE_PARAMS_2 = {
   vert_align: 'align-items',
   vgap: 'row-gap',
   w: 'width',
+  weight: 'font-weight',
+  whiteSpece: 'white-space',
   wmin: 'min-width',
   wmax: 'max-width',
-  weight: 'font-weight',
+  wordBreak: 'word-break',
   x: 'left',
   xover: 'overflow-x',
   y: 'top',
@@ -621,4 +626,6 @@ const MathKeys = [
   "union",
   "volume_integral"
 ];
+
+const Families = { img:true, photo: true, uni: "'Noto Sans', sans-serif", emo: 'emoNoto', fa6: 'fa6', fa: 'pictoFa', ga: 'pictoGame' };
 

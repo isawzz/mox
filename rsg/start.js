@@ -1,20 +1,79 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_showItem(); }
+function start() { test0_showKeys(); }
 
+async function test0_showKeys() {
+	await initTest();
+
+	let byType = {};
+	for (const k in M.superdi) {
+		let o = M.superdi[k];
+		for (const fk in Families) {
+			console.log('fk', fk, o[fk]);
+			if (isdef(o[fk])) { lookupAddIfToList(byType, [fk], k); }
+			
+		}
+		//break;
+	}
+	M.byType = byType;
+
+	let list = byType.emo; //Object.keys(M.superdi); // M.byCat.sport; // ['circumscribed_multiplication'];//, 'circumscribed_addition', 'circumscribed_subtraction', 'circumscribed_division', 'circumscribed_exponentiation', 'circumscribed_square_root', 'circumscribed_square_root_2', 'circumscribed_square_root_3', 'circumscribed_square_root_4'];
+	let [w, h, gap] = [100, 100, 10]
+	let dParent = mDom('dMain', { gap, padding: gap, wrap: true, w100: true, box: true }, { id: 'grid-container' });
+	let i = 0;
+	let n = Math.floor(window.innerWidth / (w + gap)) * Math.floor(window.innerHeight / (h + gap)); console.log('n', n);
+	let elemStyle = {className: 'grid-cell', bg: 'silver', padding: gap, cursor: 'pointer'}
+	for (const k of list) {
+
+
+		let o= M.superdi[k]; if (nundef(o.fa6)) continue;
+		let d;
+		//type:plain: all superdi objects have this type since its just the key
+		d = mDom(dParent, elemStyle, { html: k, id: getUID(), onclick: onclickItem });
+
+		//type:img:
+		//does o have this type?
+		if (isdef(o.img)) {
+			d=mDom(dParent, { ...elemStyle, fit: o.cats.includes('card') ? 'contain' : 'cover', 'object-position': 'center center' }, { tag: 'img', src: o.img, alt: k });
+		}
+
+		//type photo
+		if (isdef(o.photo)) {
+			d = mDom(dParent, { ...elemStyle, fit: o.cats.includes('card') ? 'contain' : 'cover', 'object-position': 'center center' }, { tag: 'img', src: o.photo, alt: k });
+		}
+
+		//type fa6:
+		if (isdef(o.fa6)) {
+			d = mDom(dParent, { ...elemStyle, fz: h * 0.8, family: Families.fa6 }, { html: `&#x${o.fa6};` });
+		}
+		// let d1 = mKey(k, dParent, {className:'grid-cell',w,h}, {prefer:'plain'}); //, html: o.fa6 }); //'data-innerHTML': o.fa6 });
+		if (0 === ++i % n) await mSleep(20);
+	}
+}
+async function test0_showCollection() {
+	await initTest();
+	let list = Object.keys(M.byCat).sort()
+	for (const k of list) {
+		mDom(dLeft, {}, { tag: 'button', 'html': k, onclick: showCollection });
+		mLinebreak(dLeft);
+	}
+	clickOn('math')
+}
 async function test0_showItem() {
 	await initTest();
 	let keys = M.byCat.animal; //Object.keys(M.superdi); // M.byCat.animal;
 
-	let [gap,w,h] = [10, 100, 100];
-	let dGrid=mDom('dMain',{ display: 'flex', fg:'black', gap,padding: gap, wrap: true });
+	let [gap, w, h] = [10, 100, 100];
+	let dGrid = mDom('dMain', { display: 'flex', fg: 'black', gap, padding: gap, wrap: true });
 	let i = 0;
-	let n = Math.floor(window.innerWidth / (w + gap)) * Math.floor(window.innerHeight / (h + gap));console.log('n', n);
-	for(const k of keys) {
-		let d=mDom(dGrid,{ w,h,bg:'silver' });
-		showItem(k,d);
+	let n = Math.floor(window.innerWidth / (w + gap)) * Math.floor(window.innerHeight / (h + gap)); console.log('n', n);
+	for (const k of keys) {
+		let d = mDom(dGrid, { bg: 'silver', padding: gap, cursor: 'pointer' }, { id: getUID(), onclick: onclickItem });
+		mKey(k, d, { w, h, fz: h, box: true, fg: 'black', bg: 'white' });
+		mDom(d, { w, fg: 'black', 'text-overflow': 'ellipsis', 'white-space': 'nowrap', overflow: 'hidden', fz: 16, align: 'center' }, { html: k });
+		DA.items[d.id] = { div: d, key: k };
 		if (0 === ++i % n) await mSleep(20);
-	}	
+	}
 }
 async function test0_() {
 	await loadAssetsStatic(); console.log('M', M);
@@ -86,7 +145,7 @@ async function test0_listkeys() {
 
 }
 //*********** deprecated (o.colls removed in superdi) ************** */
-async function test0_showCollection() {
+async function test0_showCollection0() {
 	await loadAssetsStatic();
 	for (const k in M.superdi) { M.superdi[k].key = k; }
 	stickyHeaderCode();

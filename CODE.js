@@ -1,4 +1,484 @@
 
+
+function mKey(imgKey, d, styles = {}, opts = {}) {
+	styles = jsCopy(styles);
+	let o = imgKey.includes('.') ? { src: imgKey } : opts.prefer == 'plain' ? { plain: imgKey } : lookup(M.superdi, [imgKey]);
+	let type = opts.prefer;
+	let types = ['src', 'img', 'photo', 'uni', 'emo', 'fa6', 'fa', 'ga', 'plain'];
+	if (nundef(o[type])) type = types.find(x => isdef(o[x]));
+
+	let d0 = mDom(d, styles, opts); //mClass(d0,'centered-text');	//mCenterCenterFlex(d0);
+	let [_, h] = mSizeSuccession(styles, 100);
+
+	if (['img', 'src', 'photo'].includes(type)) {
+		let astyle={ h, fit: o && o.cats.includes('card') ? 'contain' : 'cover', 'object-position': 'center center' };
+
+		mDom(d0, astyle, { ...opts, tag: 'img', src: o[type], alt: imgKey });
+
+	} else {
+		let family = Families[type] || 'inherit';
+		let text = ['fa6', 'fa', 'ga'].includes(type) ? `&#x${o[type]};` : o[type];
+		let fz = h; // h*.9;
+
+		let astyles = {
+			display: 'flex',
+			justifyContent: 'center',
+			alignItems: 'center',
+			align: 'center',
+			width: '100%',
+			height: '100%',
+			box: true,
+			fz,
+			family,
+			hline: '1', // Ensure consistent vertical alignment
+			'vertical-align': 'middle', // Align text vertically
+			padding: '0', // Remove any padding that might affect alignment
+			margin: '0' // Remove any margin that might affect alignment
+		};
+
+		// let x = mDom(d0, { family, fz, wmin: 100, align: 'center' }, { ...opts, html: text });
+		let x = mDom(d0, astyles, { ...opts, html: text });
+
+
+		// let data;
+		// if (type != 'plain'){
+		// 	let charCode = toCharCode(text);
+		// 	data = measureCharCodeInFont(charCode, fz,family);
+		// 	console.log('measureCharCodeInFont', charCode, fz, family, data);
+		// }else {
+		// 	data = measureTextInFont(text, fz, family);
+		// 	console.log('measureTextInFont', text, fz, family, data);
+		// }
+
+		// mFlex(d0);
+		//mStyle(x,{h:data.height});
+		// mClass(x, 'centered-text');
+
+	}
+	return d0;
+
+}
+function mKey(imgKey, d, styles = {}, opts = {}) {
+	//console.log('___mKey', imgKey, styles, opts);
+	styles = jsCopy(styles);
+	let o = imgKey.includes('.') ? { src: imgKey } : opts.prefer == 'plain' ? { plain: imgKey } : lookup(M.superdi, [imgKey]);
+	let type = opts.prefer;
+	let types = ['src', 'img', 'photo', 'uni', 'emo', 'fa6', 'fa', 'ga', 'plain'];
+	if (nundef(o[type])) type = types.find(x => isdef(o[x]));
+
+	let d0 = mDom(d, styles, opts); mClass(d0,'centered-text');
+	mCenterCenterFlex(d0);
+	let [_, h] = mSizeSuccession(styles, 100);
+
+	if (['img', 'src', 'photo'].includes(type)) {
+		addKeys({ h, w:h, fit: o && o.cats.includes('card')?'contain':'cover', 'object-position': 'center center' }, styles);
+
+		mDom(d0, styles, { ...opts, tag: 'img', src: o[type], alt: imgKey });
+
+	} else {
+		const families = { uni: "'Noto Sans', sans-serif", emo: 'emoNoto', fa6: 'fa6', fa: 'pictoFa', ga: 'pictoGame' };
+		let family = families[type] || 'inherit';
+		addKeys({ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', width: '100%', height: '100%', fontSize: styles.fz || 'inherit', family, lineHeight: '1', verticalAlign: 'middle' }, styles);
+		let html = ['fa6', 'fa', 'ga'].includes(type) ? `&#x${o[type]};` : o[type];
+
+		mDom(d0, styles, { ...opts, html });
+
+	}
+	return d0;
+
+}
+function mKey(imgKey, d, styles = {}, opts = {}) {
+	styles = jsCopy(styles);
+	let o = imgKey.includes('.') ? { src: imgKey } : opts.prefer == 'plain' ? { plain: imgKey } : lookup(M.superdi, [imgKey]);
+	let type = opts.prefer;
+	let types = ['src', 'img', 'photo', 'uni', 'emo', 'fa6', 'fa', 'ga', 'plain'];
+	if (nundef(o[type])) type = types.find(x => isdef(o[x]));
+
+	let d0 = mDom(d, styles, opts);
+	mClass(d0, 'centered-text');
+	mCenterCenterFlex(d0);
+	let [_, h] = mSizeSuccession(styles, 100);
+
+	if (['img', 'src', 'photo'].includes(type)) {
+			addKeys({ h, w: h, fit: o && o.cats.includes('card') ? 'contain' : 'cover', 'object-position': 'center center' }, styles);
+			mDom(d0, styles, { ...opts, tag: 'img', src: o[type], alt: imgKey });
+	} else {
+			const families = { uni: "'Noto Sans', sans-serif", emo: 'emoNoto', fa6: 'fa6', fa: 'pictoFa', ga: 'pictoGame' };
+			let family = families[type] || 'inherit';
+
+			// Updated styles for vertical centering
+			addKeys({
+					display: 'flex',
+					justifyContent: 'center',
+					alignItems: 'center',
+					align: 'center',
+					width: '100%',
+					height: '100%',
+					box:true,
+					fz:'100%',
+					family,
+					hline: '1', // Ensure consistent vertical alignment
+					'vertical-align': 'middle', // Align text vertically
+					padding: '0', // Remove any padding that might affect alignment
+					margin: '0' // Remove any margin that might affect alignment
+			}, styles);
+
+			let html = ['fa6', 'fa', 'ga'].includes(type) ? `&#x${o[type]};` : o[type];
+
+			console.log(html,styles.fz,family)
+			let x=measureCharacterBounds(html,styles.fz,family); console.log('x',x);
+
+
+			return mDom(d0, styles, { ...opts, html });
+	}
+
+	return d0;
+}
+
+function fitTextToBox(div, maxWidth, maxHeight, options = {}) {
+  const {
+    minFontSize = 10,
+    maxFontSize = 100,
+    fontStep = 1,
+    lineHeight = 1.2
+  } = options;
+
+  const style = window.getComputedStyle(div);
+  const originalText = div.textContent;
+
+  // Create an off-screen clone for measurement
+  const testDiv = document.createElement("div");
+  document.body.appendChild(testDiv);
+  testDiv.style.position = "absolute";
+  testDiv.style.visibility = "hidden";
+  testDiv.style.whiteSpace = "pre-wrap";
+  testDiv.style.wordBreak = "break-word";
+
+  // Copy CSS that affects size
+  const keysToCopy = ["fontFamily", "fontWeight", "fontStyle", "letterSpacing", "padding", "border"];
+  keysToCopy.forEach(key => {
+    testDiv.style[key] = style[key];
+  });
+
+  let fontSize = maxFontSize;
+  testDiv.textContent = originalText;
+
+  while (fontSize >= minFontSize) {
+    testDiv.style.fontSize = `${fontSize}px`;
+    testDiv.style.lineHeight = lineHeight;
+
+    if (
+      testDiv.offsetWidth <= maxWidth &&
+      testDiv.offsetHeight <= maxHeight
+    ) {
+      break;
+    }
+
+    fontSize -= fontStep;
+  }
+
+  // Apply the final font size to the actual div
+  div.style.fontSize = `${fontSize}px`;
+  div.style.lineHeight = lineHeight;
+
+  document.body.removeChild(testDiv);
+  return fontSize;
+}
+function fitTextToBox(text, fontFamily, maxWidth, maxHeight, options = {}) {
+  const {
+    minFontSize = 10,
+    maxFontSize = 100,
+    fontStep = 1,
+    lineHeight = 1.2,
+    fontWeight = "normal",
+    fontStyle = "normal",
+    letterSpacing = "normal",
+    padding = "0"
+  } = options;
+
+  // Create a hidden measuring element
+  const testDiv = document.createElement("div");
+  document.body.appendChild(testDiv);
+  testDiv.style.position = "absolute";
+  testDiv.style.visibility = "hidden";
+  testDiv.style.whiteSpace = "pre-wrap";
+  testDiv.style.wordBreak = "break-word";
+  testDiv.style.padding = padding;
+  testDiv.style.fontFamily = fontFamily;
+  testDiv.style.fontWeight = fontWeight;
+  testDiv.style.fontStyle = fontStyle;
+  testDiv.style.letterSpacing = letterSpacing;
+  testDiv.textContent = text;
+
+  let fontSize = maxFontSize;
+
+  while (fontSize >= minFontSize) {
+    testDiv.style.fontSize = `${fontSize}px`;
+    testDiv.style.lineHeight = lineHeight;
+
+    if (
+      testDiv.offsetWidth <= maxWidth &&
+      testDiv.offsetHeight <= maxHeight
+    ) {
+      break;
+    }
+
+    fontSize -= fontStep;
+  }
+
+  document.body.removeChild(testDiv);
+  return fontSize;
+}
+
+function showItem(key, d, styles, opts, simpleOnclickLabel, simpleOnclickItem) {
+
+	//mClass(d, 'magnifiable')
+	let id = getUID();
+	let dSym = mKey(key, d, styles, { prefer: 'emo' }); // simpleShowImageInBatch(key, d, {}, { prefer: 'photo' });
+	//return;
+
+	// mStyle(d,{position:'relative',pabottom:18});
+	let dLabel = mDom(d, { align: 'center', fz: 13, cursor: 'pointer' }, { html: key, className: 'ellipsis hoverHue' });
+	dLabel.onclick = simpleOnclickLabel;
+	mStyle(dSym, { cursor: 'pointer' });
+	dSym.onclick = simpleOnclickItem;
+	dSym.setAttribute('key', key);
+	dSym.setAttribute('draggable', true)
+	dSym.ondragstart = ev => { ev.dataTransfer.setData('itemkey', key); }
+	return dSym;
+
+
+	d.id = id; //console.log('d1', d1);
+	let item = { div: d, key };
+	DA.items[id] = item;
+	if (isList(DA.selectedImages) && DA.selectedImages.includes(key)) mSelect(d);
+
+}
+function lazyLoad(prop = 'src') {
+	let dataProp = 'data-' + prop;
+	let tag = prop == 'src' ? 'img' : 'div';
+	const elems = document.querySelectorAll(`${tag}[${dataProp}]`);
+	const observer = new IntersectionObserver((entries, obs) => {
+		entries.forEach(entry => {
+			if (entry.isIntersecting) {
+				const elem = entry.target;
+				elem.innerHTML = elem.dataset[prop];
+				//elem[prop] = elem.dataset[prop];
+				elem.removeAttribute(dataProp);
+				obs.unobserve(elem);
+			}
+		});
+	});
+	elems.forEach(img => observer.observe(img));
+}
+async function showCollection(k, d = 'dMain', outerStyles = {}, symbolStyles = {}, labelStyles = {}, opts = {}) {
+
+	let [w, h] = mSizeSuccession(outerStyles, 100); let gap = valf(outerStyles.gap, 10)
+
+	mClear(d);
+	let dParent = mDom(d, { display: 'flex', gap, padding: gap, wrap: true, box: true }, { id: "table", });
+	mCenterFlex(dParent);
+	let keys = isList(k) ? k : M.byCat[k]; console.log('keys', keys);
+
+	outerStyles = addKeys({ w, h, 'place-items': 'center', display: 'grid', border: 'solid 2px silver', bg: 'dimgray', fg: 'contrast', padding: 10, rounding: 10 }, outerStyles);
+	if (opts.onclick) outerStyles.cursor = 'pointer';
+
+	labelStyles = addKeys({ fg: 'contrast', 'text-overflow': 'ellipsis', 'white-space': 'nowrap', overflow: 'hidden', fz: 16, align: 'center' }, labelStyles);
+
+	symbolStyles = addKeys({ h: h - labelStyles.fz, box: true, padding: 4, fg: 'skyblue' }, symbolStyles);
+
+	addKeys({ prefer: 'img' }, opts);
+	let optsSymbol = { prefer: opts.prefer };
+	let i = 0;
+	let n = Math.floor(window.innerWidth / (outerStyles.w + 10)) * Math.floor(window.innerHeight / (outerStyles.h + 10));
+	//console.log('n', n);
+	for (const k of keys) {
+		// let o = M.superdi[k];
+		let d1 = mDom(dParent, outerStyles, opts);
+		mKey(k, d1, symbolStyles, optsSymbol);
+		mDom(d1, labelStyles, { html: k, title: k })
+		if (0 === ++i % n) await mSleep(50);
+	}
+}
+function toggleItemSelection(item, classSelected = 'framedPicture', selectedItems = null) {
+	if (nundef(item)) return;
+	let ui = iDiv(item);
+	item.isSelected = nundef(item.isSelected) ? true : !item.isSelected;
+	if (item.isSelected) mClass(ui, classSelected); else mRemoveClass(ui, classSelected);
+	if (isdef(selectedItems)) {
+		if (item.isSelected) {
+			console.assert(!selectedItems.includes(item), 'UNSELECTED PIC IN PICLIST!!!!!!!!!!!!')
+			selectedItems.push(item);
+		} else {
+			console.assert(selectedItems.includes(item), 'PIC NOT IN PICLIST BUT HAS BEEN SELECTED!!!!!!!!!!!!')
+			removeInPlace(selectedItems, item);
+		}
+	}
+}
+
+
+function collectCats(klist) {
+	let cats = [];
+	for (const k of klist) {
+		M.superdi[k].cats.map(x => addIf(cats, x));
+	}
+	return cats;
+}
+function simpleShowImageInBatch(key, dParent, styles = {}, opts = {}) {
+  let o = M.superdi[key]; o.key = key;
+  addKeys({ bg: rColor() }, styles);
+  mClear(dParent);
+  [w, h] = [dParent.offsetWidth, dParent.offsetHeight];
+  let [sz, fz] = [.9 * w, .8 * h];
+  let d1 = mDom(dParent, { position: 'relative', w: '100%', h: '100%', padding: 11, box: true });//overflow: 'hidden', 
+  mCenterCenterFlex(d1)
+  let el = null;
+  let src = (opts.prefer == 'photo' && isdef(o.photo)) ? o.photo : valf(o.img, null);
+  if (isdef(src)) {
+    if (o.cats.includes('card')) {
+      el = mDom(d1, { h: '100%', 'object-fit': 'cover', 'object-position': 'center center' }, { tag: 'img', src });
+      mDom(d1, { h: 1, w: '100%' })
+    } else {
+      el = mDom(d1, { w: '100%', h: '100%', 'object-fit': 'cover', 'object-position': 'center center' }, { tag: 'img', src });
+    }
+  }
+  else if (isdef(o.uni)) el = mDom(d1, { fz: fz, hline: fz, family: "'Noto Sans', sans-serif", fg: rColor(), display: 'inline' }, { html: o.uni });
+  else if (isdef(o.emo)) el = mDom(d1, { fz: fz, hline: fz, family: 'emoNoto', fg: rColor(), display: 'inline' }, { html: o.emo });
+  else if (isdef(o.fa)) el = mDom(d1, { fz: fz, hline: fz, family: 'pictoFa', bg: 'transparent', fg: rColor(), display: 'inline' }, { html: String.fromCharCode('0x' + o.fa) });
+  else if (isdef(o.ga)) el = mDom(d1, { fz: fz, hline: fz, family: 'pictoGame', bg: 'beige', fg: rColor(), display: 'inline' }, { html: String.fromCharCode('0x' + o.ga) });
+  else if (isdef(o.fa6)) el = mDom(d1, { fz: fz, hline: fz, family: 'fa6', bg: 'transparent', fg: rColor(), display: 'inline' }, { html: String.fromCharCode('0x' + o.fa6) });
+  assertion(el, 'PROBLEM!!! ' + key);
+  let label = mDom(d1, { fz: 11, cursor: 'pointer' }, { html: o.key, className: 'ellipsis hoverHue' });
+  label.onclick = simpleOnclickLabel;
+  mStyle(d1, { cursor: 'pointer' });
+  d1.onclick = simpleOnclickItem;
+  d1.setAttribute('key', key);
+  d1.setAttribute('draggable', true)
+  d1.ondragstart = ev => { ev.dataTransfer.setData('itemkey', key); }
+  return d1;
+}
+async function simpleOnclickItem(ev) {
+  let id = evToId(ev); console.log('item',id,DA.items[id]);
+  let item = DA.items[id]; if (nundef(item)) return;
+  let selkey = item.key;
+  toggleSelectionOfPicture(iDiv(item), selkey, DA.selectedImages);
+  //simpleCheckCommands();
+}
+async function simpleOnclickLabel(ev) {
+  evNoBubble(ev);
+  let id = evToId(ev); console.log('id', id)
+  let o = lookup(UI.simple, ['items', id]);
+  if (!o) return;
+  console.log('clicked label of', o);
+  let [key, elem, collname] = [o.key, o.name, iDiv(o)];
+  let newfriendly = await mGather(ev.target);
+  if (!newfriendly) return;
+  if (isEmpty(newfriendly)) {
+    showMessage(`ERROR: name invalid: ${newfriendly}`);
+    return;
+  }
+  console.log('rename friendly to', newfriendly)
+  let item = M.superdi[key];
+  item.friendly = newfriendly;
+  let di = {};
+  di[key] = item;
+  let res = await mPostRoute('postUpdateSuperdi', { di });
+  console.log('postUpdateSuperdi', res)
+  await loadAssets();
+  ev.target.innerHTML = newfriendly;
+}
+async function simpleOnDropImage(ev, elem) {
+  let dt = ev.dataTransfer;
+  if (dt.types.includes('itemkey')) {
+    let data = ev.dataTransfer.getData('itemkey');
+    await simpleOnDroppedItem(data);
+  } else {
+    const files = ev.dataTransfer.files;
+    if (files.length > 0) {
+      const reader = new FileReader();
+      reader.onload = async (evReader) => {
+        let data = evReader.target.result;
+        await simpleOnDroppedUrl(data, UI.simple);
+      };
+      reader.readAsDataURL(files[0]);
+    }
+  }
+}
+async function simpleOnDroppedItem(itemOrKey, key, sisi) {
+  if (nundef(sisi)) sisi = UI.simple;
+  let item;
+  if (isString(itemOrKey)) { key = itemOrKey; item = M.superdi[key]; } else { item = itemOrKey; }
+  assertion(isdef(key), 'NO KEY!!!!!');
+  lookupAddIfToList(item, ['colls'], sisi.name);
+  let o = M.superdi[key];
+  if (isdef(o)) {
+    console.log(`HA! ${key} already there`);
+    let changed = false;
+    for (const k in item) {
+      let val = item[k];
+      if (isLiteral(val) && o[k] != item[k]) { changed = true; break; }
+      else if (isList(val) && !sameList(val, o[k])) { changed = true; break; }
+    }
+    if (!changed) return;
+  }
+  console.log(`........But changed!!!`);
+  let di = {}; di[key] = item;
+  await updateSuperdi(di);
+  simpleInit(sisi.name, sisi)
+}
+async function simpleOnDroppedUrl(src, sisi) {
+  let sz = 400;
+  let dPopup = mDom(document.body, { position: 'fixed', top: 40, left: 0, wmin: sz, hmin: sz, bg: 'pink' });
+  let dParent = mDom(dPopup);
+  let d = mDom(dParent, { w: sz, h: sz, border: 'dimgray', margin: 10 });
+  let canvas = createPanZoomCanvas(d, src, sz, sz);
+  let instr = mDom(dPopup, { align: 'center', mabot: 10 }, { html: `- panzoom image to your liking -` })
+  let dinp = mDom(dPopup, { padding: 10, align: 'right', display: 'inline-block' })
+  mDom(dinp, { display: 'inline-block' }, { html: 'Name: ' });
+  let inpFriendly = mDom(dinp, { outline: 'none', w: 200 }, { className: 'input', name: 'friendly', tag: 'input', type: 'text', placeholder: `<enter name>` });
+  let defaultName = '';
+  let iDefault = 1;
+  let k = sisi.masterKeys.find(x => x == `${sisi.name}${iDefault}`);
+  while (isdef(k)) { iDefault++; k = sisi.masterKeys.find(x => x == `${sisi.name}${iDefault}`); }
+  defaultName = `${sisi.name}${iDefault}`;
+  inpFriendly.value = defaultName;
+  mDom(dinp, { h: 1 });
+  mDom(dinp, { display: 'inline-block' }, { html: 'Categories: ' })
+  let inpCats = mDom(dinp, { outline: 'none', w: 200 }, { className: 'input', name: 'cats', tag: 'input', type: 'text', placeholder: `<enter categories>` });
+  let db2 = mDom(dPopup, { padding: 10, display: 'flex', gap: 10, 'justify-content': 'end' });
+  mButton('Cancel', () => dPopup.remove(), db2, { w: 70 }, 'input');
+  mButton('Save', () => simpleFinishEditing(canvas, dPopup, inpFriendly, inpCats, sisi), db2, { w: 70 }, 'input');
+}
+function onclickItem(ev){
+	//console.log('onclickItem', ev.target);
+  let id = evToId(ev); //console.log('item',id,DA.items[id]); return;
+  let item = DA.items[id]; if (nundef(item)) return;
+  let selkey = item.key;
+  toggleSelection(iDiv(item), selkey, DA.selectedImages);
+}
+function toggleSelection(elem, selkey, selectedPics, className = 'framedPicture') {
+	if (selectedPics.includes(selkey)) {
+		removeInPlace(selectedPics, selkey); mClassRemove(elem, className); 
+	} else {
+		selectedPics.push(selkey); mClass(elem, className); 
+	}
+}
+function findAncestorWith(elem, { attribute = null, className = null, id = null }) {
+	elem = toElem(elem);
+	while (elem) {
+		if ((attribute && elem.hasAttribute && elem.hasAttribute(attribute))
+			|| (className && elem.classList && elem.classList.contains(className))
+			|| (id && isdef(elem.id))) { return elem; }
+		elem = elem.parentNode;
+	}
+	return null;
+}
+function findParentWithId(elem) { while (elem && !(elem.id)) { elem = elem.parentNode; } return elem; }
+
+function evToId(ev) {
+	let elem = findAncestorWith(ev.target, { id: true });
+	return elem.id;
+}
 function showItem(key,d){
 
 	//mClass(d, 'magnifiable')

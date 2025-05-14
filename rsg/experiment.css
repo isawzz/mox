@@ -1,0 +1,71 @@
+.centered-text {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+}
+
+.autoGrid {
+	display: grid;
+	grid-auto-flow: row;
+	grid-auto-columns: minmax(100px, 1fr);
+	grid-template-rows: masonry;
+	grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+	gap: 8px;
+}
+
+.autoGrid>div {
+	aspect-ratio: 1 / 1;
+	background-color: lightgray;
+	border: 1px solid #aaa;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#grid-container {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+	gap: 8px;
+}
+
+.grid-cell {
+	aspect-ratio: 1 / 1;
+	/* Ensures square */
+	background-color: lightgray;
+	border: 1px solid #aaa;
+	/* height:100px; */
+	/* display: flex;                 Center content
+  align-items: center;
+  justify-content: stretch; */
+	/* text-align: center; */
+
+	padding: 4px;
+	/* Optional, allows breathing room */
+	word-wrap: break-word;
+	/* Ensures long words can break */
+	overflow-wrap: break-word;
+	/* Modern equivalent, better support */
+}
+
+#grid-container {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+	/* square base */
+	gap: 8px;
+}
+
+.grid-cell {
+	aspect-ratio: 1 / 1;
+	background-color: lightgray;
+	border: 1px solid #aaa;
+
+	display: block;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	padding: 4px;
+}
