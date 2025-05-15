@@ -9,32 +9,36 @@ async function test0_showKeys() {
 	for (const k in M.superdi) {
 		let o = M.superdi[k];
 		for (const fk in Families) {
-			console.log('fk', fk, o[fk]);
+			//console.log('fk', fk, o[fk]);
 			if (isdef(o[fk])) { lookupAddIfToList(byType, [fk], k); }
-			
+
 		}
 		//break;
 	}
 	M.byType = byType;
 
-	let list = byType.emo; //Object.keys(M.superdi); // M.byCat.sport; // ['circumscribed_multiplication'];//, 'circumscribed_addition', 'circumscribed_subtraction', 'circumscribed_division', 'circumscribed_exponentiation', 'circumscribed_square_root', 'circumscribed_square_root_2', 'circumscribed_square_root_3', 'circumscribed_square_root_4'];
-	let [w, h, gap] = [100, 100, 10]
-	let dParent = mDom('dMain', { gap, padding: gap, wrap: true, w100: true, box: true }, { id: 'grid-container' });
+	let list = byType.fa6; //M.byCat.transport; //Object.keys(M.superdi); // M.byCat.sport; // ['circumscribed_multiplication'];//, 'circumscribed_addition', 'circumscribed_subtraction', 'circumscribed_division', 'circumscribed_exponentiation', 'circumscribed_square_root', 'circumscribed_square_root_2', 'circumscribed_square_root_3', 'circumscribed_square_root_4'];
+	let [w, h, gap] = [120, 100, 10];
+	let dParent = mDom('dMain', { display: 'grid', gridTemplateCols: `repeat(auto-fill, ${w}px)`, gridTemplateRows: h, justifyContent: 'center', gap, padding: gap, wrap: true, w100: true, box: true }, { id: 'grid-container' });
 	let i = 0;
 	let n = Math.floor(window.innerWidth / (w + gap)) * Math.floor(window.innerHeight / (h + gap)); console.log('n', n);
-	let elemStyle = {className: 'grid-cell', bg: 'silver', padding: gap, cursor: 'pointer'}
+	//let elemStyle = {className: 'grid-cell', bg: 'silver', padding: gap, cursor: 'pointer'}
+	let elemStyle = { display: 'block', align:'center', w100: true, h100: true, box: true, fg: 'white', bg: 'grey', padding: gap, cursor: 'pointer' };
 	for (const k of list) {
 
 
-		let o= M.superdi[k]; if (nundef(o.fa6)) continue;
+		let o = M.superdi[k]; console.log(o)
 		let d;
 		//type:plain: all superdi objects have this type since its just the key
-		d = mDom(dParent, elemStyle, { html: k, id: getUID(), onclick: onclickItem });
+		d = mDom(dParent, { ...elemStyle, breakWord:true }, { html: k, id: getUID(), onclick: onclickItem });
 
+		//type emo
+		if (isdef(o.emo)) {
+			d = mDom(dParent, { ...elemStyle, fz: h * 0.8, family: Families.emo }, { html: o.emo });
+		}
 		//type:img:
-		//does o have this type?
 		if (isdef(o.img)) {
-			d=mDom(dParent, { ...elemStyle, fit: o.cats.includes('card') ? 'contain' : 'cover', 'object-position': 'center center' }, { tag: 'img', src: o.img, alt: k });
+			d = mDom(dParent, { ...elemStyle, fit: o.cats.includes('card') ? 'contain' : 'cover', 'object-position': 'center center' }, { tag: 'img', src: o.img, alt: k });
 		}
 
 		//type photo
@@ -42,9 +46,22 @@ async function test0_showKeys() {
 			d = mDom(dParent, { ...elemStyle, fit: o.cats.includes('card') ? 'contain' : 'cover', 'object-position': 'center center' }, { tag: 'img', src: o.photo, alt: k });
 		}
 
+		//type uni:
+		if (isdef(o.uni)) {
+			d = mDom(dParent, { ...elemStyle, fz: h * 0.8, family: Families.uni }, { html: o.uni });
+		}
 		//type fa6:
 		if (isdef(o.fa6)) {
 			d = mDom(dParent, { ...elemStyle, fz: h * 0.8, family: Families.fa6 }, { html: `&#x${o.fa6};` });
+		}
+
+		//type:ga:
+		if (isdef(o.ga)) {
+			d = mDom(dParent, { ...elemStyle, fz: h * 0.8, family: Families.ga }, { html: `&#x${o.ga};` });
+		}
+		//type:fa:
+		if (isdef(o.fa)) {
+			d = mDom(dParent, { ...elemStyle, fz: h * 0.8, family: Families.fa }, { html: `&#x${o.fa};` });
 		}
 		// let d1 = mKey(k, dParent, {className:'grid-cell',w,h}, {prefer:'plain'}); //, html: o.fa6 }); //'data-innerHTML': o.fa6 });
 		if (0 === ++i % n) await mSleep(20);

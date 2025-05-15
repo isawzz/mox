@@ -1,4 +1,6 @@
 
+
+
 function showCollection(ev){
 	let name = ev.target.innerHTML;
 	let keys = M.byCat[name]; //Object.keys(M.superdi); // M.byCat.animal;
