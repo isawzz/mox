@@ -117,7 +117,6 @@ async function initTest() {
 	DA.items = {};
 	DA.selectedImages = [];
 	await loadAssetsStatic(); //console.log('M', M);
-	for (const k in M.superdi) { M.superdi[k].key = k; }
 	stickyHeaderCode();
 
 	let elems = mLayoutLM('dPage');

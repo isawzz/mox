@@ -305,26 +305,55 @@ fieldset .disabled {
 }
 
 /* #region experimental */
-#grid-container {
+.msGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 120px); /* fixed width */
-  grid-auto-rows: 120px;                            /* fixed height */
-  gap: 8px;
-  justify-content: center;                          /* optional: center grid */
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;                   /* prevent horizontal growth */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 9px;
+
+  box-sizing: border-box;              /* includes scrollbar in width calc */
+  width: 100%;                         /* or set a fixed width */
+
+  grid-auto-rows: 100px;
+  font-size: 90px;
+  padding: 8px;
+
+  /* justify-content: center; */
 }
 
-.grid-cell {
-  display: block;                /* block-level content */
-  width: 100%;                   /* stretch to column width */
-  height: 100%;                  /* stretch to row height */
+.msGrid>div {
+  display: block;
+  width: 100%;
+  height: 100%;
   box-sizing: border-box;
 
-  background-color: lightgray;
+  background: dimgray;
+  color: white;
   border: 1px solid #aaa;
   padding: 4px;
 
+  display: flex;
+  /* enables Flexbox */
+  align-items: center;
+  /* vertical centering */
+  justify-content: center;
+  /* horizontal centering */
   text-align: center;
   overflow-wrap: break-word;
+}
+
+.msGrid>img {
+  width: 100%;
+  height: 100%;
+  object-position: center center;
+  object-fit: cover;
+}
+
+.msGrid>img.card {
+  object-fit: contain;
 }
 
 /* #endregion experimental */

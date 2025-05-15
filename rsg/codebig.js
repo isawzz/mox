@@ -3372,29 +3372,10 @@ async function loadStaticYaml(path) {
 	return jsyaml.load(await res.text());
 }
 function loadSuperdiAssets() {
-	let [di, byColl, byFriendly, byCat, allImages] = [M.superdi, {}, {}, {}, {}];
-	// for (const k in Symbols) {
-	// 	let kNew = isdef(di[k]) && isdef(di[k].text) ? k + '_uni' : k;
-	// 	if (k == 'writing_hand') console.log(k, di[k], kNew)
-	// 	if (isdef(di[k]) && nundef(di[k].text)) {
-	// 		assertion(k != 'writing_hand')
-	// 		let o = di[k];
-	// 		if (nundef(o.colls)) o.colls = [];
-	// 		o.colls.push('unicode');
-	// 		if (isdef(o.text)) console.log(':text', k, o.text);
-	// 		else o.text = Symbols[k];
-	// 	} else di[kNew] = { key: kNew, friendly: k, text: Symbols[k], colls: ['unicode'], cats: [] };
-	// }
-	// for (const k of MathKeys) {
-	// 	di[k].cats.push('math');
-	// 	lookupAddIfToList(byCat, ['math'], k);
-	// }
+	let [di, byType, byCat, allImages] = [M.superdi, {}, {}, {}];
 	for (const k in di) {
 		let o = di[k];
 		for (const cat of o.cats) lookupAddIfToList(byCat, [cat], k);
-		//for (const coll of o.colls) lookupAddIfToList(byColl, [coll], k);
-		//let friendly=
-		//lookupAddIfToList(byFriendly, [o.friendly], k)
 		if (isdef(o.img)) {
 			let fname = stringAfterLast(o.img, '/')
 			allImages[k] = { fname, path: o.img, key: k };
@@ -3404,13 +3385,18 @@ function loadSuperdiAssets() {
 			allImages[k + '_photo'] = { fname, path: o.photo, key: k };
 		}
 	}
+	for (const k in M.superdi) { M.superdi[k].key = k; }
+
 	M.allImages = allImages;
 	M.byCat = byCat;
-	//M.byCollection = byColl;
-	//M.byFriendly = byFriendly;
 	M.categories = Object.keys(byCat); M.categories.sort();
-	//M.collections = Object.keys(byColl); M.collections.sort();
-	//M.names = Object.keys(byFriendly); M.names.sort();
+	for (const k in M.superdi) {
+		let o = M.superdi[k];
+		for (const fk in Families) {
+			if (isdef(o[fk])) { lookupAddIfToList(byType, [fk], k); }
+		}
+	}
+	M.byType = byType;
 }
 function loadUsers() {
 	console.log('hier werden users updated was immer zu tun ist!!!')
@@ -4402,8 +4388,8 @@ function mStyle(elem, styles = {}, opts = {}) {
 	styles = jsCopy(styles);
 	let noUnit = ['opacity', 'flex', 'grow', 'shrink', 'grid', 'z', 'iteration', 'count', 'orphans', 'widows', 'weight', 'order', 'index'];
 	const STYLE_PARAMS_3 = {
-		border: (elem, v) => elem.style.border = v.includes(' ')?v:`1px solid ${v}`,
-		outline: (elem, v) => elem.style.outline = v.includes(' ')?v:`1px solid ${v}`,
+		border: (elem, v) => elem.style.border = v.includes(' ') ? v : `1px solid ${v}`,
+		outline: (elem, v) => elem.style.outline = v.includes(' ') ? v : `1px solid ${v}`,
 		box: (elem, v) => elem.style.boxSizing = v ? 'border-box' : 'content-box',
 		bgSrc: (elem, v) => elem.style.backgroundImage = `url(${v})`,
 		breakWord: (elem, v) => elem.style.overflowWrap = 'break-word',

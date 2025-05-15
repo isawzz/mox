@@ -1,36 +1,40 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_showKeys(); }
+function start() { test0_msGrid(); }
 
+async function test0_msGrid() {
+	await initTest();
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); mFlex('dMain');
+	//let cols = 7, w = cols * 130 + 30, h = 5 * 130 + 10;
+	let container = mDom('dMain', { className: 'msGrid', bg: 'violet' }); //,w,h });
+	let list = M.byType.fa6; //Object.keys(M.superdi); // M.byType.fa6; //M.byCat.transport; //M.byCat.sport; // ['circumscribed_multiplication'];//, 'circumscribed_addition', 'circumscribed_subtraction', 'circumscribed_division', 'circumscribed_exponentiation', 'circumscribed_square_root', 'circumscribed_square_root_2', 'circumscribed_square_root_3', 'circumscribed_square_root_4'];
+	console.log('list', list);
+	let elemStyle = {};// display: 'block', align:'center', w100: true, h100: true, box: true, fg: 'white', bg: 'grey', padding: 10, cursor: 'pointer' };
+	for (const k of list) {
+		let o = M.superdi[k];
+		// if (isdef(o.fa6)) { d = mDom(dParent, { ...elemStyle, family: Families.fa6 }, { html: `&#x${o.fa6};` }); }
+		let d = msKey(k, container);
+
+	}
+
+	mScrollBehavior(container,654,654); // 5 times row height + vertical gap
+}
 async function test0_showKeys() {
 	await initTest();
 
-	let byType = {};
-	for (const k in M.superdi) {
-		let o = M.superdi[k];
-		for (const fk in Families) {
-			//console.log('fk', fk, o[fk]);
-			if (isdef(o[fk])) { lookupAddIfToList(byType, [fk], k); }
-
-		}
-		//break;
-	}
-	M.byType = byType;
-
-	let list = byType.fa6; //M.byCat.transport; //Object.keys(M.superdi); // M.byCat.sport; // ['circumscribed_multiplication'];//, 'circumscribed_addition', 'circumscribed_subtraction', 'circumscribed_division', 'circumscribed_exponentiation', 'circumscribed_square_root', 'circumscribed_square_root_2', 'circumscribed_square_root_3', 'circumscribed_square_root_4'];
+	let list = Object.keys(M.superdi); // M.byType.fa6; //M.byCat.transport; //M.byCat.sport; // ['circumscribed_multiplication'];//, 'circumscribed_addition', 'circumscribed_subtraction', 'circumscribed_division', 'circumscribed_exponentiation', 'circumscribed_square_root', 'circumscribed_square_root_2', 'circumscribed_square_root_3', 'circumscribed_square_root_4'];
 	let [w, h, gap] = [120, 100, 10];
 	let dParent = mDom('dMain', { display: 'grid', gridTemplateCols: `repeat(auto-fill, ${w}px)`, gridTemplateRows: h, justifyContent: 'center', gap, padding: gap, wrap: true, w100: true, box: true }, { id: 'grid-container' });
 	let i = 0;
 	let n = Math.floor(window.innerWidth / (w + gap)) * Math.floor(window.innerHeight / (h + gap)); console.log('n', n);
 	//let elemStyle = {className: 'grid-cell', bg: 'silver', padding: gap, cursor: 'pointer'}
-	let elemStyle = { display: 'block', align:'center', w100: true, h100: true, box: true, fg: 'white', bg: 'grey', padding: gap, cursor: 'pointer' };
+	let elemStyle = { display: 'block', align: 'center', w100: true, h100: true, box: true, fg: 'white', bg: 'grey', padding: gap, cursor: 'pointer' };
 	for (const k of list) {
 
-
-		let o = M.superdi[k]; console.log(o)
+		let o = M.superdi[k]; //console.log(o)
 		let d;
 		//type:plain: all superdi objects have this type since its just the key
-		d = mDom(dParent, { ...elemStyle, breakWord:true }, { html: k, id: getUID(), onclick: onclickItem });
+		d = mDom(dParent, { ...elemStyle, breakWord: true }, { html: k, id: getUID(), onclick: onclickItem });
 
 		//type emo
 		if (isdef(o.emo)) {
