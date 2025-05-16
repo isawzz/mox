@@ -9,15 +9,24 @@ async function test0_board2() {
 	let [wtotal,htotal]=[sz*2*maxcols,sz*rows*.75*2+sz/2];
 	let board=mDom('dMain',{w:wtotal,h:htotal,bg:'red',padding}); //{w:520,h:420,bg:'green',patop:1})
 	let grid=mDom(board,{className:'hexGrid',gap});
-	let tiles = createHexShapedGrid(grid,rows,maxcols,sz,gap/2);
+	let {boardRows,tileMap}=createHexShapedGrid(grid,rows,maxcols,sz,gap/2);
 	let r=getRectInt(grid); console.log('rect',r,wtotal,htotal)
-	console.log('tiles',tiles)
-	for(const t of tiles){
+	console.log('tiles',tileMap)
+	for(const id in tileMap){
+		let t = tileMap[id];
 		let d=iDiv(t);
 		mCenterCenterFlex(d);
 		let factor=1;
 		msKey(rChoose(Object.keys(M.superdi)),d,{hmax:sz*factor,fz:sz*factor,fg:rColor()})
 	}
+	let tiles = arrFlatten(boardRows);console.log('tiles',tiles)
+  let cityMap = {}; // key: `r_c` => city object
+	addCity(cityMap,grid,0,0,0,0,padding);
+
+	mDom(grid,{bg:'blue',w:100,h:100,zIndex:10000});
+	//addCity(cityMap,grid,0,0,tiles[0].x,tiles[0].y,padding);
+
+	//const cityMap = addCities(grid, boardRows, 50);
 }
 async function test0_board1() {
 	await initTest();
