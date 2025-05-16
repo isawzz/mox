@@ -305,27 +305,37 @@ fieldset .disabled {
 }
 
 /* #region experimental */
-.msGrid {
+.fadeIn {
+  animation: fader 0.5s ease-in forwards;
+}
+.fadeOut {
+  animation: fader 0.5s ease-out reverse forwards;
+}
+@keyframes fader {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.gallery {
   display: grid;
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;                   /* prevent horizontal growth */
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 9px;
+  grid-template-columns: repeat(auto-fill, minmax(101px, 1fr));
+  grid-auto-rows: 101px;
+  gap: 8px;
 
   box-sizing: border-box;              /* includes scrollbar in width calc */
   width: 100%;                         /* or set a fixed width */
 
-  grid-auto-rows: 100px;
-  font-size: 90px;
+  font-size: 64px;
   padding: 8px;
 
   /* justify-content: center; */
 }
 
-.msGrid>div {
-  display: block;
+.gallery>div {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -333,27 +343,78 @@ fieldset .disabled {
   background: dimgray;
   color: white;
   border: 1px solid #aaa;
-  padding: 4px;
+  padding: 4px 4px 0px 4px;
 
   display: flex;
-  /* enables Flexbox */
+  flex-wrap: wrap;
   align-items: center;
-  /* vertical centering */
   justify-content: center;
-  /* horizontal centering */
   text-align: center;
   overflow-wrap: break-word;
 }
 
-.msGrid>img {
-  width: 100%;
-  height: 100%;
+.gallery>img {
   object-position: center center;
   object-fit: cover;
 }
 
-.msGrid>img.card {
+.gallery>img.card {
   object-fit: contain;
 }
 
+.label {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 16px;
+  text-align: center;
+
+}
+
 /* #endregion experimental */
+
+/* #region hex */
+.hexGrid {
+  display:'inline';
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.hex {
+  position: absolute;
+  width: 100px; /* side * 2 */
+  height: 86.6px; /* sqrt(3) * side */
+  background: #3498db;
+  clip-path: polygon(
+    50% 0%, 100% 25%, 100% 75%,
+    50% 100%, 0% 75%, 0% 25%
+  );
+  box-sizing: border-box;
+}
+.hex {
+  position: absolute;
+  width: 100px; /* side * 2 */
+  height: 86.6px; /* sqrt(3) * side */
+  background: #f5c87a;
+  clip-path: polygon(
+    50% 0%, 100% 25%, 100% 75%,
+    50% 100%, 0% 75%, 0% 25%
+  );
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

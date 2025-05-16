@@ -1,10 +1,344 @@
 
+function createHexGrid(d, rows, cols, sideLength = 50, gap=1) {
+  const container = toElem(d);
+  container.innerHTML = '';
+  const hexWidth = sideLength * 2;
+  const hexHeight = Math.sqrt(3) * sideLength;
+  const vertSpacing = hexHeight * 0.75;
 
-function toCharCode(uniEmoText){
-	//remove the ';' at the end of unicode text
-	if (uniEmoText.endsWith(';')) uniEmoText = uniEmoText.slice(0, -1);
-	//console.log('toCharCode', uniEmoText);
-	return String.fromCodePoint(parseInt(uniEmoText.replace('&#', '0'), 16));
+  container.style.height = `${vertSpacing * rows + hexHeight * 0.25}px`;
+  
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const hex = document.createElement('div');
+      hex.className = 'hex';
+      hex.style.width = `${hexWidth - gap}px`;
+      hex.style.height = `${hexHeight - gap}px`;
+
+      const xOffset = (r % 2) * (hexWidth / 2);
+      const x = c * hexWidth + xOffset;
+      const y = r * vertSpacing;
+
+      hex.style.left = `${x}px`;
+      hex.style.top = `${y}px`;
+
+      container.appendChild(hex);
+    }
+  }
+}
+function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50, gap=1) {
+  if (rows % 2 === 0) {
+    console.error("Number of rows must be odd for a symmetrical hexagon grid.");
+    return;
+  }
+
+  const container = toElem(containerId);
+  container.innerHTML = '';
+
+  const hexWidth = sideLength * 2;
+  const hexHeight = hexWidth; //Math.sqrt(3) * sideLength;
+  const vertSpacing = hexHeight * 0.75;
+
+  const midRow = Math.floor(rows / 2);
+
+  let tiles = [];
+
+  for (let r = 0; r < rows; r++) {
+    const offsetFromMiddle = Math.abs(midRow - r);
+    const cols = maxCols - offsetFromMiddle;
+
+    for (let c = 0; c < cols; c++) {
+      const hex = document.createElement('div');
+      hex.className = 'hex';
+      hex.style.width = `${hexWidth-gap}px`;
+      hex.style.height = `${hexHeight-gap}px`;
+
+      const horizontalOffset = (r % 2 === 1) ? hexWidth / 2 : 0;
+      const totalRowOffset = ((maxCols - cols) / 2) * hexWidth;
+
+      const x = c * hexWidth + totalRowOffset; // + horizontalOffset - (r%2 == 1?hexWidth/2:0);
+      const y = r * vertSpacing;
+
+      hex.style.left = `${x}px`;
+      hex.style.top = `${y}px`;
+
+      container.appendChild(hex);
+      tiles.push({div:hex,x,y,c,r})
+    }
+  }
+
+  container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
+  return tiles;
+}
+
+function mScrollBehavior(container, hScroll, hSnapp) {
+  // const rowHeight = 120 + 8; // row height + vertical gap
+  // const hScroll=5*rowHeight;
+  let isScrolling = false;
+  container.tabIndex = 0;
+  let isUserScrolling = false;
+  let scrollTimeout;
+
+  // Keyboard PageUp/PageDown
+  container.addEventListener('keydown', (e) => {
+    if (e.key === 'PageDown' || e.key === 'PageUp') {
+      e.preventDefault();
+      const direction = e.key === 'PageDown' ? 1 : -1;
+      smoothScrollBy(container, direction * hScroll); //container.clientHeight);
+    }
+  });
+
+  // Wheel scroll: scroll exactly one screen
+  let wheelScrolling = false;
+  container.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    if (wheelScrolling) return;
+    wheelScrolling = true;
+    const direction = e.deltaY > 0 ? 1 : -1;
+    smoothScrollBy(container, direction * hScroll); //container.clientHeight);
+    setTimeout(() => {
+      wheelScrolling = false;
+    }, 340);
+  }, { passive: false });
+
+  // Scroll event: detect manual scrolling (including scrollbar drag/click)
+  container.addEventListener('scroll', () => {
+    isUserScrolling = true;
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      snapScroll(container);
+      isUserScrolling = false;
+    }, 150); // adjust delay for scroll end detection
+  });
+
+  // Smooth scroll helper
+  function smoothScrollBy(element, distance) {
+    element.scrollBy({
+      top: distance,
+      behavior: 'smooth'
+    });
+  }
+
+  // Snap scroll position to nearest full page (container height)
+  function snapScroll(element) {
+    const pageHeight = hSnapp; //element.clientHeight;
+    const currentScroll = element.scrollTop;
+    const pageIndex = Math.round(currentScroll / pageHeight);
+    const targetScroll = pageIndex * pageHeight;
+
+    if (Math.abs(targetScroll - currentScroll) > 2) {
+      element.scrollTo({
+        top: targetScroll,
+        behavior: 'smooth'
+      });
+    }
+  }
+
+}
+function mKey(imgKey, d, styles = {}, opts = {}) {
+  styles = jsCopy(styles);
+  let o = imgKey.includes('.') ? { src: imgKey } : opts.prefer == 'plain' ? { plain: imgKey } : lookup(M.superdi, [imgKey]);
+  let type = opts.prefer;
+  let types = ['src', 'img', 'photo', 'uni', 'emo', 'fa6', 'fa', 'ga', 'plain'];
+  if (nundef(o[type])) type = types.find(x => isdef(o[x]));
+
+  let d0 = mDom(d, styles, opts);
+  let [w, h] = mSizeSuccession(styles, 100);
+
+  if (['img', 'src', 'photo'].includes(type)) {
+    let astyle = { w, h, fit: o && o.cats.includes('card') ? 'contain' : 'cover', 'object-position': 'center center' };
+
+    mDom(d0, astyle, { ...opts, tag: 'img', src: o[type], alt: imgKey });
+
+  } else if (type == 'plain') {
+    let x = mDom(d0, {}, { ...opts, html: o[type] });
+
+  } else {
+    let family = Families[type] || 'inherit';
+    let text = ['fa6', 'fa', 'ga'].includes(type) ? `&#x${o[type]};` : o[type];
+    let fz = type == 'plain' ? 18 : h * .8; // h*.9;
+
+    let astyles = {
+      fz,
+      family,
+      //matop:-12
+      // display: 'flex',
+      // justifyContent: 'center',
+      // alignItems: 'center',
+      // align: 'center',
+      // width: '100%',
+      // height: '100%',
+      // box: true,
+      // hline: '1', // Ensure consistent vertical alignment
+      // 'vertical-align': 'middle', // Align text vertically
+      // padding: '0', // Remove any padding that might affect alignment
+      // margin: '0' // Remove any margin that might affect alignment
+    };
+
+    // let x = mDom(d0, { family, fz, wmin: 100, align: 'center' }, { ...opts, html: text });
+    let x = mDom(d0, astyles, { ...opts, html: text });
+
+  }
+  return d0;
+
+}
+
+function msKey(key, d, styles = {}, opts = {}) {
+  styles = jsCopy(styles);
+  let o = key.includes('.') ? { src: key } : opts.prefer == 'plain' ? { plain: key } : lookup(M.superdi, [key]);
+  let type = opts.prefer;
+  let types = ['src', 'img', 'photo', 'uni', 'emo', 'fa6', 'fa', 'ga', 'plain'];
+  if (nundef(o[type])) type = types.find(x => isdef(o[x]));
+
+  //type = 'fa6'
+  let d0;
+
+  if (['img', 'src', 'photo'].includes(type)) {
+    d0 = mDom(d, { ...styles, h: 100 }, { ...opts, tag: 'img', src: o[type], alt: key });
+  } else if (type == 'plain') {
+    d0 = mDom(d, { styles, className: 'label' }, { ...opts, html: o[type], title: o[type] });
+  } else {
+    let family = Families[type] || 'inherit';
+    let text = ['fa6', 'fa', 'ga'].includes(type) ? `&#x${o[type]};` : o[type];
+    d0 = mDom(d, { ...styles, family }, { ...opts, html: text });
+
+  }
+  return d0;
+}
+
+function showCollection(ev) {
+  let name = ev.target.innerHTML;
+  let keys = M.byCat[name]; //Object.keys(M.superdi); // M.byCat.animal;
+  showKeys(keys, 'dMain');
+}
+async function showKeys(keys, d) {
+  let centered = { display: 'flex', alignItems: 'center', justifyContent: 'center', baseline: 'middle' };
+  mClear(d);
+  let [gap, w, h] = [10, 100, 100];
+  let dGrid = mDom(d, { display: 'flex', fg: 'black', gap, padding: gap, wrap: true });
+  let i = 0;
+  let n = Math.floor(window.innerWidth / (w + gap)) * Math.floor(window.innerHeight / (h + gap)); console.log('n', n);
+  for (const k of keys) {
+    let d = mDom(dGrid, { bg: 'silver', padding: gap, cursor: 'pointer' }, { id: getUID(), onclick: onclickItem });
+
+    let x = mKey(k, d, { w, h, fz: h, hline: h, box: true, fg: 'black', bg: 'white' }, { special: true });
+
+    mDom(d, { w, fg: 'black', 'text-overflow': 'ellipsis', 'white-space': 'nowrap', overflow: 'hidden', fz: 16, align: 'center' }, { html: k, title: k });
+    DA.items[d.id] = { div: d, key: k };
+    if (0 === ++i % n) await mSleep(20);
+  }
+}
+
+function fitFzToBox(div, maxWidth, maxHeight, options = {}) {
+  const {
+    minFontSize = 10,
+    maxFontSize = 100,
+    fontStep = 1,
+    lineHeight = 1
+  } = options;
+
+  const style = window.getComputedStyle(div);
+  const originalText = div.textContent;
+
+  // Create an off-screen clone for measurement
+  const testDiv = document.createElement("div");
+  document.body.appendChild(testDiv);
+  testDiv.style.position = "absolute";
+  testDiv.style.visibility = "hidden";
+  testDiv.style.whiteSpace = "pre-wrap";
+  testDiv.style.wordBreak = "break-word";
+
+  // Copy CSS that affects size
+  const keysToCopy = ["fontFamily", "fontWeight", "fontStyle", "letterSpacing", "padding", "border"];
+  keysToCopy.forEach(key => {
+    testDiv.style[key] = style[key];
+  });
+
+  let fontSize = maxFontSize;
+  testDiv.textContent = originalText;
+
+  while (fontSize >= minFontSize) {
+    testDiv.style.fontSize = `${fontSize}px`;
+    testDiv.style.lineHeight = lineHeight;
+
+    if (
+      testDiv.offsetWidth <= maxWidth &&
+      testDiv.offsetHeight <= maxHeight
+    ) {
+      break;
+    }
+
+    fontSize -= fontStep;
+  }
+
+  // Apply the final font size to the actual div
+  div.style.fontSize = `${fontSize}px`;
+  div.style.lineHeight = lineHeight;
+
+  document.body.removeChild(testDiv);
+  return fontSize;
+}
+
+function fitTextToBox(text, family, maxWidth, maxHeight, options = {}) {
+  const {
+    minFontSize = 10,
+    maxFontSize = 100,
+    fontStep = 1,
+    lineHeight = 1.2,
+    weight = "normal",
+    fontStyle = "normal",
+    letterSpacing = "normal",
+    padding = "0"
+  } = options;
+
+  // Create a hidden measuring element
+  const testDiv = mDom(document.body, {}, { tag: 'div', html: text });
+  mStyle(testDiv, {
+    position: 'absolute',
+    visibility: 'hidden',
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word',
+    padding,
+    family,
+    weight,
+    fontStyle,
+    letterSpacing
+  });
+
+  let fz = maxFontSize;
+
+  // Adjust font size to fit within the box
+  while (fz >= minFontSize) {
+    mStyle(testDiv, { fz, lineHeight });
+    if (testDiv.offsetWidth <= maxWidth && testDiv.offsetHeight <= maxHeight) break;
+    fz -= fontStep;
+  }
+
+  // Clean up and return the calculated font size
+  testDiv.remove();
+  return fz;
+}
+async function initTest() {
+  DA.items = {};
+  DA.selectedImages = [];
+  await loadAssetsStatic(); //console.log('M', M);
+  stickyHeaderCode();
+
+  let elems = mLayoutLM('dPage');
+  mStyle('dMain', { overy: 'auto' });
+
+  let dLeft = mBy('dLeft');
+  mStyle(dLeft, { overy: 'auto' });
+
+
+}
+
+function toCharCode(uniEmoText) {
+  //remove the ';' at the end of unicode text
+  if (uniEmoText.endsWith(';')) uniEmoText = uniEmoText.slice(0, -1);
+  //console.log('toCharCode', uniEmoText);
+  return String.fromCodePoint(parseInt(uniEmoText.replace('&#', '0'), 16));
 }
 
 function measureCharCodeInFont(charCode, fontSize, fontFamily, fontWeight = "normal") {
@@ -118,28 +452,28 @@ function measureCharacterBounds(char, fontSize, fontFamily) {
 
 function onclickItem(ev) { toggleSelection(evToId(ev), DA.selectedImages); }
 function toggleSelection(id, selist, className = 'framedPicture') {
-	if (selist.includes(id)) { removeInPlace(selist, id); mClassRemove(id, className); } else { selist.push(id); mClass(id, className); }
+  if (selist.includes(id)) { removeInPlace(selist, id); mClassRemove(id, className); } else { selist.push(id); mClass(id, className); }
 }
 function stickyHeaderCode() {
-	const header = document.querySelector('.sticky_header');
-	const contentArea = document.querySelector('.content_area');
+  const header = document.querySelector('.sticky_header');
+  const contentArea = document.querySelector('.content_area');
 
-	// Function to set the height and top margin of the content area
-	const setContentAreaHeight = () => {
-		const headerHeight = header.offsetHeight;
-		contentArea.style.height = `calc(100vh - ${headerHeight}px)`;
-		// Although not strictly necessary with the height calculation,
-		// a margin-top equal to header height can prevent content from
-		// initially being hidden behind a fixed header in some layouts.
-		// In this sticky/flex-like approach, height calculation is sufficient.
-		// contentArea.style.marginTop = `${headerHeight}px`;
-	};
+  // Function to set the height and top margin of the content area
+  const setContentAreaHeight = () => {
+    const headerHeight = header.offsetHeight;
+    contentArea.style.height = `calc(100vh - ${headerHeight}px)`;
+    // Although not strictly necessary with the height calculation,
+    // a margin-top equal to header height can prevent content from
+    // initially being hidden behind a fixed header in some layouts.
+    // In this sticky/flex-like approach, height calculation is sufficient.
+    // contentArea.style.marginTop = `${headerHeight}px`;
+  };
 
-	// Set the height initially
-	setContentAreaHeight();
+  // Set the height initially
+  setContentAreaHeight();
 
-	// Recalculate height on window resize
-	window.addEventListener('resize', setContentAreaHeight);
+  // Recalculate height on window resize
+  window.addEventListener('resize', setContentAreaHeight);
 
 }
 

@@ -3573,7 +3573,7 @@ function mClass(d) {
 	d = toElem(d);
 	if (arguments.length == 2) {
 		let arg = arguments[1];
-		if (isString(arg) && arg.indexOf(' ') > 0) { arg = [toWords(arg)]; }
+		if (isString(arg) && arg.indexOf(' ') > 0) { arg = toWords(arg); }
 		else if (isString(arg)) arg = [arg];
 		if (isList(arg)) {
 			for (let i = 0; i < arg.length; i++) {
@@ -3796,14 +3796,6 @@ function mGetStyle(elem, prop) {
 	}
 	if (nundef(val)) val = getStyleProp(elem, prop);
 	if (val.endsWith('px')) return firstNumber(val); else return val;
-}
-function mGrid(rows, cols, dParent, styles = {}, opts = {}) {
-	[rows, cols] = [Math.ceil(rows), Math.ceil(cols)]
-	addKeys({ display: 'inline-grid', gridCols: 'repeat(' + cols + ',1fr)' }, styles);
-	if (rows) styles.gridRows = 'repeat(' + rows + ',auto)';
-	else styles.overy = 'auto';
-	let d = mDom(dParent, styles, opts);
-	return d;
 }
 function mHasClass(el, className) {
 	if (el.classList) return el.classList.contains(className);

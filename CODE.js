@@ -1,4 +1,135 @@
 
+//hexgrid versuche
+function createHexGrid(d, rows, cols, sideLength = 50) {
+  const container = toElem(d)
+  container.innerHTML = ''; // clear previous grid
+
+  const hexWidth = sideLength * 2;
+  const hexHeight = hexWidth; // Math.sqrt(3) * sideLength;
+
+  for (let r = 0; r < rows; r++) {
+    const row = document.createElement('div');
+    row.className = 'hex-row' + (r % 2 ? ' offset' : '');
+    for (let c = 0; c < cols; c++) {
+      const hex = document.createElement('div');
+      hex.className = 'hex';
+      hex.style.width = `${hexWidth}px`;
+      hex.style.height = `${hexHeight}px`;
+      row.appendChild(hex);
+    }
+    container.appendChild(row);
+  }
+}
+function createHexGrid(d, rows, cols, sideLength = 50) {
+  const container = toElem(d);
+  container.innerHTML = '';
+  const hexWidth = sideLength * 2;
+  const hexHeight = Math.sqrt(3) * sideLength;
+  const vertSpacing = hexHeight * 0.75;
+
+  container.style.height = `${vertSpacing * rows + hexHeight * 0.25}px`;
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const hex = document.createElement('div');
+      hex.className = 'hex';
+      hex.style.width = `${hexWidth - 1}px`;
+      hex.style.height = `${hexHeight - 1}px`;
+
+      const xOffset = (r % 2) * (hexWidth / 2);
+      const x = c * hexWidth + xOffset;
+      const y = r * vertSpacing;
+
+      hex.style.left = `${x}px`;
+      hex.style.top = `${y}px`;
+
+      container.appendChild(hex);
+    }
+  }
+}
+
+function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50, gap=1) {
+  if (rows % 2 === 0) {
+    console.error("Number of rows must be odd for a symmetrical hexagon grid.");
+    return;
+  }
+
+  const container = toElem(containerId);
+  container.innerHTML = '';
+
+  const hexWidth = sideLength * 2;
+  const hexHeight = Math.sqrt(3) * sideLength;
+  const vertSpacing = hexHeight * 0.75;
+
+  const midRow = Math.floor(rows / 2);
+
+  for (let r = 0; r < rows; r++) {
+    // Number of columns in this row (symmetric)
+    const offsetFromMiddle = Math.abs(midRow - r);
+    const cols = maxCols - offsetFromMiddle;
+
+    for (let c = 0; c < cols; c++) {
+      const hex = document.createElement('div');
+      hex.className = 'hex';
+      hex.style.width = `${hexWidth}px`;
+      hex.style.height = `${hexHeight}px`;
+
+      // Center the row horizontally
+      const rowOffset = ((maxCols - cols) / 2) * hexWidth + ((r % 2) * hexWidth / 2);
+      const x = c * hexWidth + rowOffset;
+      const y = r * vertSpacing;
+
+      hex.style.left = `${x}px`;
+      hex.style.top = `${y}px`;
+
+      container.appendChild(hex);
+    }
+  }
+
+  // Set container height and maybe width
+  container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
+}
+function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50) {
+  if (rows % 2 === 0) {
+    console.error("Number of rows must be odd for a symmetrical hexagon grid.");
+    return;
+  }
+
+  const container = toElem(containerId);
+  container.innerHTML = '';
+
+  const hexWidth = sideLength * 2;
+  const hexHeight = Math.sqrt(3) * sideLength;
+  const vertSpacing = hexHeight * 0.75;
+
+  const midRow = Math.floor(rows / 2);
+
+  for (let r = 0; r < rows; r++) {
+    const offsetFromMiddle = Math.abs(midRow - r);
+    const cols = maxCols - offsetFromMiddle;
+
+    for (let c = 0; c < cols; c++) {
+      const hex = document.createElement('div');
+      hex.className = 'hex';
+      hex.style.width = `${hexWidth}px`;
+      hex.style.height = `${hexHeight}px`;
+
+      // CORRECTED: Even rows are offset by half a hex width
+      const evenRow = r % 2 === 0;
+      const centerOffset = ((maxCols - cols) / 2) * hexWidth;
+      const x = c * hexWidth + centerOffset + (evenRow ? hexWidth / 2 : 0);
+      const y = r * vertSpacing;
+
+      hex.style.left = `${x}px`;
+      hex.style.top = `${y}px`;
+
+      container.appendChild(hex);
+    }
+  }
+
+  container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
+}
+
 //scroll versuche!!!
 function onPgDown(ev) {
 	let container = mBy('msGrid', 'class')

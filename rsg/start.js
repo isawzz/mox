@@ -1,23 +1,67 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_msGrid(); }
+function start() { test0_board2(); }
 
+async function test0_board2() {
+	await initTest();
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
+	let [gap,padding,sz,rows,maxcols]=[2,10,44,5,6]; //rows must be odd number!!!!
+	let [wtotal,htotal]=[sz*2*maxcols,sz*rows*.75*2+sz/2];
+	let board=mDom('dMain',{w:wtotal,h:htotal,bg:'red',padding}); //{w:520,h:420,bg:'green',patop:1})
+	let grid=mDom(board,{className:'hexGrid',gap});
+	let tiles = createHexShapedGrid(grid,rows,maxcols,sz,gap/2);
+	let r=getRectInt(grid); console.log('rect',r,wtotal,htotal)
+	console.log('tiles',tiles)
+	for(const t of tiles){
+		let d=iDiv(t);
+		mCenterCenterFlex(d);
+		let factor=1;
+		msKey(rChoose(Object.keys(M.superdi)),d,{hmax:sz*factor,fz:sz*factor,fg:rColor()})
+	}
+}
+async function test0_board1() {
+	await initTest();
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
+	let [gap,padding,sz,rows,maxcols]=[2,10,44,5,6]; //rows must be odd number!!!!
+	let [wtotal,htotal]=[sz*2*maxcols,sz*rows*.75*2+sz/2];
+	let board=mDom('dMain',{w:wtotal,h:htotal,bg:'red',padding}); //{w:520,h:420,bg:'green',patop:1})
+	let grid=mDom(board,{className:'hexGrid',gap});
+	let tiles = createHexShapedGrid(grid,rows,maxcols,sz,gap/2);
+	let r=getRectInt(grid); console.log('rect',r,wtotal,htotal)
+	console.log('tiles',tiles)
+}
+async function test0_board0() {
+	await initTest();
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
+	let grid = mGrid(3,3,'dMain',{bg:'red',gap:2,padding:2,box:true,margin:4});
+	for(const i of range(9)){
+		let d=mDom(grid,{bg:'blue',w:100,h:100});
+	}
+	let r=getRectInt(grid); console.log('rect',r)
+}
 async function test0_msGrid() {
 	await initTest();
 	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); mFlex('dMain');
 	//let cols = 7, w = cols * 130 + 30, h = 5 * 130 + 10;
-	let container = mDom('dMain', { className: 'msGrid', bg: 'violet' }); //,w,h });
-	let list = M.byType.fa6; //Object.keys(M.superdi); // M.byType.fa6; //M.byCat.transport; //M.byCat.sport; // ['circumscribed_multiplication'];//, 'circumscribed_addition', 'circumscribed_subtraction', 'circumscribed_division', 'circumscribed_exponentiation', 'circumscribed_square_root', 'circumscribed_square_root_2', 'circumscribed_square_root_3', 'circumscribed_square_root_4'];
-	console.log('list', list);
+	let list = M.byCat.sport; //Object.keys(M.superdi); //M.byType.fa6; //Object.keys(M.superdi); // M.byCat.transport; //  ['circumscribed_multiplication'];//, 'circumscribed_addition', 'circumscribed_subtraction', 'circumscribed_division', 'circumscribed_exponentiation', 'circumscribed_square_root', 'circumscribed_square_root_2', 'circumscribed_square_root_3', 'circumscribed_square_root_4'];
+
+	let container = mDom('dMain', { className: 'gallery fadeIn', bg: 'sienna' }); //,w,h });
+	//console.log('list', list);
 	let elemStyle = {};// display: 'block', align:'center', w100: true, h100: true, box: true, fg: 'white', bg: 'grey', padding: 10, cursor: 'pointer' };
+	let i = 0;
+	let n = Math.floor(window.innerWidth / (130)) * Math.floor(window.innerHeight / (130)); console.log('n', n);
 	for (const k of list) {
 		let o = M.superdi[k];
 		// if (isdef(o.fa6)) { d = mDom(dParent, { ...elemStyle, family: Families.fa6 }, { html: `&#x${o.fa6};` }); }
-		let d = msKey(k, container);
+		let d = mDom(container,{rounding:3, bg:'beige',fg:'black'})
+		let d1 = msKey(k, d, { hmax: 64 }, {prefer:'photo'});
+		mLinebreak(d)
+		let d2 = mDom(d, { className: 'label' }, { html: k, title: k })
+		if (0 === ++i % n) await mSleep(20);
 
 	}
 
-	mScrollBehavior(container,654,654); // 5 times row height + vertical gap
+	mScrollBehavior(container, 654, 654); // 5 times row height + vertical gap
 }
 async function test0_showKeys() {
 	await initTest();

@@ -1,8 +1,16 @@
 alles ist fuer immer ok - I have left this plane. 
 nur machen was fe oder A sagen sonst vppmw airport
 
+___ 5:29 AM 5/16/2025 airport lib 22.5. 63000 K4
+6:24 AM 5/16/2025
+mach einen kleineren container
+520=sz*2*maxcols+20
 ___ 6:14 AM 5/15/2025 airport lib 19.5. 62000 K4
-
+2:21 PM 5/15/2025 day 2:
+2:50 PM 5/15/2025 was ist der fehler?
+ok soll ich sowas wie msClasses machen?
+msGrid
+ok - soll ich byType machen? ja
 ___ 10:57 AM 5/14/2025 airport lib 19.5. 61000 K4
 ___ 5:42 AM 5/13/2025 airport lib 19.5. 60000 K4
 ___ 5:31 AM 5/12/2025 airport lib 19.5. 59000 K4
