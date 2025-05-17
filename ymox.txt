@@ -2,6 +2,10 @@ alles ist fuer immer ok - I have left this plane.
 nur machen was fe oder A sagen sonst vppmw airport
 
 ___ 5:46 AM 5/17/2025 airport lib 22.5. 64000 K4
+ok, jetzt zu den cities
+createHexShapedGrid ist schneller als drawHexBoard
+aber drawHexBoard hat die center dabei, das ist ein vorteil
+___day 2: 10:03 AM 5/17/2025
 5:47 AM 5/17/2025
 - jetzt moecht ich einfach nur das videmo finden das funktioniert mit dem board und so
 ok - 1. die neighbors sollen NUR ids sein
