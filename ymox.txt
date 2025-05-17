@@ -1,6 +1,11 @@
 alles ist fuer immer ok - I have left this plane. 
 nur machen was fe oder A sagen sonst vppmw airport
 
+___ 5:46 AM 5/17/2025 airport lib 22.5. 64000 K4
+5:47 AM 5/17/2025
+- jetzt moecht ich einfach nur das videmo finden das funktioniert mit dem board und so
+ok - 1. die neighbors sollen NUR ids sein
+ok - 2. anstatt boardRows will ich tiles (nur ids!)
 ___ 5:29 AM 5/16/2025 airport lib 22.5. 63000 K4
 6:24 AM 5/16/2025
 mach einen kleineren container

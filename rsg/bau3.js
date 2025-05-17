@@ -1,26 +1,26 @@
 
-  function addCity(cityMap, container, r, c, x, y, padding=0) {
-    const key = `${r}_${c}`;
-    if (cityMap[key]) return; // avoid duplicates
+function addCity(cityMap, container, r, c, x, y, padding = 0) {
+  const key = `${r}_${c}`;
+  if (cityMap[key]) return; // avoid duplicates
 
-    const city = document.createElement('div');
-    city.className = 'city';
-    city.style.position = 'absolute';
-    let sz=30;
-    city.style.width = `${sz}px`;
-    city.style.height = `${sz}px`;
-    city.style.borderRadius = '50%';
-    city.style.background = 'green';
+  const city = document.createElement('div');
+  city.className = 'city';
+  city.style.position = 'absolute';
+  let sz = 30;
+  city.style.width = `${sz}px`;
+  city.style.height = `${sz}px`;
+  city.style.borderRadius = '50%';
+  city.style.background = 'green';
 
-    x-=padding;
-    y-=padding;
+  x -= padding;
+  y -= padding;
 
-    city.style.left = `${x - sz/2}px`;
-    city.style.top = `${y - sz/2}px`;
+  city.style.left = `${x - sz / 2}px`;
+  city.style.top = `${y - sz / 2}px`;
 
-    container.appendChild(city);
-    cityMap[key] = { div: city, x, y, r, c };
-  }
+  container.appendChild(city);
+  cityMap[key] = { div: city, x, y, r, c };
+}
 
 
 function addCities(container, grid, sideLength) {
@@ -43,7 +43,7 @@ function addCities(container, grid, sideLength) {
         if (i === 2 || i === 3) rowIndex += 1; // bottom corners
         if (i === 3 || i === 4 || i === 5) colIndex -= 1; // left side
 
-        addCity(cityMap, container, rowIndex, colIndex, 0-10,0-10); //cx, cy);
+        addCity(cityMap, container, rowIndex, colIndex, 0 - 10, 0 - 10); //cx, cy);
         return;
       }
       return;
@@ -82,50 +82,6 @@ function createHexGrid(d, rows, cols, sideLength = 50, gap = 1) {
     }
   }
 }
-function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50, gap = 1) {
-  if (rows % 2 === 0) {
-    console.error("Number of rows must be odd for a symmetrical hexagon grid.");
-    return;
-  }
-
-  const container = toElem(containerId);
-  container.innerHTML = '';
-
-  const hexWidth = sideLength * 2;
-  const hexHeight = hexWidth; //Math.sqrt(3) * sideLength;
-  const vertSpacing = hexHeight * 0.75;
-
-  const midRow = Math.floor(rows / 2);
-
-  let tiles = [];
-
-  for (let r = 0; r < rows; r++) {
-    const offsetFromMiddle = Math.abs(midRow - r);
-    const cols = maxCols - offsetFromMiddle;
-
-    for (let c = 0; c < cols; c++) {
-      const hex = document.createElement('div');
-      hex.className = 'hex';
-      hex.style.width = `${hexWidth - gap}px`;
-      hex.style.height = `${hexHeight - gap}px`;
-
-      const horizontalOffset = (r % 2 === 1) ? hexWidth / 2 : 0;
-      const totalRowOffset = ((maxCols - cols) / 2) * hexWidth;
-
-      const x = c * hexWidth + totalRowOffset; // + horizontalOffset - (r%2 == 1?hexWidth/2:0);
-      const y = r * vertSpacing;
-
-      hex.style.left = `${x}px`;
-      hex.style.top = `${y}px`;
-
-      container.appendChild(hex);
-      tiles.push({ div: hex, x, y, c, r })
-    }
-  }
-
-  container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
-  return tiles;
-}
 
 function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50, gap = 1) {
   if (rows % 2 === 0) {
@@ -142,7 +98,7 @@ function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50
 
   const midRow = Math.floor(rows / 2);
   const tileMap = {}; // id -> tile object
-  const boardRows = [];    // row-wise storage
+  const tiles = [];    // row-wise storage
 
   for (let r = 0; r < rows; r++) {
     const offsetFromMiddle = Math.abs(midRow - r);
@@ -171,57 +127,48 @@ function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50
 
       div.addEventListener('mouseenter', () => {
         for (const dir of ['NE', 'E', 'SE', 'SW', 'W', 'NW']) {
-          const neighbor = tile[dir];
+          const neighbor = tileMap[tile[dir]]; console.log(neighbor)
           if (neighbor) neighbor.div.classList.add('neighbor-highlight');
         }
       });
 
       div.addEventListener('mouseleave', () => {
         for (const dir of ['NE', 'E', 'SE', 'SW', 'W', 'NW']) {
-          const neighbor = tile[dir];
+          const neighbor = tileMap[tile[dir]];
           if (neighbor) neighbor.div.classList.remove('neighbor-highlight');
         }
       });
       tileMap[id] = tile;
-      row.push(tile);
+      tiles.push(id);
       container.appendChild(div);
     }
 
-    boardRows.push(row);
   }
 
   // After all tiles are created, link neighbors
-  for (let r = 0; r < boardRows.length; r++) {
-    for (let i = 0; i < boardRows[r].length; i++) {
-      const tile = boardRows[r][i];
-      let c = tile.c;
-      const isOdd = r % 2 === 1;
+  for (let i = 0; i < tiles.length; i++) {
+    const tile = tileMap[tiles[i]];
+    let [r, c] = [tile.r, tile.c];
+    const isOdd = r % 2 === 1;
 
-      function getTile(rr, cc) {
-        if (isdef(tileMap[`r${rr}_c${cc}`])) return tileMap[`r${rr}_c${cc}`];
-        else return null;
-      }
-
-      // Neighbor lookup varies by row parity
-      tile.E = getTile(r, c + 2);
-      tile.W = getTile(r, c - 2);
-      tile.NE = getTile(r - 1, c + 1);
-      tile.NW = getTile(r - 1, c - 1);
-      tile.SE = getTile(r + 1, c + 1);
-      tile.SW = getTile(r + 1, c - 1);
-      // tile.E = getTile(r, c + 1);
-      // tile.W = getTile(r, c - 1);
-      // tile.NE = getTile(r - 1, c + (isOdd ? 0 : -1));
-      // tile.NW = getTile(r - 1, c + (isOdd ? -1 : 0));
-      // tile.SE = getTile(r + 1, c + (isOdd ? 0 : -1));
-      // tile.SW = getTile(r + 1, c + (isOdd ? -1 : 0));
-
+    function getTile(rr, cc) {
+      if (isdef(tileMap[`r${rr}_c${cc}`])) return `r${rr}_c${cc}`; //tileMap[`r${rr}_c${cc}`];
+      else return null;
     }
+
+    // Neighbor lookup varies by row parity
+    tile.E = getTile(r, c + 2);
+    tile.W = getTile(r, c - 2);
+    tile.NE = getTile(r - 1, c + 1);
+    tile.NW = getTile(r - 1, c - 1);
+    tile.SE = getTile(r + 1, c + 1);
+    tile.SW = getTile(r + 1, c - 1);
+
   }
 
   container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
 
-  return { boardRows, tileMap };
+  return { tiles, tileMap };
 }
 
 

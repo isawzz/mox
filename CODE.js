@@ -1,5 +1,175 @@
 
 //hexgrid versuche
+function addCities(container, grid, sideLength) {
+  const cityMap = {}; // key: `r_c` => city object
+
+  for (const row of grid) {
+    for (const tile of row) {
+      const { x, y, r, c } = tile;
+      //let [tx,ty]=[x+sideLength/2,y+sideLength/2];
+      for (let i = 0; i < 6; i++) {
+        const angle_deg = 60 * i - 30;
+        const angle_rad = Math.PI / 180 * angle_deg;
+        const cx = x + sideLength * Math.cos(angle_rad);
+        const cy = y + sideLength * Math.sin(angle_rad); // - sideLength / 2;
+
+        // Determine index of the tile *below* and to the *left* of the corner
+        // Here, we use angle to determine ownership
+        let rowIndex = r;
+        let colIndex = c;
+        if (i === 2 || i === 3) rowIndex += 1; // bottom corners
+        if (i === 3 || i === 4 || i === 5) colIndex -= 1; // left side
+
+        addCity(cityMap, container, rowIndex, colIndex, 0 - 10, 0 - 10); //cx, cy);
+        return;
+      }
+      return;
+    }
+  }
+
+  return cityMap;
+}
+
+function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50, gap = 1) {
+  if (rows % 2 === 0) {
+    console.error("Number of rows must be odd for a symmetrical hexagon grid.");
+    return;
+  }
+
+  const container = toElem(containerId);
+  container.innerHTML = '';
+
+  const hexWidth = sideLength * 2;
+  const hexHeight = hexWidth; //Math.sqrt(3) * sideLength;
+  const vertSpacing = hexHeight * 0.75;
+
+  const midRow = Math.floor(rows / 2);
+  const tileMap = {}; // id -> tile object
+  const boardRows = [];    // row-wise storage
+
+  for (let r = 0; r < rows; r++) {
+    const offsetFromMiddle = Math.abs(midRow - r);
+    const cols = maxCols - offsetFromMiddle;
+    const row = [];
+
+    for (let i = 0; i < cols; i++) {
+      const div = document.createElement('div');
+      div.className = 'hex';
+      div.style.width = `${hexWidth - gap}px`;
+      div.style.height = `${hexHeight - gap}px`;
+
+      const horizontalOffset = (r % 2 === 1) ? hexWidth / 2 : 0;
+      const totalRowOffset = ((maxCols - cols) / 2) * hexWidth;
+
+      const x = i * hexWidth + totalRowOffset;// + horizontalOffset;
+      const y = r * vertSpacing;
+
+      const c = Math.round(x / (hexWidth / 2)); // GLOBAL COLUMN INDEX
+
+      div.style.left = `${x}px`;
+      div.style.top = `${y}px`;
+
+      const id = `r${r}_c${c}`;
+      const tile = { id, div, x, y, c, r, NE: null, E: null, SE: null, SW: null, W: null, NW: null };
+
+      div.addEventListener('mouseenter', () => {
+        for (const dir of ['NE', 'E', 'SE', 'SW', 'W', 'NW']) {
+          const neighbor = tileMap[tile[dir]];
+          if (neighbor) neighbor.div.classList.add('neighbor-highlight');
+        }
+      });
+
+      div.addEventListener('mouseleave', () => {
+        for (const dir of ['NE', 'E', 'SE', 'SW', 'W', 'NW']) {
+          const neighbor = tileMap[tile[dir]];
+          if (neighbor) neighbor.div.classList.remove('neighbor-highlight');
+        }
+      });
+      tileMap[id] = tile;
+      row.push(tile);
+      container.appendChild(div);
+    }
+
+    boardRows.push(row);
+  }
+
+  // After all tiles are created, link neighbors
+  for (let r = 0; r < boardRows.length; r++) {
+    for (let i = 0; i < boardRows[r].length; i++) {
+      const tile = boardRows[r][i];
+      let c = tile.c;
+      const isOdd = r % 2 === 1;
+
+      function getTile(rr, cc) {
+        if (isdef(tileMap[`r${rr}_c${cc}`])) return `r${rr}_c${cc}`; //tileMap[`r${rr}_c${cc}`];
+        else return null;
+      }
+
+      // Neighbor lookup varies by row parity
+      tile.E = getTile(r, c + 2);
+      tile.W = getTile(r, c - 2);
+      tile.NE = getTile(r - 1, c + 1);
+      tile.NW = getTile(r - 1, c - 1);
+      tile.SE = getTile(r + 1, c + 1);
+      tile.SW = getTile(r + 1, c - 1);
+      // tile.E = getTile(r, c + 1);
+      // tile.W = getTile(r, c - 1);
+      // tile.NE = getTile(r - 1, c + (isOdd ? 0 : -1));
+      // tile.NW = getTile(r - 1, c + (isOdd ? -1 : 0));
+      // tile.SE = getTile(r + 1, c + (isOdd ? 0 : -1));
+      // tile.SW = getTile(r + 1, c + (isOdd ? -1 : 0));
+
+    }
+  }
+
+  container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
+
+  return { boardRows, tileMap, tiles:arrFlatten(boardRows) };
+}
+function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50, gap = 1) {
+  if (rows % 2 === 0) {
+    console.error("Number of rows must be odd for a symmetrical hexagon grid.");
+    return;
+  }
+
+  const container = toElem(containerId);
+  container.innerHTML = '';
+
+  const hexWidth = sideLength * 2;
+  const hexHeight = hexWidth; //Math.sqrt(3) * sideLength;
+  const vertSpacing = hexHeight * 0.75;
+
+  const midRow = Math.floor(rows / 2);
+
+  let tiles = [];
+
+  for (let r = 0; r < rows; r++) {
+    const offsetFromMiddle = Math.abs(midRow - r);
+    const cols = maxCols - offsetFromMiddle;
+
+    for (let c = 0; c < cols; c++) {
+      const hex = document.createElement('div');
+      hex.className = 'hex';
+      hex.style.width = `${hexWidth - gap}px`;
+      hex.style.height = `${hexHeight - gap}px`;
+
+      const horizontalOffset = (r % 2 === 1) ? hexWidth / 2 : 0;
+      const totalRowOffset = ((maxCols - cols) / 2) * hexWidth;
+
+      const x = c * hexWidth + totalRowOffset; // + horizontalOffset - (r%2 == 1?hexWidth/2:0);
+      const y = r * vertSpacing;
+
+      hex.style.left = `${x}px`;
+      hex.style.top = `${y}px`;
+
+      container.appendChild(hex);
+      tiles.push({ div: hex, x, y, c, r })
+    }
+  }
+
+  container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
+  return tiles;
+}
 function createHexGrid(d, rows, cols, sideLength = 50) {
   const container = toElem(d)
   container.innerHTML = ''; // clear previous grid

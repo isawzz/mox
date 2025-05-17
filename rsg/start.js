@@ -1,29 +1,79 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_board2(); }
+function start() { test0_addCities(); }
 
+async function test0_addCities() {
+	await initTest();
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
+	let d = mDom('dMain');
+	let gap = 2, sz = 50;
+	let grid = mDom(d, { className: 'hexGrid', gap });
+	let { tiles, tileMap } = createHexShapedGrid(grid, 5, 5, sz, gap / 2);
+	for (const id in tileMap) { let o = tileMap[id]; mStyle(iDiv(o), { bg: 'rand' }) }
+	for (const id in tileMap) {
+		let t = tileMap[id];
+		let d = iDiv(t);
+		mCenterCenterFlex(d);
+		let factor = 1;
+		msKey(rChoose(Object.keys(M.superdi)), d, { hmax: sz * factor, fz: sz * factor, fg: rColor() })
+	}
+	console.log(Object.values(tileMap)[4])
+}
+async function test0_hexboardComparison() {
+	await initTest();
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
+	let d = mDom('dMain');
+	let gap = 2, sz = 10;
+	//let dhex = hexFromCenter(d, { x: 100, y: 100 }, {bg:'red'}); //return;
+
+	let t0 = getNow();
+
+	let grid = mDom(d, { className: 'hexGrid', gap });
+	let { tiles, tileMap } = createHexShapedGrid(grid, 25, 16, sz / 2, gap / 2);
+	for (const id in tileMap) {
+		let o = tileMap[id];
+		mStyle(iDiv(o), { bg: 'rand' })
+	}
+
+	let t1 = showTimeSince(t0);
+
+	let board = drawHexBoard(4, 13, d, { gap }, { bg: 'rand', sz });
+
+	let t2 = showTimeSince(t1);
+
+	console.log('tiles', tileMap, '\nboard', board)
+
+}
 async function test0_board2() {
 	await initTest();
 	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
-	let [gap,padding,sz,rows,maxcols]=[2,10,44,5,6]; //rows must be odd number!!!!
-	let [wtotal,htotal]=[sz*2*maxcols,sz*rows*.75*2+sz/2];
-	let board=mDom('dMain',{w:wtotal,h:htotal,bg:'red',padding}); //{w:520,h:420,bg:'green',patop:1})
-	let grid=mDom(board,{className:'hexGrid',gap});
-	let {boardRows,tileMap}=createHexShapedGrid(grid,rows,maxcols,sz,gap/2);
-	let r=getRectInt(grid); console.log('rect',r,wtotal,htotal)
-	console.log('tiles',tileMap)
-	for(const id in tileMap){
+	let [gap, padding, sz, rows, maxcols] = [2, 10, 44, 5, 6]; //rows must be odd number!!!!
+	let [wtotal, htotal] = [sz * 2 * maxcols, sz * rows * .75 * 2 + sz / 2];
+	let board = mDom('dMain', { w: wtotal, h: htotal, bg: 'red', padding }); //{w:520,h:420,bg:'green',patop:1})
+	let grid = mDom(board, { className: 'hexGrid', gap });
+	let { boardRows, tileMap, tiles } = createHexShapedGrid(grid, rows, maxcols, sz, gap / 2);
+	let r = getRectInt(grid); //console.log('rect',r,wtotal,htotal)
+	//console.log('tiles',tileMap)
+	for (const id in tileMap) {
 		let t = tileMap[id];
-		let d=iDiv(t);
+		let d = iDiv(t);
 		mCenterCenterFlex(d);
-		let factor=1;
-		msKey(rChoose(Object.keys(M.superdi)),d,{hmax:sz*factor,fz:sz*factor,fg:rColor()})
+		let factor = 1;
+		msKey(rChoose(Object.keys(M.superdi)), d, { hmax: sz * factor, fz: sz * factor, fg: rColor() })
 	}
-	let tiles = arrFlatten(boardRows);console.log('tiles',tiles)
-  let cityMap = {}; // key: `r_c` => city object
-	addCity(cityMap,grid,0,0,0,0,padding);
+	//let tiles = arrFlatten(boardRows);//
+	console.log('tiles', tiles)
+	let cityMap = {}; // key: `r_c` => city object
 
-	mDom(grid,{bg:'blue',w:100,h:100,zIndex:10000});
+	let t = tileMap[tiles[0]];
+	console.log('tile', t);
+	let [x, y] = [t.x + sz + 10, t.y + sz + 10]; console.log(x, y);
+
+
+	//addCity(cityMap, grid, 0, 0, x, y, padding);
+	//x=
+
+	//mDom(grid,{bg:'blue',w:100,h:100,position:'absolute',left:50,top:50});
 	//addCity(cityMap,grid,0,0,tiles[0].x,tiles[0].y,padding);
 
 	//const cityMap = addCities(grid, boardRows, 50);
@@ -31,22 +81,22 @@ async function test0_board2() {
 async function test0_board1() {
 	await initTest();
 	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
-	let [gap,padding,sz,rows,maxcols]=[2,10,44,5,6]; //rows must be odd number!!!!
-	let [wtotal,htotal]=[sz*2*maxcols,sz*rows*.75*2+sz/2];
-	let board=mDom('dMain',{w:wtotal,h:htotal,bg:'red',padding}); //{w:520,h:420,bg:'green',patop:1})
-	let grid=mDom(board,{className:'hexGrid',gap});
-	let tiles = createHexShapedGrid(grid,rows,maxcols,sz,gap/2);
-	let r=getRectInt(grid); console.log('rect',r,wtotal,htotal)
-	console.log('tiles',tiles)
+	let [gap, padding, sz, rows, maxcols] = [2, 10, 44, 5, 6]; //rows must be odd number!!!!
+	let [wtotal, htotal] = [sz * 2 * maxcols, sz * rows * .75 * 2 + sz / 2];
+	let board = mDom('dMain', { w: wtotal, h: htotal, bg: 'red', padding }); //{w:520,h:420,bg:'green',patop:1})
+	let grid = mDom(board, { className: 'hexGrid', gap });
+	let tiles = createHexShapedGrid(grid, rows, maxcols, sz, gap / 2);
+	let r = getRectInt(grid); console.log('rect', r, wtotal, htotal)
+	console.log('tiles', tiles)
 }
 async function test0_board0() {
 	await initTest();
 	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
-	let grid = mGrid(3,3,'dMain',{bg:'red',gap:2,padding:2,box:true,margin:4});
-	for(const i of range(9)){
-		let d=mDom(grid,{bg:'blue',w:100,h:100});
+	let grid = mGrid(3, 3, 'dMain', { bg: 'red', gap: 2, padding: 2, box: true, margin: 4 });
+	for (const i of range(9)) {
+		let d = mDom(grid, { bg: 'blue', w: 100, h: 100 });
 	}
-	let r=getRectInt(grid); console.log('rect',r)
+	let r = getRectInt(grid); console.log('rect', r)
 }
 async function test0_msGrid() {
 	await initTest();
@@ -62,8 +112,8 @@ async function test0_msGrid() {
 	for (const k of list) {
 		let o = M.superdi[k];
 		// if (isdef(o.fa6)) { d = mDom(dParent, { ...elemStyle, family: Families.fa6 }, { html: `&#x${o.fa6};` }); }
-		let d = mDom(container,{rounding:3, bg:'beige',fg:'black'})
-		let d1 = msKey(k, d, { hmax: 64 }, {prefer:'photo'});
+		let d = mDom(container, { rounding: 3, bg: 'beige', fg: 'black' })
+		let d1 = msKey(k, d, { hmax: 64 }, { prefer: 'photo' });
 		mLinebreak(d)
 		let d2 = mDom(d, { className: 'label' }, { html: k, title: k })
 		if (0 === ++i % n) await mSleep(20);

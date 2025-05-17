@@ -418,17 +418,17 @@ fieldset .disabled {
 
 .hex {
   position: absolute;
-  background: lightgray;
+  background-color: lightgray;
   /* clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); */
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  transition: background 0.2s;
+  transition: background-color 0.2s;
   cursor:pointer;
 }
 
 .hex:hover {
-  background: #ddd;
+  background-color: #eeeeee80;
 }
 
 .neighbor-highlight {
-  background: orange !important;
+  background-color: orange !important;
 }

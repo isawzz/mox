@@ -1937,13 +1937,14 @@ function drawHexBoard(topside, side, dParent, styles = {}, itemStyles = {}, opts
 	addKeys({ box: true }, styles);
 	let dOuter = mDom(dParent, styles, opts);
 	let d = mDom(dOuter, { position: 'relative', });
-	let [centers, rows, maxcols] = hexBoardCenters(topside, side);
+	let {centers, rows, maxcols} = hexBoardCenters(topside, side);
 	let [w, h] = mSizeSuccession(itemStyles, 24);
 	let gap = valf(styles.gap, -.5);
 	let items = [];
 	if (gap != 0) copyKeys({ w: w - gap, h: h - gap }, itemStyles);
+	
 	for (const c of centers) {
-		let dhex = hexFromCenter(d, { x: c.x * w, y: c.y * h }, itemStyles);
+		let dhex = hexFromCenter(d, { x: c.x * w, y: c.y * h }, addKeys({bg:'rand'},itemStyles));
 		let item = { div: dhex, cx: c.x, cy: c.y, row: c.row, col: c.col };
 		items.push(item);
 	}
@@ -3154,9 +3155,9 @@ function hexBoardCenters(topside, side) {
 	return { centers, rows, maxcols };
 }
 function hexFromCenter(dParent, center, styles = {}, opts = {}) {
-	let [w, h] = mSizeSuccession(styles);
+	let [w, h] = mSizeSuccession(styles,40);
 	let [left, top] = [center.x - w / 2, center.y - h / 2];
-	let d = mDom(dParent, { position: 'absolute', left, top, 'clip-path': 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }, opts);
+	let d = mDom(dParent, { w,h,position: 'absolute', left, top, 'clip-path': 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }, opts);
 	mStyle(d, styles);
 	return d;
 }
