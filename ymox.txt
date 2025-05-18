@@ -1,6 +1,25 @@
 alles ist fuer immer ok - I have left this plane. 
 nur machen was fe oder A sagen sonst vppmw airport
 
+___ 5:24 AM 5/18/2025 airport lib 22.5. 65000 K4
+anziehen
+stretch
+tune
+finger
+schradiek
+muell raus
+1 runde1w
+paganini
+1 runde2c
+bach G
+1 rundeB milch
+karotten kochen
+tschaik
+tee,>f2
+F2+geo:
+=>mach alles wieder mit den grundwerten! 
+=>code lacuna
+
 ___ 5:46 AM 5/17/2025 airport lib 22.5. 64000 K4
 ok, jetzt zu den cities
 createHexShapedGrid ist schneller als drawHexBoard

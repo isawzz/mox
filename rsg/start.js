@@ -2,7 +2,102 @@ onload = start; VERBOSE = true; TESTING = true;
 
 function start() { test0_addCities(); }
 
+function drawCircle(d, x, y, sz = 4,bg='red') {
+	mDom(d, { bg, round: true, w: sz, h: sz, position: 'absolute', left: x-sz/2, top: y-sz/2 }); //left:0,top:0}); //
+}
+function getEndPoints(c0,c1){return [c0[0],c0[1],c1[0],c1[1]];}
+function getCoordinates(){
+	let res=[];
+	for(const a of arguments){res.push(a[0]),res.push(a[1])}
+	return res;
+}
 async function test0_addCities() {
+	await initTest();
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
+	let d = mDom('dMain', { padding: 0 });
+	let gap = 6, sz = 50;
+	let grid = mDom(d, { className: 'hexGrid', gap, margin:0, position:'relative' });
+	let tiles = createHexShapedGrid(grid, 5, 5, sz, gap / 2);
+	for (const id in tiles) { let t = tiles[id]; mStyle(iDiv(t), { bg: 'rand' }) }
+	//exampleFields0(tiles,sz);	console.log(Object.values(tiles)[4])
+	for (const id in tiles) {
+		let t = tiles[id]; console.log(t);
+
+		drawCircle(grid,t.x+100,t.y+25,20);
+		let [cx, cy] = [t.cx, t.cy] = [t.x + sz, t.y + sz];
+		drawCircle(grid,cx,cy+50,20);
+		drawCircle(grid,cx,cy+50,14,'yellow');
+		let corners = getHexCorners(cx, cy, sz); console.log(corners);
+		let [c0, c1] = [corners[1], corners[2]]
+		let [x0,y0,x1,y1,x2,y2,x3,y3]=getCoordinates(...corners);
+
+		drawCircle(grid,x0,y0,14,'yellow');
+
+		return;
+		//drawLineSegmentDiv(c0[0], c0[1], c1[0], c1[1], grid);
+		let scity = 20;
+		let [left, top] = [cx - scity / 2, cy - scity / 2];
+		mDom(grid, { bg: 'black', round: true, w: 20, h: 20, position: 'absolute', left, top });
+		for (const pos of [c0, c1]) {
+			//console.log('pos',pos);
+			mDom(grid, { bg: 'green', round: true, w: 3, h: 3, position: 'absolute', left: pos[0], top: pos[1] }); //left:0,top:0}); //
+			//return;
+		}
+		return;
+		// for (const a of [90]) {
+		// 	let angle = Math.PI * a / 180
+		// 	let [dx, dy] = [Math.cos(angle) * sz, Math.sin(angle) * sz];
+		// 	[dx, dy] = [Math.round(dx), Math.round(dy)]
+		// 	let [ccx, ccy] = [cx + dx, cy - dy];
+		// 	console.log(cx, cy, dx, dy, ccx, ccy)
+		// 	mDom(grid, { bg: 'green', round: true, w: 20, h: 20, position: 'absolute', left: ccx - 10, top: ccy - 10 });
+		// }
+		// for (const a of [30]) {
+		// 	let angle = Math.PI * a / 180
+		// 	let [dx, dy] = [Math.cos(angle) * sz, Math.sin(angle) * sz];
+		// 	[dx, dy] = [Math.round(dx), Math.round(dy)]
+		// 	let [ccx, ccy] = [cx + dx, cy - dy];
+		// 	console.log(cx, cy, dx, dy, ccx, ccy)
+		// 	mDom(grid, { bg: 'green', round: true, w: 20, h: 20, position: 'absolute', left: ccx, top: ccy });
+		// }
+		//30, 90, 150, 210, 270, 330]) {		
+		break;
+	}
+}
+async function test0_hexboard() {
+	await initTest();
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
+	let d = mDom('dMain', { padding: 10 });
+	let gap = 2, sz = 50;
+	let grid = mDom(d, { className: 'hexGrid', gap });
+	let tiles = createHexShapedGrid(grid, 5, 5, sz, gap / 2);
+	for (const id in tiles) { let o = tiles[id]; mStyle(iDiv(o), { bg: 'rand' }) }
+	for (const id in tiles) {
+		let t = tiles[id];
+		let d = iDiv(t);
+		mCenterCenterFlex(d);
+		let factor = 1;
+		msKey(rChoose(Object.keys(M.superdi)), d, { hmax: sz * factor, fz: sz * factor, fg: rColor() })
+
+		d.addEventListener('mouseenter', () => {
+			for (const dir of ['NE', 'E', 'SE', 'SW', 'W', 'NW']) {
+				const neighbor = tiles[t[dir]]; console.log(neighbor)
+				if (neighbor) neighbor.div.classList.add('neighbor-highlight');
+			}
+		});
+
+		d.addEventListener('mouseleave', () => {
+			for (const dir of ['NE', 'E', 'SE', 'SW', 'W', 'NW']) {
+				const neighbor = tiles[t[dir]];
+				if (neighbor) neighbor.div.classList.remove('neighbor-highlight');
+			}
+		});
+
+	}
+	console.log(Object.values(tiles)[4])
+}
+//************* deprecated ******************** */
+async function test0_fields() {
 	await initTest();
 	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
 	let d = mDom('dMain');

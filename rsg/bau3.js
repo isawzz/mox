@@ -1,4 +1,107 @@
 
+function drawLineSegmentDiv(x1, y1, x2, y2, parent, thickness = 5, color = 'black') {
+  const length = Math.hypot(x2 - x1, y2 - y1);
+  const angleRad = Math.atan2(y2 - y1, x2 - x1);
+  const angleDeg = angleRad * 180 / Math.PI;
+
+  const line = document.createElement('div');
+  line.style.position = 'absolute';
+  line.style.left = `${x1}px`;
+  line.style.top = `${y1 - thickness / 2}px`; // center vertically
+  line.style.width = `${length}px`;
+  line.style.height = `${thickness}px`;
+  line.style.backgroundColor = color;
+  line.style.transform = `rotate(${angleDeg}deg)`;
+  line.style.transformOrigin = '0 50%'; // rotate around start point
+  line.style.pointerEvents = 'none';
+
+  parent.appendChild(line);
+  return line;
+}
+
+function normalSegmentThroughMidpoint(x1, y1, x2, y2, length) {
+  // Midpoint
+  const mx = (x1 + x2) / 2;
+  const my = (y1 + y2) / 2;
+
+  // Direction vector of the original segment
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+
+  // Normalized perpendicular vector
+  let nx = -dy;
+  let ny = dx;
+  const norm = Math.hypot(nx, ny);
+
+  if (norm === 0) {
+    throw new Error("The two points are identical; cannot compute a normal.");
+  }
+
+  nx /= norm;
+  ny /= norm;
+
+  // Half-length vector for the normal
+  const halfLen = length / 2;
+  const xA = mx + nx * halfLen;
+  const yA = my + ny * halfLen;
+  const xB = mx - nx * halfLen;
+  const yB = my - ny * halfLen;
+
+  return [
+    { x: xA, y: yA },
+    { x: xB, y: yB }
+  ];
+}
+
+function normalThroughMidpoint(x1, y1, x2, y2) {
+  // Midpoint
+  const mx = (x1 + x2) / 2;
+  const my = (y1 + y2) / 2;
+
+  // Slope of the original segment
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+
+  let slope, normalSlope, intercept;
+
+  if (dx === 0) {
+    // Vertical line → normal is horizontal (slope = 0)
+    normalSlope = 0;
+    intercept = my;
+  } else if (dy === 0) {
+    // Horizontal line → normal is vertical (infinite slope)
+    normalSlope = Infinity; // special case
+    intercept = mx;         // x-intercept of vertical line
+  } else {
+    const originalSlope = dy / dx;
+    normalSlope = -1 / originalSlope;
+    intercept = my - normalSlope * mx;
+  }
+
+  return {
+    midpoint: { x: mx, y: my },
+    normalLine: {
+      slope: normalSlope,
+      intercept: intercept,
+      form: normalSlope === Infinity
+        ? `x = ${intercept}`
+        : `y = ${normalSlope}x + ${intercept}`
+    }
+  };
+}
+
+function getHexCorners(x, y, radius) {
+  const corners = [];
+  for (let i = 0; i < 6; i++) {
+    const angle = Math.PI / 3 * i - Math.PI / 6; // -30° to make flat top
+    const cornerX = x + radius * Math.cos(angle);
+    const cornerY = y + radius * Math.sin(angle);
+    corners.push([cornerX, cornerY]);
+  }
+  return corners;
+}
+
+
 function addCity(cityMap, container, r, c, x, y, padding = 0) {
   const key = `${r}_${c}`;
   if (cityMap[key]) return; // avoid duplicates
@@ -97,13 +200,11 @@ function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50
   const vertSpacing = hexHeight * 0.75;
 
   const midRow = Math.floor(rows / 2);
-  const tileMap = {}; // id -> tile object
-  const tiles = [];    // row-wise storage
+  const tiles = {}; // id -> tile object
 
   for (let r = 0; r < rows; r++) {
     const offsetFromMiddle = Math.abs(midRow - r);
     const cols = maxCols - offsetFromMiddle;
-    const row = [];
 
     for (let i = 0; i < cols; i++) {
       const div = document.createElement('div');
@@ -125,34 +226,20 @@ function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50
       const id = `r${r}_c${c}`;
       const tile = { id, div, x, y, c, r, NE: null, E: null, SE: null, SW: null, W: null, NW: null };
 
-      div.addEventListener('mouseenter', () => {
-        for (const dir of ['NE', 'E', 'SE', 'SW', 'W', 'NW']) {
-          const neighbor = tileMap[tile[dir]]; console.log(neighbor)
-          if (neighbor) neighbor.div.classList.add('neighbor-highlight');
-        }
-      });
-
-      div.addEventListener('mouseleave', () => {
-        for (const dir of ['NE', 'E', 'SE', 'SW', 'W', 'NW']) {
-          const neighbor = tileMap[tile[dir]];
-          if (neighbor) neighbor.div.classList.remove('neighbor-highlight');
-        }
-      });
-      tileMap[id] = tile;
-      tiles.push(id);
+      tiles[id] = tile;
       container.appendChild(div);
     }
 
   }
 
   // After all tiles are created, link neighbors
-  for (let i = 0; i < tiles.length; i++) {
-    const tile = tileMap[tiles[i]];
+  for (const id in tiles) {
+    const tile = tiles[id];
     let [r, c] = [tile.r, tile.c];
     const isOdd = r % 2 === 1;
 
     function getTile(rr, cc) {
-      if (isdef(tileMap[`r${rr}_c${cc}`])) return `r${rr}_c${cc}`; //tileMap[`r${rr}_c${cc}`];
+      if (isdef(tiles[`r${rr}_c${cc}`])) return `r${rr}_c${cc}`; //tileMap[`r${rr}_c${cc}`];
       else return null;
     }
 
@@ -168,9 +255,32 @@ function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50
 
   container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
 
-  return { tiles, tileMap };
+  return tiles;
 }
+function exampleFields0(tiles, sz) {
+  for (const id in tiles) {
+    let t = tiles[id];
+    let d = iDiv(t);
+    mCenterCenterFlex(d);
+    msKey(rChoose(Object.keys(M.superdi)), d, { hmax: sz, fz: sz, fg: rColor() })
 
+    d.addEventListener('mouseenter', () => {
+      for (const dir of ['NE', 'E', 'SE', 'SW', 'W', 'NW']) {
+        const neighbor = tiles[t[dir]]; console.log(neighbor)
+        if (neighbor) neighbor.div.classList.add('neighbor-highlight');
+      }
+    });
+
+    d.addEventListener('mouseleave', () => {
+      for (const dir of ['NE', 'E', 'SE', 'SW', 'W', 'NW']) {
+        const neighbor = tiles[t[dir]];
+        if (neighbor) neighbor.div.classList.remove('neighbor-highlight');
+      }
+    });
+
+  }
+
+}
 
 function mScrollBehavior(container, hScroll, hSnapp) {
   // const rowHeight = 120 + 8; // row height + vertical gap
