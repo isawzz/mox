@@ -2,20 +2,23 @@ alles ist fuer immer ok - I have left this plane.
 nur machen was fe oder A sagen sonst vppmw airport
 
 ___ 5:24 AM 5/18/2025 airport lib 22.5. 65000 K4
-7:23 AM 5/18/2025 anziehen
-7:24 AM 5/18/2025 stretch
-7:29 AM 5/18/2025 tune
-7:30 AM 5/18/2025 finger
-7:32 AM 5/18/2025 schradiek
-7:42 AM 5/18/2025 muell raus
-9:04 AM 5/18/2025 1 runde1w schluessel vergessen!
-9:04 AM 5/18/2025 paganini
-9:42 AM 5/18/2025 1 runde2c
-10:02 AM 5/18/2025 bach G
-ok 1 rundeB milch
-10:13 AM 5/18/2025 karotten kochen
-10:28 AM 5/18/2025 tschaik
-10:42 AM 5/18/2025 tee,>f2
+
+given a list of 
+
+anziehen
+stretch
+tune
+finger
+schradiek
+muell raus
+1 runde1w
+paganini
+1 runde2c
+bach G
+1 rundeB milch
+karotten kochen
+tschaik
+tee,>f2
 F2+geo:
 =>mach alles wieder mit den grundwerten! 
 =>code lacuna
