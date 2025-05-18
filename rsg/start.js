@@ -2,67 +2,71 @@ onload = start; VERBOSE = true; TESTING = true;
 
 function start() { test0_addCities(); }
 
-function drawCircle(d, x, y, sz = 4,bg='red') {
-	mDom(d, { bg, round: true, w: sz, h: sz, position: 'absolute', left: x-sz/2, top: y-sz/2 }); //left:0,top:0}); //
-}
-function getEndPoints(c0,c1){return [c0[0],c0[1],c1[0],c1[1]];}
-function getCoordinates(){
-	let res=[];
-	for(const a of arguments){res.push(a[0]),res.push(a[1])}
-	return res;
-}
 async function test0_addCities() {
 	await initTest();
 	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
-	let d = mDom('dMain', { padding: 0 });
+	let d = mDom('dMain', { padding: 0,margin:10 });
 	let gap = 6, sz = 50;
-	let grid = mDom(d, { className: 'hexGrid', gap, margin:0, position:'relative' });
+	let grid = mDom(d, { className: 'hexGrid', gap, margin: 0, position: 'relative' });
 	let tiles = createHexShapedGrid(grid, 5, 5, sz, gap / 2);
-	for (const id in tiles) { let t = tiles[id]; mStyle(iDiv(t), { bg: 'rand' }) }
-	//exampleFields0(tiles,sz);	console.log(Object.values(tiles)[4])
+
+	let cities = {}, streets={};
 	for (const id in tiles) {
-		let t = tiles[id]; console.log(t);
-
-		drawCircle(grid,t.x+100,t.y+25,20);
-		let [cx, cy] = [t.cx, t.cy] = [t.x + sz, t.y + sz];
-		drawCircle(grid,cx,cy+50,20);
-		drawCircle(grid,cx,cy+50,14,'yellow');
-		let corners = getHexCorners(cx, cy, sz); console.log(corners);
-		let [c0, c1] = [corners[1], corners[2]]
-		let [x0,y0,x1,y1,x2,y2,x3,y3]=getCoordinates(...corners);
-
-		drawCircle(grid,x0,y0,14,'yellow');
-
-		return;
-		//drawLineSegmentDiv(c0[0], c0[1], c1[0], c1[1], grid);
-		let scity = 20;
-		let [left, top] = [cx - scity / 2, cy - scity / 2];
-		mDom(grid, { bg: 'black', round: true, w: 20, h: 20, position: 'absolute', left, top });
-		for (const pos of [c0, c1]) {
-			//console.log('pos',pos);
-			mDom(grid, { bg: 'green', round: true, w: 3, h: 3, position: 'absolute', left: pos[0], top: pos[1] }); //left:0,top:0}); //
-			//return;
-		}
-		return;
-		// for (const a of [90]) {
-		// 	let angle = Math.PI * a / 180
-		// 	let [dx, dy] = [Math.cos(angle) * sz, Math.sin(angle) * sz];
-		// 	[dx, dy] = [Math.round(dx), Math.round(dy)]
-		// 	let [ccx, ccy] = [cx + dx, cy - dy];
-		// 	console.log(cx, cy, dx, dy, ccx, ccy)
-		// 	mDom(grid, { bg: 'green', round: true, w: 20, h: 20, position: 'absolute', left: ccx - 10, top: ccy - 10 });
-		// }
-		// for (const a of [30]) {
-		// 	let angle = Math.PI * a / 180
-		// 	let [dx, dy] = [Math.cos(angle) * sz, Math.sin(angle) * sz];
-		// 	[dx, dy] = [Math.round(dx), Math.round(dy)]
-		// 	let [ccx, ccy] = [cx + dx, cy - dy];
-		// 	console.log(cx, cy, dx, dy, ccx, ccy)
-		// 	mDom(grid, { bg: 'green', round: true, w: 20, h: 20, position: 'absolute', left: ccx, top: ccy });
-		// }
-		//30, 90, 150, 210, 270, 330]) {		
-		break;
+		let t = tiles[id];
+		// test0_tile(id, tiles, grid, sz);
+		let adj=getCorners(t.x, t.y, sz);
+		let seg=getSegments(t.x, t.y, sz);
+		cities = addKeys(adj, cities);
+		streets = addKeys(seg,streets);
+		mStyle(iDiv(t), { bg: 'rand' });
 	}
+	console.log(Object.keys(cities));
+	for(const id in streets){
+		//get x, y from city id
+		let [x1, y1, x2,y2]=allNumbers(id); console.log(x1, y1, x2, y2);
+		drawLineSegmentDiv(x1, y1, x2, y2, grid, thickness = 8, color = 'black')
+	}
+	for(const id in cities){
+		//get x,y from city id
+		let [x,y]=allNumbers(id); console.log(x,y);
+		drawCircle(grid, x,y, 20, 'red');
+		drawCircle(grid, x,y, 14, 'yellow');
+	}
+
+
+}
+function test0_tileDict(id, tiles, grid, sz) {
+
+	let t = tiles[id]; console.log(t);
+	console.log(t);
+	let di = getCorners(t.x, t.y, sz);
+	for (let i = 0; i < list.length / 2; i++) {
+		drawCircle(grid, list[2 * i], list[2 * i + 1], 20, 'red');
+		drawCircle(grid, list[2 * i], list[2 * i + 1], 14, 'yellow');
+
+	}
+}
+function test0_tile(id, tiles, grid, sz) {
+
+	let t = tiles[id]; console.log(t);
+	console.log(t);
+	let list = getCornerList(t.x, t.y, sz);
+	for (let i = 0; i < list.length / 2; i++) {
+		drawCircle(grid, list[2 * i], list[2 * i + 1], 20, 'red');
+		drawCircle(grid, list[2 * i], list[2 * i + 1], 14, 'yellow');
+
+	}
+	return;
+	drawCircle(grid, t.x + 100, t.y + 25, 20);
+	let [cx, cy] = [t.cx, t.cy] = [t.x + sz, t.y + sz];
+	drawCircle(grid, cx, cy + 50, 20);
+	drawCircle(grid, cx, cy + 50, 14, 'yellow');
+	let corners = getHexCorners(cx, cy, sz); console.log(corners);
+	let [c0, c1] = [corners[1], corners[2]]
+	let [x0, y0, x1, y1, x2, y2, x3, y3] = getCoordinates(...corners);
+
+	drawCircle(grid, x0, y0, 14, 'yellow');
+
 }
 async function test0_hexboard() {
 	await initTest();

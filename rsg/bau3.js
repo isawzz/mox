@@ -89,6 +89,38 @@ function normalThroughMidpoint(x1, y1, x2, y2) {
     }
   };
 }
+function drawCircle(d, x, y, sz = 4, bg = 'red') {
+  mDom(d, { bg, round: true, w: sz, h: sz, position: 'absolute', left: x - sz / 2, top: y - sz / 2 }); //left:0,top:0}); //
+}
+function getEndPoints(c0, c1) { return [c0[0], c0[1], c1[0], c1[1]]; }
+function getCoordinates() {
+  let res = [];
+  for (const a of arguments) { res.push(a[0]), res.push(a[1]) }
+  return res;
+}
+function getCorners(x, y, sz) {
+  let res = {};
+  let list = getCornerList(x, y, sz);
+  for (let i = 0; i < list.length / 2; i++) {
+    let id = `c${list[2 * i]}_${list[2 * i + 1]}`;
+    res[id] = { x: list[2 * i], y: list[2 * i + 1] }
+  }
+  return res;
+}
+function getSegments(x, y, sz) {
+  let res = {};
+  let list = getCornerList(x, y, sz);
+  for (let i = 0; i < list.length / 2; i++) {
+    let x1 = list[2 * i];
+    let y1 = list[2 * i + 1];
+    let x2 = list[2 * ((i + 1) % 6)];
+    let y2 = list[2 * ((i + 1) % 6) + 1];
+    let id = `s${x1}_${y1}_${x2}_${y2}`;
+    res[id] = { x1, y1, x2, y2 }
+  }
+  return res;
+}
+function getCornerList(x, y, sz) { return [x + sz, y, x + 2 * sz, y + sz / 2, x + 2 * sz, y + sz * 3 / 2, x + sz, y + 2 * sz, x, y + sz * 3 / 2, x, y + sz / 2]; }
 
 function getHexCorners(x, y, radius) {
   const corners = [];
