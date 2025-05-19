@@ -3686,10 +3686,10 @@ function mDatalist(dParent, list, opts = {}) {
 function mDom(dParent, styles = {}, opts = {}) {
 	let tag = valf(opts.tag, 'div');
 	let d = document.createElement(tag);
-	if (isdef(dParent)) mAppend(dParent, d);
 	if (tag == 'textarea') styles.wrap = 'hard';
 	mStyle(d, styles);
 	applyOpts(d, opts);
+	if (isdef(dParent)) mAppend(dParent, d);
 	return d;
 }
 function mDraggable(item) {

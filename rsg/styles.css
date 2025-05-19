@@ -391,42 +391,17 @@ fieldset .disabled {
   height: 100%;
 }
 
-.hex0 {
-  position: absolute;
-  width: 100px;
-  /* side * 2 */
-  height: 86.6px;
-  /* sqrt(3) * side */
-  background: #3498db;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%,
-      50% 100%, 0% 75%, 0% 25%);
-  box-sizing: border-box;
-}
-
-.hex1 {
-  position: absolute;
-  width: 100px;
-  /* side * 2 */
-  height: 86.6px;
-  /* sqrt(3) * side */
-  background: #f5c87a;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%,
-      50% 100%, 0% 75%, 0% 25%);
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-}
-
 .hex {
   position: absolute;
   background-color: lightgray;
   /* clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); */
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   transition: background-color 0.2s;
-  cursor:pointer;
+  cursor: pointer;
 }
 
 .hex:hover {
-  background-color: #eeeeee80;
+  background-color: #eeeeeea0;
 }
 
 .neighbor-highlight {

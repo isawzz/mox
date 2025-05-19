@@ -1,36 +1,119 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_addCities(); }
+function start() { test0_hexboardComparison(); }
 
-async function test0_addCities() {
+async function test0_hexboardComparison() {
 	await initTest();
 	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
-	let d = mDom('dMain', { padding: 0,margin:10 });
-	let gap = 6, sz = 50;
-	let grid = mDom(d, { className: 'hexGrid', gap, margin: 0, position: 'relative' });
-	let tiles = createHexShapedGrid(grid, 5, 5, sz, gap / 2);
+	let gap = 2, sz = 10;
 
-	let cities = {}, streets={};
+	// let topcols = 15, side = 25;
+	// let maxcols = topcols + side - 1;
+	// let rows = side * 2 - 1;
+	let rows=45,maxcols=45;
+
+	//let dhex = hexFromCenter(d, { x: 100, y: 100 }, {bg:'red'}); //return;
+
+	let t0 = getNow();
+
+	let d = mDom('dMain');
+	let grid = mDom(d, { bg: 'blue', gap, margin: 0, position: 'relative' });
+	let tiles = createHexShapedGrid(grid, rows, maxcols, sz / 2, gap / 2);
+	//console.log('tiles', tiles);
+	for (const id in tiles) {
+		let o = tiles[id];
+		mStyle(iDiv(o), { bg: 'rand' })
+	}
+
+	let t1 = showTimeSince(t0);
+
+	let d1 = mDom('dMain');
+	let grid1 = mDom(d1, { bg: 'green', gap, margin: 0, position: 'relative' });
+	let tiles1 = createHexShapedGridOptimized(grid1, rows, maxcols, sz / 2, gap / 2);
+	const allTiles = tiles1.flat().filter(Boolean);
+	//console.log(allTiles)
+	// let grid = mDom(d, { className: 'hexGrid', gap });
+	// let { tiles, tileMap } = createHexShapedGrid(grid, 25, 16, sz / 2, gap / 2);
+	// for (const id in tiles) {
+	// 	let o = tiles[id];
+	for(const o of allTiles){
+		mStyle(iDiv(o), { bg: 'rand' })
+	}
+	let t2 = showTimeSince(t1);
+	return;
+
+	let board = drawHexBoard(topcols, side, d, { display: 'inline-block', bg: 'green', gap: gap / 2 }, { bg: 'rand', sz });
+
+	let t3 = showTimeSince(t2);
+
+	console.log('tiles', tiles, '\nboard', board)
+
+}
+async function test0_squareGrid() {
+	await initTest();
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
+	let d = mDom('dMain', { padding: 0, margin: 10 });
+	let gap = 6, sz = 50;
+	let grid = mDom(d, { className: 'hexGrid', gap, margin: 0 });
+	let tiles = createSquareGrid(grid, 5, 5, sz, gap / 2);
+	return;
+	let cities = {}, streets = {};
 	for (const id in tiles) {
 		let t = tiles[id];
 		// test0_tile(id, tiles, grid, sz);
-		let adj=getCorners(t.x, t.y, sz);
-		let seg=getSegments(t.x, t.y, sz);
+		let adj = getCorners(t.x, t.y, sz);
+		let seg = getSegments(t.x, t.y, sz);
 		cities = addKeys(adj, cities);
-		streets = addKeys(seg,streets);
+		streets = addKeys(seg, streets);
 		mStyle(iDiv(t), { bg: 'rand' });
 	}
 	console.log(Object.keys(cities));
-	for(const id in streets){
+	for (const id in streets) {
 		//get x, y from city id
-		let [x1, y1, x2,y2]=allNumbers(id); console.log(x1, y1, x2, y2);
+		let [x1, y1, x2, y2] = allNumbers(id); console.log(x1, y1, x2, y2);
 		drawLineSegmentDiv(x1, y1, x2, y2, grid, thickness = 8, color = 'black')
 	}
-	for(const id in cities){
+	for (const id in cities) {
 		//get x,y from city id
-		let [x,y]=allNumbers(id); console.log(x,y);
-		drawCircle(grid, x,y, 20, 'red');
-		drawCircle(grid, x,y, 14, 'yellow');
+		let [x, y] = allNumbers(id); //console.log(x,y);
+		drawCircle(grid, x, y, 20, 'red');
+		drawCircle(grid, x, y, 14, 'yellow');
+	}
+
+
+}
+async function test0_addCities() {
+	await initTest();
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
+	let d = mDom('dMain', { padding: 0, margin: 10 });
+	let gap = 6, sz = 50;
+	let grid = mDom(d, { bg: 'blue', gap, margin: 0, position: 'relative' });
+	let tiles = createHexShapedGrid(grid, 5, 5, sz, gap / 2);
+
+	let rgrid = getRectInt(grid); console.log(rgrid)
+	let r = getRectInt(d); console.log(r)
+
+	let cities = {}, streets = {};
+	for (const id in tiles) {
+		let t = tiles[id];
+		// test0_tile(id, tiles, grid, sz);
+		let adj = getCorners(t.x, t.y, sz);
+		let seg = getSegments(t.x, t.y, sz);
+		cities = addKeys(adj, cities);
+		streets = addKeys(seg, streets);
+		mStyle(iDiv(t), { bg: 'rand' });
+	}
+	//console.log(Object.keys(cities));
+	for (const id in streets) {
+		//get x, y from city id
+		let [x1, y1, x2, y2] = allNumbers(id); //console.log(x1, y1, x2, y2);
+		drawLineSegmentDiv(x1, y1, x2, y2, grid, thickness = 8, color = 'black')
+	}
+	for (const id in cities) {
+		//get x,y from city id
+		let [x, y] = allNumbers(id); //console.log(x,y);
+		drawCircle(grid, x, y, 20, 'red');
+		drawCircle(grid, x, y, 14, 'yellow');
 	}
 
 
@@ -117,31 +200,6 @@ async function test0_fields() {
 		msKey(rChoose(Object.keys(M.superdi)), d, { hmax: sz * factor, fz: sz * factor, fg: rColor() })
 	}
 	console.log(Object.values(tileMap)[4])
-}
-async function test0_hexboardComparison() {
-	await initTest();
-	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
-	let d = mDom('dMain');
-	let gap = 2, sz = 10;
-	//let dhex = hexFromCenter(d, { x: 100, y: 100 }, {bg:'red'}); //return;
-
-	let t0 = getNow();
-
-	let grid = mDom(d, { className: 'hexGrid', gap });
-	let { tiles, tileMap } = createHexShapedGrid(grid, 25, 16, sz / 2, gap / 2);
-	for (const id in tileMap) {
-		let o = tileMap[id];
-		mStyle(iDiv(o), { bg: 'rand' })
-	}
-
-	let t1 = showTimeSince(t0);
-
-	let board = drawHexBoard(4, 13, d, { gap }, { bg: 'rand', sz });
-
-	let t2 = showTimeSince(t1);
-
-	console.log('tiles', tileMap, '\nboard', board)
-
 }
 async function test0_board2() {
 	await initTest();
