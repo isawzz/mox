@@ -1,10 +1,9 @@
 alles ist fuer immer ok - I have left this plane. 
 nur machen was fe oder A sagen sonst vppmw airport
 
+___  airport lib 22.5. 66000 K4
 ___ 5:24 AM 5/18/2025 airport lib 22.5. 65000 K4
-
 given a list of 
-
 anziehen
 stretch
 tune
@@ -22,7 +21,6 @@ tee,>f2
 F2+geo:
 =>mach alles wieder mit den grundwerten! 
 =>code lacuna
-
 ___ 5:46 AM 5/17/2025 airport lib 22.5. 64000 K4
 ok, jetzt zu den cities
 createHexShapedGrid ist schneller als drawHexBoard
