@@ -1,5 +1,132 @@
 
+function _triangleTessellationCenters(rows, cols, w, h) {
+  const centers = [];
+
+  for (let r = 0; r < rows; r++) {
+    const baseY = r * (h / 2); // every row is half-height offset
+    const startX = (r % 2 === 1) ? w / 2 : 0; // staggered rows
+
+    for (let c = 0; c < cols; c++) {
+      const x = startX + c * w;
+      const isUp = (r % 2 === 0);
+      const y = baseY + (isUp ? h / 3 : (2 * h) / 3);
+
+      centers.push({ x, y, up: isUp });
+    }
+  }
+
+  return centers;
+}
+
+function _triangleTessellationCenters(rows, cols, n) {
+  const centers = [];
+  const h = (Math.sqrt(3) / 2) * n;
+
+  for (let r = 0; r < rows; r++) {
+    const y = r * h;
+    for (let c = 0; c < cols; c++) {
+      const x = c * n + ((r % 2) * n) / 2;
+      const isPointingUp = (r + c) % 2 === 0;
+      centers.push({ x, y: isPointingUp ? y + h / 3 : y + (2 * h) / 3, up: isPointingUp });
+    }
+  }
+
+  return centers;
+}
+function _drawTriangleAtCenter(parent, center, n, pointingUp = true, color = 'black') {
+  const h = (Math.sqrt(3) / 2) * n;
+  const div = document.createElement('div');
+
+  div.style.position = 'absolute';
+  div.style.width = `${n}px`;
+  div.style.height = `${h}px`;
+  div.style.left = `${center.x - n / 2}px`;
+  div.style.top = `${center.y - h / 2}px`;
+  div.style.backgroundColor = color;
+  div.style.clipPath = pointingUp
+    ? 'polygon(50% 0%, 0% 100%, 100% 100%)'
+    : 'polygon(0% 0%, 100% 0%, 50% 100%)';
+
+  parent.appendChild(div);
+  return div;
+}
 //hexgrid versuche
+function createHexShapedGridX(containerId, rows = 5, maxCols = 5, sz = 50, gap = 1) {
+  if (rows % 2 === 0) {
+    console.error("Number of rows must be odd for a symmetrical hexagon grid.");
+    return;
+  }
+
+  const container = toElem(containerId);
+  //const frag=document.createDocumentFragment();
+  container.innerHTML = '';
+
+  const hexWidth = sz * 2;
+  const hexHeight = hexWidth; //Math.sqrt(3) * sideLength;
+  const vertSpacing = hexHeight * 0.75;
+
+  const midRow = Math.floor(rows / 2);
+  const tiles = {}; // id -> tile object
+  let [w, h] = [hexWidth - gap, hexHeight - gap];
+
+  for (let r = 0; r < rows; r++) {
+    const offsetFromMiddle = Math.abs(midRow - r);
+    const cols = maxCols - offsetFromMiddle;
+    const totalRowOffset = ((maxCols - cols) / 2) * hexWidth;
+    const horizontalOffset = (r % 2 === 1) ? hexWidth / 2 : 0;
+    const y = r * vertSpacing;
+    for (let i = 0; i < cols; i++) {
+      const x = i * hexWidth + totalRowOffset;// + horizontalOffset;
+      const c = Math.round(x / (hexWidth / 2)); // GLOBAL COLUMN INDEX
+      const id = `r${r}_c${c}`;
+
+      let div = mDom(container, { className: 'hex', left: x, top: y, w, h }, { id })
+      const tile = { id, div, x, y, sz, c, r, NE: null, E: null, SE: null, SW: null, W: null, NW: null };
+
+      tiles[id] = tile;
+    }
+
+  }
+
+  // After all tiles are created, link neighbors
+  for (const id in tiles) {
+    const tile = tiles[id];
+    let [r, c] = [tile.r, tile.c];
+
+    function getTile(rr, cc) { return tiles[`r${rr}_c${cc}`] || null; }
+    //   if (isdef(tiles[`r${rr}_c${cc}`])) return `r${rr}_c${cc}`; //tileMap[`r${rr}_c${cc}`];
+    //   else return null;
+    // }
+
+    // Neighbor lookup varies by row parity
+    tile.E = getTile(r, c + 2);
+    tile.W = getTile(r, c - 2);
+    tile.NE = getTile(r - 1, c + 1);
+    tile.NW = getTile(r - 1, c - 1);
+    tile.SE = getTile(r + 1, c + 1);
+    tile.SW = getTile(r + 1, c - 1);
+
+  }
+
+  // container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
+  let hGrid = rows * vertSpacing + hexHeight * 0.25;
+  let wGrid = maxCols * hexWidth;
+  console.log(w, h)
+  mStyle(container, { w: wGrid, h: hGrid }); //,bg:'skyblue'})
+  //container.appendChild(frag);
+
+  return tiles;
+}
+function getHexCorners(x, y, radius) {
+  const corners = [];
+  for (let i = 0; i < 6; i++) {
+    const angle = Math.PI / 3 * i - Math.PI / 6; // -30° to make flat top
+    const cornerX = x + radius * Math.cos(angle);
+    const cornerY = y + radius * Math.sin(angle);
+    corners.push([cornerX, cornerY]);
+  }
+  return corners;
+}
 function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50, gap = 1) {
   if (rows % 2 === 0) {
     console.error("Number of rows must be odd for a symmetrical hexagon grid.");

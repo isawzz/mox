@@ -1,4 +1,34 @@
 
+function getCorners(x, y, sz, func) {
+  let res = {};
+  let list = func(x, y, sz);
+  for (let i = 0; i < list.length / 2; i++) {
+    let id = `c${list[2 * i]}_${list[2 * i + 1]}`;
+    res[id] = { x: list[2 * i], y: list[2 * i + 1] }
+  }
+  return res;
+}
+function getSegments(x, y, sz, npoly=6) {
+  let func={4:getQuadCornerList,6:getHexCornerList}[npoly];
+  let res = {};
+  let list = func(x, y, sz);
+  for (let i = 0; i < list.length / 2; i++) {
+    let x1 = list[2 * i];
+    let y1 = list[2 * i + 1];
+    let x2 = list[2 * ((i + 1) % npoly)];
+    let y2 = list[2 * ((i + 1) % npoly) + 1];
+
+    //sort by x,y
+    if (x1>x2) {[x1,x2]=[x2,x1];[y1,y2]=[y2,y1];} 
+    else if (x1==x2 && y1>y2) {[x1,x2]=[x2,x1];[y1,y2]=[y2,y1];}
+
+    let id = `s${x1}_${y1}_${x2}_${y2}`;
+    // let id2 = `s${x2}_${y2}_${x1}_${y1}`;
+    res[id] = { x1, y1, x2, y2}
+    // res[id2] = { x1, y1, x2, y2, d:'cc' }
+  }
+  return res;
+}
 
 function drawLineSegmentDiv(x1, y1, x2, y2, parent, thickness = 5, color = 'black') {
   const length = Math.hypot(x2 - x1, y2 - y1);
@@ -99,18 +129,18 @@ function getCoordinates() {
   for (const a of arguments) { res.push(a[0]), res.push(a[1]) }
   return res;
 }
-function getCorners(x, y, sz) {
+function getHexCorners(x, y, sz) {
   let res = {};
-  let list = getCornerList(x, y, sz);
+  let list = getHexCornerList(x, y, sz);
   for (let i = 0; i < list.length / 2; i++) {
     let id = `c${list[2 * i]}_${list[2 * i + 1]}`;
     res[id] = { x: list[2 * i], y: list[2 * i + 1] }
   }
   return res;
 }
-function getSegments(x, y, sz) {
+function getHexSegments(x, y, sz) {
   let res = {};
-  let list = getCornerList(x, y, sz);
+  let list = getHexCornerList(x, y, sz);
   for (let i = 0; i < list.length / 2; i++) {
     let x1 = list[2 * i];
     let y1 = list[2 * i + 1];
@@ -121,18 +151,32 @@ function getSegments(x, y, sz) {
   }
   return res;
 }
-function getCornerList(x, y, sz) { return [x + sz, y, x + 2 * sz, y + sz / 2, x + 2 * sz, y + sz * 3 / 2, x + sz, y + 2 * sz, x, y + sz * 3 / 2, x, y + sz / 2]; }
+function getHexCornerList(x, y, sz) { return [x + sz, y, x + 2 * sz, y + sz / 2, x + 2 * sz, y + sz * 3 / 2, x + sz, y + 2 * sz, x, y + sz * 3 / 2, x, y + sz / 2]; }
 
-function getHexCorners(x, y, radius) {
-  const corners = [];
-  for (let i = 0; i < 6; i++) {
-    const angle = Math.PI / 3 * i - Math.PI / 6; // -30° to make flat top
-    const cornerX = x + radius * Math.cos(angle);
-    const cornerY = y + radius * Math.sin(angle);
-    corners.push([cornerX, cornerY]);
+function getQuadCornerList(x, y, sz) { return [x, y, x + sz, y, x + sz, y + sz, x, y + sz]; }
+function getQuadCorners(x, y, sz) {
+  let res = {};
+  let list = getQuadCornerList(x, y, sz);
+  for (let i = 0; i < list.length / 2; i++) {
+    let id = `c${list[2 * i]}_${list[2 * i + 1]}`;
+    res[id] = { x: list[2 * i], y: list[2 * i + 1] }
   }
-  return corners;
+  return res;
 }
+function getQuadSegments(x, y, sz) {
+  let res = {};
+  let list = getQuadCornerList(x, y, sz);
+  for (let i = 0; i < list.length / 2; i++) {
+    let x1 = list[2 * i];
+    let y1 = list[2 * i + 1];
+    let x2 = list[2 * ((i + 1) % 6)];
+    let y2 = list[2 * ((i + 1) % 6) + 1];
+    let id = `s${x1}_${y1}_${x2}_${y2}`;
+    res[id] = { x1, y1, x2, y2 }
+  }
+  return res;
+}
+
 
 
 function addCity(cityMap, container, r, c, x, y, padding = 0) {

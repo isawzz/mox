@@ -65,70 +65,36 @@ function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sz = 50, gap = 
 
   return tiles;
 }
-function createHexShapedGridX(containerId, rows = 5, maxCols = 5, sz = 50, gap = 1) {
-  if (rows % 2 === 0) {
-    console.error("Number of rows must be odd for a symmetrical hexagon grid.");
-    return;
-  }
-
-  const container = toElem(containerId);
-  //const frag=document.createDocumentFragment();
+function createSquareGrid(dParent, rows = 5, cols = 5, sz = 50, gap = 1) {
+  const container = toElem(dParent);
   container.innerHTML = '';
+  // container.style.width = `${cols * (sz + gap)}px`;
+  // container.style.height = `${rows * (sz + gap)}px`;
 
-  const hexWidth = sz * 2;
-  const hexHeight = hexWidth; //Math.sqrt(3) * sideLength;
-  const vertSpacing = hexHeight * 0.75;
-
-  const midRow = Math.floor(rows / 2);
-  const tiles = {}; // id -> tile object
-  let [w, h] = [hexWidth - gap, hexHeight - gap];
+  let [w, h] = [sz - gap, sz - gap];
+  const tiles = {}; // id → tile
 
   for (let r = 0; r < rows; r++) {
-    const offsetFromMiddle = Math.abs(midRow - r);
-    const cols = maxCols - offsetFromMiddle;
-    const totalRowOffset = ((maxCols - cols) / 2) * hexWidth;
-    const horizontalOffset = (r % 2 === 1) ? hexWidth / 2 : 0;
-    const y = r * vertSpacing;
-    for (let i = 0; i < cols; i++) {
-      const x = i * hexWidth + totalRowOffset;// + horizontalOffset;
-      const c = Math.round(x / (hexWidth / 2)); // GLOBAL COLUMN INDEX
+    for (let c = 0; c < cols; c++) {
       const id = `r${r}_c${c}`;
-
-      let div = mDom(container, { className: 'hex', left: x, top: y, w, h }, { id })
-      const tile = { id, div, x, y, sz, c, r, NE: null, E: null, SE: null, SW: null, W: null, NW: null };
-
+      let [x, y] = [c * sz, r * sz]; console.log(x,y)
+      let div = mDom(container, { position:'absolute', left: x, top: y, w, h }, { id })
+      const tile = { id, r, c, x, y, sz, div, N: null, E: null, S: null, W: null };
       tiles[id] = tile;
+
     }
-
   }
 
-  // After all tiles are created, link neighbors
+  // Link neighbors
   for (const id in tiles) {
-    const tile = tiles[id];
-    let [r, c] = [tile.r, tile.c];
-
-    function getTile(rr, cc) { return tiles[`r${rr}_c${cc}`] || null; }
-    //   if (isdef(tiles[`r${rr}_c${cc}`])) return `r${rr}_c${cc}`; //tileMap[`r${rr}_c${cc}`];
-    //   else return null;
-    // }
-
-    // Neighbor lookup varies by row parity
-    tile.E = getTile(r, c + 2);
-    tile.W = getTile(r, c - 2);
-    tile.NE = getTile(r - 1, c + 1);
-    tile.NW = getTile(r - 1, c - 1);
-    tile.SE = getTile(r + 1, c + 1);
-    tile.SW = getTile(r + 1, c - 1);
-
+    const t = tiles[id];
+    t.N = tiles[`r${t.r - 1}_c${t.c}`] || null;
+    t.S = tiles[`r${t.r + 1}_c${t.c}`] || null;
+    t.E = tiles[`r${t.r}_c${t.c + 1}`] || null;
+    t.W = tiles[`r${t.r}_c${t.c - 1}`] || null;
   }
 
-  // container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
-  let hGrid = rows * vertSpacing + hexHeight * 0.25;
-  let wGrid = maxCols * hexWidth;
-  console.log(w, h)
-  mStyle(container, { w: wGrid, h: hGrid }); //,bg:'skyblue'})
-  //container.appendChild(frag);
-
+  mStyle(container, { w: cols * sz, h: rows * sz }); //,bg:'skyblue'})
   return tiles;
 }
 

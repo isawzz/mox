@@ -1,7 +1,162 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_hexboardComparison(); }
+function start() { test0_randomTiling(); }
 
+async function test0_voro0() {
+
+	mBy('dPage').appendChild(svg);
+
+}
+async function test0_randomTiling() {
+	const { tiles } = generateRandomTilingWithNCorners({
+		width: 800,
+		height: 600,
+		rows: 4,
+		cols: 4,
+		jitter: 0.5,
+		corners: 3,
+	});
+
+	const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+	svg.setAttribute('width', 800);
+	svg.setAttribute('height', 600);
+	svg.style.background = '#111';
+
+	tiles.forEach(tile => {
+		const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+		poly.setAttribute(
+			'points',
+			tile.map(p => `${p.x},${p.y}`).join(' ')
+		);
+		poly.setAttribute('fill', `hsl(${Math.random() * 360}, 60%, 50%)`);
+		poly.setAttribute('stroke', '#333');
+		svg.appendChild(poly);
+	});
+
+	mBy('dPage').appendChild(svg);
+
+}
+async function test0_tess0Cairo() {
+	await initTest();
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
+	let rows = 10, cols = 10, gap = 0, w = 10, h = 10;
+	let d = mDom('dMain', { bg: 'blue', padding: 20, display: 'inline-block' });
+	let grid = mDom(d, { position: 'relative' });
+
+	cairoTiling(grid, rows, cols, w, h);
+}
+async function test0_tess0penta() {
+	await initTest();
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
+	let rows = 3, cols = 4, gap = 0, w = 30, h = 24;
+	let d = mDom('dMain', { bg: 'blue', padding: 20, display: 'inline-block' });
+	let grid = mDom(d, { position: 'relative' });
+
+	let centers = pentagonTessellationCenters(rows, cols, w, h); //console.log(centers);
+	//calculate total w and h needed for tesselation
+	let wTotal = cols * w / 2 + w / 2;
+	let hTotal = rows * h;
+	for (const center of centers) {
+		console.log(center)
+		drawPentagonAtCenter(grid, center, w - gap, h - gap, 'red');
+	}
+	mStyle(d, { w: wTotal, h: hTotal })
+}
+async function test0_tess0triangle() {
+	await initTest();
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
+	let rows = 3, cols = 4, gap = 2, w = 30, h = 24;
+	let d = mDom('dMain', { bg: 'blue', padding: 20, display: 'inline-block' });
+	let grid = mDom(d, { position: 'relative' });
+
+	let centers = triangleTessellationCenters(rows, cols, w, h); //console.log(centers);
+	//calculate total w and h needed for tesselation
+	let wTotal = cols * w / 2 + w / 2;
+	let hTotal = rows * h;
+	for (const center of centers) {
+		console.log(center)
+		drawTriangleAtCenter(grid, center, w - 2 * gap, h - gap, center.up, 'red');
+	}
+	mStyle(d, { w: wTotal, h: hTotal })
+}
+async function test0_squareGrid() {
+	await initTest();
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
+	let gap = 1, sz = 50;
+	let rows = 1, maxcols = 2;
+	let d = mDom('dMain', { bg: 'blue', padding: 20, display: 'inline-block' });
+	let grid = mDom(d, { gap, position: 'relative' });
+	let tiles = createHexShapedGrid(grid, rows, maxcols, sz, gap); let func = getHexCornerList, npoly = 6;
+	//let tiles = createSquareGrid(grid, rows, maxcols, sz, gap); let func = getQuadCornerList, npoly = 4;
+	console.log('tiles', tiles);
+	for (const id in tiles) {
+		let o = tiles[id];
+		mStyle(iDiv(o), { bg: 'rand' })
+	}
+	let rgrid = getRectInt(grid); console.log(rgrid)
+	let r = getRectInt(d); console.log(r)
+
+	let cities = {}, streets = {};
+	for (const id in tiles) {
+		let t = tiles[id];
+		// test0_tile(id, tiles, grid, sz);
+		let adj = getCorners(t.x, t.y, sz, func);
+		let seg = getSegments(t.x, t.y, sz, npoly); console.log(seg)
+		cities = addKeys(adj, cities);
+		streets = addKeys(seg, streets);
+		for (const sk in seg) { if (streets[sk] || seg[sk].d == 'cc') continue; streets[sk] = seg[sk]; }
+		mStyle(iDiv(t), { bg: 'rand' });
+	}
+	for (const id in streets) {
+		let [x1, y1, x2, y2] = allNumbers(id); //console.log(x1, y1, x2, y2);
+		drawLineSegmentDiv(x1, y1, x2, y2, grid, thickness = 8, color = 'black')
+	}
+	for (const id in cities) {
+		let [x, y] = allNumbers(id); //console.log(x,y);
+		drawCircle(grid, x, y, 20, 'red');
+		drawCircle(grid, x, y, 14, 'yellow');
+	}
+	console.log(Object.values(cities));
+	console.log(Object.values(streets));
+	console.log(Object.keys(cities));
+	console.log(Object.keys(streets));
+}
+async function test0_addCities() {
+	await initTest();
+	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
+	let d = mDom('dMain', { padding: 0, margin: 10 });
+	let gap = 6, sz = 50;
+	let grid = mDom(d, { bg: 'blue', gap, margin: 0, position: 'relative' });
+	let tiles = createHexShapedGrid(grid, 5, 5, sz, gap / 2);
+
+	let rgrid = getRectInt(grid); console.log(rgrid)
+	let r = getRectInt(d); console.log(r)
+
+	let cities = {}, streets = {};
+	for (const id in tiles) {
+		let t = tiles[id];
+		// test0_tile(id, tiles, grid, sz);
+		let adj = getHexCorners(t.x, t.y, sz);
+		let seg = getHexSegments(t.x, t.y, sz);
+		cities = addKeys(adj, cities);
+		streets = addKeys(seg, streets);
+		mStyle(iDiv(t), { bg: 'rand' });
+	}
+	//console.log(Object.keys(cities));
+	for (const id in streets) {
+		//get x, y from city id
+		let [x1, y1, x2, y2] = allNumbers(id); //console.log(x1, y1, x2, y2);
+		drawLineSegmentDiv(x1, y1, x2, y2, grid, thickness = 8, color = 'black')
+	}
+	for (const id in cities) {
+		//get x,y from city id
+		let [x, y] = allNumbers(id); //console.log(x,y);
+		drawCircle(grid, x, y, 20, 'red');
+		drawCircle(grid, x, y, 14, 'yellow');
+	}
+
+
+}
 async function test0_hexboardComparison() {
 	await initTest();
 	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
@@ -10,7 +165,7 @@ async function test0_hexboardComparison() {
 	// let topcols = 15, side = 25;
 	// let maxcols = topcols + side - 1;
 	// let rows = side * 2 - 1;
-	let rows=45,maxcols=45;
+	let rows = 45, maxcols = 45;
 
 	//let dhex = hexFromCenter(d, { x: 100, y: 100 }, {bg:'red'}); //return;
 
@@ -36,7 +191,7 @@ async function test0_hexboardComparison() {
 	// let { tiles, tileMap } = createHexShapedGrid(grid, 25, 16, sz / 2, gap / 2);
 	// for (const id in tiles) {
 	// 	let o = tiles[id];
-	for(const o of allTiles){
+	for (const o of allTiles) {
 		mStyle(iDiv(o), { bg: 'rand' })
 	}
 	let t2 = showTimeSince(t1);
@@ -49,80 +204,11 @@ async function test0_hexboardComparison() {
 	console.log('tiles', tiles, '\nboard', board)
 
 }
-async function test0_squareGrid() {
-	await initTest();
-	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
-	let d = mDom('dMain', { padding: 0, margin: 10 });
-	let gap = 6, sz = 50;
-	let grid = mDom(d, { className: 'hexGrid', gap, margin: 0 });
-	let tiles = createSquareGrid(grid, 5, 5, sz, gap / 2);
-	return;
-	let cities = {}, streets = {};
-	for (const id in tiles) {
-		let t = tiles[id];
-		// test0_tile(id, tiles, grid, sz);
-		let adj = getCorners(t.x, t.y, sz);
-		let seg = getSegments(t.x, t.y, sz);
-		cities = addKeys(adj, cities);
-		streets = addKeys(seg, streets);
-		mStyle(iDiv(t), { bg: 'rand' });
-	}
-	console.log(Object.keys(cities));
-	for (const id in streets) {
-		//get x, y from city id
-		let [x1, y1, x2, y2] = allNumbers(id); console.log(x1, y1, x2, y2);
-		drawLineSegmentDiv(x1, y1, x2, y2, grid, thickness = 8, color = 'black')
-	}
-	for (const id in cities) {
-		//get x,y from city id
-		let [x, y] = allNumbers(id); //console.log(x,y);
-		drawCircle(grid, x, y, 20, 'red');
-		drawCircle(grid, x, y, 14, 'yellow');
-	}
-
-
-}
-async function test0_addCities() {
-	await initTest();
-	let elems = mLayoutLM('dPage'); mStyle('dMain', { overy: 'auto' }); //mFlex('dMain');
-	let d = mDom('dMain', { padding: 0, margin: 10 });
-	let gap = 6, sz = 50;
-	let grid = mDom(d, { bg: 'blue', gap, margin: 0, position: 'relative' });
-	let tiles = createHexShapedGrid(grid, 5, 5, sz, gap / 2);
-
-	let rgrid = getRectInt(grid); console.log(rgrid)
-	let r = getRectInt(d); console.log(r)
-
-	let cities = {}, streets = {};
-	for (const id in tiles) {
-		let t = tiles[id];
-		// test0_tile(id, tiles, grid, sz);
-		let adj = getCorners(t.x, t.y, sz);
-		let seg = getSegments(t.x, t.y, sz);
-		cities = addKeys(adj, cities);
-		streets = addKeys(seg, streets);
-		mStyle(iDiv(t), { bg: 'rand' });
-	}
-	//console.log(Object.keys(cities));
-	for (const id in streets) {
-		//get x, y from city id
-		let [x1, y1, x2, y2] = allNumbers(id); //console.log(x1, y1, x2, y2);
-		drawLineSegmentDiv(x1, y1, x2, y2, grid, thickness = 8, color = 'black')
-	}
-	for (const id in cities) {
-		//get x,y from city id
-		let [x, y] = allNumbers(id); //console.log(x,y);
-		drawCircle(grid, x, y, 20, 'red');
-		drawCircle(grid, x, y, 14, 'yellow');
-	}
-
-
-}
 function test0_tileDict(id, tiles, grid, sz) {
 
 	let t = tiles[id]; console.log(t);
 	console.log(t);
-	let di = getCorners(t.x, t.y, sz);
+	let di = getHexCorners(t.x, t.y, sz);
 	for (let i = 0; i < list.length / 2; i++) {
 		drawCircle(grid, list[2 * i], list[2 * i + 1], 20, 'red');
 		drawCircle(grid, list[2 * i], list[2 * i + 1], 14, 'yellow');
@@ -133,7 +219,7 @@ function test0_tile(id, tiles, grid, sz) {
 
 	let t = tiles[id]; console.log(t);
 	console.log(t);
-	let list = getCornerList(t.x, t.y, sz);
+	let list = getHexCornerList(t.x, t.y, sz);
 	for (let i = 0; i < list.length / 2; i++) {
 		drawCircle(grid, list[2 * i], list[2 * i + 1], 20, 'red');
 		drawCircle(grid, list[2 * i], list[2 * i + 1], 14, 'yellow');
