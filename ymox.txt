@@ -1,12 +1,45 @@
 alles ist fuer immer ok - I have left this plane. 
 nur machen was fe oder A sagen sonst vppmw airport
 
-___ 6:58 AM 5/21/2025 airport lib 22.5. 69000 K4
+___ 6:58 AM 5/21/2025 airport lib 22.5. 70000 K4
+	list = [
+		'HexTessagon',
+		'SquareTessagon',
+		'TriangleTessagon',
+		'BrickTessagon',
+		'DiamondTessagon',
+		'RhombusTessagon',
+		'ParallelogramTessagon',
+		'RectangleTessagon',
+		'IsoTriangleTessagon',
+		'RightTriangleTessagon',
+		'TrapezoidTessagon',
+		'CairoTessagon',
+		'PentagonTessagon',
+		'HexHexDualTessagon',
+		'HexTriangleDualTessagon',
+		'OctoDiamondTessagon',
+		'OctoSquareTessagon',
+		'WeaveTessagon',
+		'ZigZagTessagon',
+		'SnubSquareTessagon',
+		'SnubHexTessagon',
+		'RhombusTriangleTessagon',
+		'RhombusHexTessagon',
+		'WindmillTessagon'
+	].sort();
+
+9:44 AM 5/21/2025
+der call muss gemacht werden!!!
+9:01 AM 5/21/2025
+goto app.py
+8:29 AM 5/21/2025 
+ich moecht eine sidebar haben wo all die types sind
 7:54 AM 5/21/2025 anziehen
 7:55 AM 5/21/2025 stretch
 8:00 AM 5/21/2025 finger
-tune
-schradiek
+- postponed tune
+- postponed schradiek
 =>weiter pl!
 =>wie kann man gleich alle importen? vielleicht noch ein modul dazu?
 =>assert erst 3h30 no exception

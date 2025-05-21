@@ -1,10 +1,101 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { API_BASE = getBackendUrl(); test0_tessagon0(); }
+function start() { API_BASE = getBackendUrl(); test0_createTess(); }
 
+async function test0_createTess() {
+	const vertices = [
+		[0, 0], [100, 0], [100, 100], [0, 100],  // square corners
+		[50, 50], // center point
+	];
+	const faces = [
+		[0, 1, 4, 3],
+		[1, 2, 4],
+		[2, 3, 4],
+	];
+
+	const container = document.getElementById('dPage');
+	createTessellationDivs(container, faces, vertices, {
+		width: 200,
+		height: 200,
+		backgroundColor: '#88c',
+	});
+}
+async function test0_tessagon1() {
+	await initTest();
+	let list = Object.keys(M.byCat).sort();
+	tessagon_class_dict = [
+		'BigHexTriTessagon',
+		'BrickTessagon',
+		'CloverdaleTessagon',
+		'DissectedHexQuadTessagon',
+		"DissectedHexTriTessagon",
+		"DissectedSquareTessagon",
+		"DissectedTriangleTessagon",
+		"DodecaTessagon",
+		"DodecaTriTessagon",
+		"FloretTessagon",
+		"HexBigTriTessagon",
+		"HexSquareTriTessagon",
+		"HexTessagon",
+		"HexTriTessagon",
+		"IslamicHexStarsTessagon",
+		"IslamicStarsCrossesTessagon",
+		"OctoTessagon",
+		"PentaTessagon",
+		"Penta2Tessagon",
+		"PythagoreanTessagon",
+		"RhombusTessagon",
+		"SquareTessagon",
+		"SquareTriTessagon",
+		"SquareTri2Tessagon",
+		"StanleyParkTessagon",
+		"TriTessagon",
+		"ValemountTessagon",
+		"WeaveTessagon",
+		"ZigZagTessagon",
+	];
+
+	for (const k of tessagon_class_dict) {
+		mDom(dLeft, {}, { tag: 'button', 'html': k, onclick: showTessellation });
+		mLinebreak(dLeft);
+	}
+	//clickOn('SnubHexTessagon')
+}
 async function test0_tessagon0() {
+	await initTest();
+	let list = Object.keys(M.byCat).sort();
+	list = [
+		'HexTessagon',
+		'SquareTessagon',
+		'TriangleTessagon',
+		'BrickTessagon',
+		'DiamondTessagon',
+		'RhombusTessagon',
+		'ParallelogramTessagon',
+		'RectangleTessagon',
+		'IsoTriangleTessagon',
+		'RightTriangleTessagon',
+		'TrapezoidTessagon',
+		'CairoTessagon',
+		'PentagonTessagon',
+		'HexHexDualTessagon',
+		'HexTriangleDualTessagon',
+		'OctoDiamondTessagon',
+		'OctoSquareTessagon',
+		'WeaveTessagon',
+		'ZigZagTessagon',
+		'SnubSquareTessagon',
+		'SnubHexTessagon',
+		'RhombusTriangleTessagon',
+		'RhombusHexTessagon',
+		'WindmillTessagon'
+	].sort();
 
-	
+	for (const k of list) {
+		mDom(dLeft, {}, { tag: 'button', 'html': k, onclick: showTessellation });
+		mLinebreak(dLeft);
+	}
+	//clickOn('SnubHexTessagon')
 
 	let html = `
 	<h1>Tessagon SVG Viewer</h1>
@@ -18,17 +109,17 @@ async function test0_tessagon0() {
 		fill="lightblue" stroke-width="0.005">
 	</svg>
 	`;
-	let dPage = mBy('dPage');
-	dPage.innerHTML = html;
+	let d = mBy('dMain');
+	d.innerHTML = html;
 	document.getElementById('tess-form').addEventListener('submit', async function (e) {
 		e.preventDefault();
 		const u = document.getElementById('u-num').value;
 		const v = document.getElementById('v-num').value;
 
 		const response = await fetch(`http://localhost:5000/tessellate?u=${u}&v=${v}`);
-		console.log(response)
+		//console.log(response)
 		const svgText = await response.text();
-		console.log(svgText)
+		//console.log(svgText)
 		let svg = document.getElementById('svg2');
 		svg.innerHTML = svgText;
 		setTimeout(() => {
