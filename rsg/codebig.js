@@ -61,6 +61,30 @@ async function MPollTables() {
 function MTGetGameProp(prop) { return MGetGame(T.game)[prop]; }
 function TGetGameOption(prop) { return lookup(T, ['options', prop]); }
 function UGetName() { return U.name; }
+function _calc_hex_col_array(rows, cols) {
+	let colarr = [];
+	let even = rows % 2 == 0;
+	for (let i = 0; i < rows; i++) {
+		colarr[i] = cols;
+		if (even && i < (rows / 2) - 1) cols += 1;
+		else if (even && i > rows / 2) cols -= 1;
+		else if (!even && i < (rows - 1) / 2) cols += 1;
+		else if (!even || i >= (rows - 1) / 2) cols -= 1;
+	}
+	return colarr;
+}
+function _drawPentagonAtCenter(parent, center, w, h, color = 'black') {
+	const div = document.createElement('div');
+	div.style.position = 'absolute';
+	div.style.width = `${w}px`;
+	div.style.height = `${h}px`;
+	div.style.left = `${center.x - w / 2}px`;
+	div.style.top = `${center.y - h / 2}px`;
+	div.style.backgroundColor = color;
+	div.style.clipPath = 'polygon(50% 0%, 100% 30%, 70% 100%, 30% 100%, 0% 30%)';
+	parent.appendChild(div);
+	return div;
+}
 async function actionLoadAll() {
 	let action = await mPhpGetFile('zdata/action.txt');
 	DA.action = null;
@@ -85,6 +109,46 @@ function actionProcessLine(a, di) {
 	lookupAddToList(di.byDate, [o.date], o);
 }
 async function actionSaveAll() {
+}
+function addCities(container, grid, sideLength) {
+	const cityMap = {};
+	for (const row of grid) {
+		for (const tile of row) {
+			const { x, y, r, c } = tile;
+			for (let i = 0; i < 6; i++) {
+				const angle_deg = 60 * i - 30;
+				const angle_rad = Math.PI / 180 * angle_deg;
+				const cx = x + sideLength * Math.cos(angle_rad);
+				const cy = y + sideLength * Math.sin(angle_rad);
+				let rowIndex = r;
+				let colIndex = c;
+				if (i === 2 || i === 3) rowIndex += 1;
+				if (i === 3 || i === 4 || i === 5) colIndex -= 1;
+				addCity(cityMap, container, rowIndex, colIndex, 0 - 10, 0 - 10);
+				return;
+			}
+			return;
+		}
+	}
+	return cityMap;
+}
+function addCity(cityMap, container, r, c, x, y, padding = 0) {
+	const key = `${r}_${c}`;
+	if (cityMap[key]) return;
+	const city = document.createElement('div');
+	city.className = 'city';
+	city.style.position = 'absolute';
+	let sz = 30;
+	city.style.width = `${sz}px`;
+	city.style.height = `${sz}px`;
+	city.style.borderRadius = '50%';
+	city.style.background = 'green';
+	x -= padding;
+	y -= padding;
+	city.style.left = `${x - sz / 2}px`;
+	city.style.top = `${y - sz / 2}px`;
+	container.appendChild(city);
+	cityMap[key] = { div: city, x, y, r, c };
 }
 function addIf(arr, el) { if (!arr.includes(el)) arr.push(el); }
 function addKeys(ofrom, oto) { for (const k in ofrom) if (!oto.hasOwnProperty(k)) oto[k] = ofrom[k]; return oto; }
@@ -114,6 +178,27 @@ function animatedTitle(msg = 'DU BIST DRAN!!!!!') {
 		document.title = `${corner} ${msg}`; //'⌞&amp;21543;    U+231E \0xE2Fo\u0027o Bar';
 	}, 1000);
 }
+async function api(method, endpoint, body = null) {
+	try {
+		const response = await fetch(`${API_BASE}${endpoint}`, {
+			method,
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: body ? JSON.stringify(body) : null
+		});
+		if (!response.ok) {
+			throw new Error(`Server error: ${response.status}`);
+		}
+		const data = await response.json();
+		console.log("API response:", data);
+		return data;
+	} catch (error) {
+		console.error("API error:", error);
+		alert(`API error: ${error.message}`);
+		return null;
+	}
+}
 function applyOpts(d, opts = {}) {
 	const aliases = {
 		classes: 'className',
@@ -136,6 +221,15 @@ function arrDisjoint(ad1, ad2, prop) {
 	console.log(isDict(ad1), isDict(ad2))
 	if (isDict(ad1) && isDict(ad2)) return Object.keys(ad1).find(x => x in ad2);
 	else return ad1.map(x => x[prop]).find(el => ad2.map(x => x[prop]) == el);
+}
+function arrFlatten(arr) {
+	let res = [];
+	for (let i = 0; i < arr.length; i++) {
+		for (let j = 0; j < arr[i].length; j++) {
+			res.push(arr[i][j]);
+		}
+	}
+	return res;
 }
 function arrGen(n, min, max) {
 	let arr = [];
@@ -348,6 +442,19 @@ function button96() {
 	}
 	return { prepLayout, setup, present, stats, activate };
 }
+function cairoTiling(container, rows, cols, w = 100, h = 100) {
+	container.style.position = 'relative';
+	container.innerHTML = '';
+	for (let r = 0; r < rows; r++) {
+		const y = r * h;
+		const xOffset = (r % 2) * (w / 2);
+		for (let c = 0; c < cols; c++) {
+			const x = c * w + xOffset;
+			const flip = (r + c) % 2 === 1;
+			drawCairoTile(container, x, y, w, h, flip, '#ccc');
+		}
+	}
+}
 function calcClipPoints(x0, y0, w, h, clipPath) {
 	const percentagePoints = clipPath
 		.match(/polygon\((.*?)\)/)[1]
@@ -420,6 +527,22 @@ function centerAt(elem, x, y) {
 	elem.style.top = `${offsetY}px`;
 }
 function checkState() {
+}
+function circleCenters(rows, cols, wCell, hCell) {
+	let [w, h] = [cols * wCell, rows * hCell];
+	let cx = w / 2;
+	let cy = h / 2;
+	let centers = [{ x: cx, y: cy }];
+	let rx = cx + wCell / 2; let dradx = rx / wCell;
+	let ry = cy + hCell / 2; let drady = ry / hCell;
+	let nSchichten = Math.floor(Math.min(dradx, drady));
+	for (let i = 1; i < nSchichten; i++) {
+		let [newCenters, wsch, hsch] = oneCircleCenters(i * 2 + 1, i * 2 + 1, wCell, hCell);
+		for (const nc of newCenters) {
+			centers.push({ x: nc.x + cx - wsch / 2, y: nc.y + cy - hsch / 2 });
+		}
+	}
+	return [centers, wCell * cols, hCell * rows];
 }
 function clamp(x, min, max) { return Math.min(Math.max(x, min), max); }
 async function cleanupOldActionIfAny(ev) {
@@ -1636,6 +1759,248 @@ function createGamePlayer(name, gamename, opts = {}) {
 	copyKeys(opts, pl);
 	return pl;
 }
+function createHexGrid(d, rows, cols, sideLength = 50, gap = 1) {
+	const container = toElem(d);
+	container.innerHTML = '';
+	const hexWidth = sideLength * 2;
+	const hexHeight = hexWidth;
+	const vertSpacing = hexHeight * 0.75;
+	container.style.height = `${vertSpacing * rows + hexHeight * 0.25}px`;
+	for (let r = 0; r < rows; r++) {
+		for (let c = 0; c < cols; c++) {
+			const hex = document.createElement('div');
+			hex.className = 'hex';
+			hex.style.width = `${hexWidth - gap}px`;
+			hex.style.height = `${hexHeight - gap}px`;
+			const xOffset = (r % 2) * (hexWidth / 2);
+			const x = c * hexWidth + xOffset;
+			const y = r * vertSpacing;
+			hex.style.left = `${x}px`;
+			hex.style.top = `${y}px`;
+			container.appendChild(hex);
+		}
+	}
+}
+function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sz = 50, gap = 1) {
+	if (rows % 2 === 0) {
+		console.error("Number of rows must be odd for a symmetrical hexagon grid.");
+		return;
+	}
+	const container = toElem(containerId);
+	container.innerHTML = '';
+	const hexWidth = sz * 2;
+	const hexHeight = hexWidth;
+	const vertSpacing = hexHeight * 0.75;
+	const midRow = Math.floor(rows / 2);
+	const tiles = {};
+	let [w, h] = [hexWidth - gap, hexHeight - gap];
+	for (let r = 0; r < rows; r++) {
+		const offsetFromMiddle = Math.abs(midRow - r);
+		const cols = maxCols - offsetFromMiddle;
+		const totalRowOffset = ((maxCols - cols) / 2) * hexWidth;
+		const horizontalOffset = (r % 2 === 1) ? hexWidth / 2 : 0;
+		const y = r * vertSpacing;
+		for (let i = 0; i < cols; i++) {
+			const x = i * hexWidth + totalRowOffset;
+			const c = Math.round(x / (hexWidth / 2));
+			const id = `r${r}_c${c}`;
+			let div = mDom(container, { className: 'hex', left: x, top: y, w, h }, { id })
+			const tile = { id, div, x, y, sz, c, r, NE: null, E: null, SE: null, SW: null, W: null, NW: null };
+			tiles[id] = tile;
+		}
+	}
+	for (const id in tiles) {
+		const tile = tiles[id];
+		let [r, c] = [tile.r, tile.c];
+		function getTile(rr, cc) { return tiles[`r${rr}_c${cc}`] || null; }
+		tile.E = getTile(r, c + 2);
+		tile.W = getTile(r, c - 2);
+		tile.NE = getTile(r - 1, c + 1);
+		tile.NW = getTile(r - 1, c - 1);
+		tile.SE = getTile(r + 1, c + 1);
+		tile.SW = getTile(r + 1, c - 1);
+	}
+	let hGrid = rows * vertSpacing + hexHeight * 0.25;
+	let wGrid = maxCols * hexWidth;
+	mStyle(container, { w: wGrid, h: hGrid }); //,bg:'skyblue'})
+	return tiles;
+}
+function createHexShapedGridOptimized(containerId, rows = 5, maxCols = 5, sz = 50, gap = 1) {
+	if (rows <= 0 || maxCols <= 0 || sz <= 0 || gap < 0) {
+		console.error("Invalid input parameters: rows, maxCols, and sz must be positive, gap must be non-negative.");
+		return null;
+	}
+	if (rows % 2 === 0) {
+		console.error("Number of rows must be odd for a symmetrical hexagon grid.");
+		return null;
+	}
+	const container = typeof toElem !== 'undefined' ? toElem(containerId) : document.getElementById(containerId);
+	if (!container) {
+		console.error(`Container element with id "${containerId}" not found.`);
+		return null;
+	}
+	container.innerHTML = ''; // Clear previous content
+	const hexWidth = sz * 2;
+	const hexHeight = hexWidth;
+	const vertSpacing = hexHeight * 0.75;
+	const midRow = Math.floor(rows / 2);
+	const gridWidth = 2 * maxCols;
+	const grid = [];
+	let minX = Infinity;
+	let maxX = -Infinity;
+	let minY = Infinity;
+	let maxY = -Infinity;
+	for (let r = 0; r < rows; r++) {
+		grid[r] = new Array(gridWidth).fill(null);
+		const offsetFromMiddle = Math.abs(midRow - r);
+		const cols = maxCols - offsetFromMiddle;
+		const totalRowOffset = ((maxCols - cols) / 2) * hexWidth;
+		for (let i = 0; i < cols; i++) {
+			const x = i * hexWidth + totalRowOffset;
+			const y = r * vertSpacing;
+			const c = Math.round(x / (hexWidth / 2));
+			minX = Math.min(minX, x);
+			maxX = Math.max(maxX, x);
+			minY = Math.min(minY, y);
+			maxY = Math.max(maxY, y);
+			if (c >= 0 && c < gridWidth) {
+				const tile = {
+					r: r, // Row index in the 2D array
+					c: c, // Column index in the 2D array (offset coordinate)
+					x: x, // X position for rendering (based on original code)
+					y: y, // Y position for rendering (based on original code)
+					sz: sz, // Size parameter
+					NE: null,
+					E: null,
+					SE: null,
+					SW: null,
+					W: null,
+					NW: null,
+					div: null // Reference to the created DOM element
+				};
+				const tileId = `hex_${r}_${c}`;
+				const tileW = hexWidth - gap;
+				const tileH = hexHeight - gap;
+				let div = typeof mDom !== 'undefined' ? mDom(container, { className: 'hex', left: x, top: y, w: tileW, h: tileH }, { id: tileId }) : null;
+				if (div) {
+					tile.div = div;
+				} else {
+					div = document.createElement('div');
+					div.id = tileId;
+					div.className = 'hex';
+					div.style.position = 'absolute';
+					div.style.left = `${x}px`;
+					div.style.top = `${y}px`;
+					div.style.width = `${tileW}px`;
+					div.style.height = `${tileH}px`;
+					container.appendChild(div);
+					tile.div = div;
+				}
+				grid[r][c] = tile;
+			} else {
+				console.warn(`Calculated column index ${c} out of bounds [0, ${gridWidth - 1}] for row ${r}. Tile at i=${i}, x=${x}. This tile will not be added to the grid array.`);
+			}
+		}
+	}
+	for (let r = 0; r < rows; r++) {
+		for (let c = 0; c < gridWidth; c++) {
+			const tile = grid[r][c];
+			if (tile) {
+				const neighbors = {
+					E: { dr: 0, dc: 2 },
+					W: { dr: 0, dc: -2 },
+					NE: { dr: -1, dc: 1 },
+					NW: { dr: -1, dc: -1 },
+					SE: { dr: 1, dc: 1 },
+					SW: { dr: 1, dc: -1 }
+				};
+				for (const dir in neighbors) {
+					const neighborPos = neighbors[dir];
+					const nr = r + neighborPos.dr;
+					const nc = c + neighborPos.dc;
+					if (nr >= 0 && nr < rows && nc >= 0 && nc < gridWidth) {
+						const neighborTile = grid[nr] ? grid[nr][nc] : null;
+						if (neighborTile) {
+							tile[dir] = neighborTile;
+						}
+					}
+				}
+			}
+		}
+	}
+	let wGrid = (maxX - minX) + (hexWidth - gap);
+	let hGrid = (maxY - minY) + (hexHeight - gap);
+	if (typeof mStyle !== 'undefined') {
+		mStyle(container, { w: wGrid, h: hGrid });
+	} else {
+		container.style.width = `${wGrid}px`;
+		container.style.height = `${hGrid}px`;
+		container.style.position = 'relative'; // Ensure positioning context for absolute children
+		container.style.overflow = 'hidden'; // Hide potential overflow
+	}
+	return grid;
+}
+if (typeof toElem === 'undefined') {
+	/**
+	 * Dummy function to get an element by ID.
+	 * @param {string} id The ID of the element.
+	 * @returns {HTMLElement|null} The element or null if not found.
+	 */
+	function toElem(id) {
+		return document.getElementById(id);
+	}
+}
+if (typeof mDom === 'undefined') {
+	/**
+	 * Dummy function to create a DOM element with styles and attributes and append to a container.
+	 * @param {HTMLElement} container The container element.
+	 * @param {Object} styles CSS styles to apply.
+	 * @param {Object} attrs Attributes to set.
+	 * @returns {HTMLElement} The created element.
+	 */
+	function mDom(container, styles, attrs) {
+		const div = document.createElement('div');
+		if (styles) {
+			for (const prop in styles) {
+				if (['w', 'h', 'left', 'top'].includes(prop)) {
+					div.style[prop] = `${styles[prop]}px`;
+				} else {
+					div.style[prop] = styles[prop];
+				}
+			}
+		}
+		if (attrs) {
+			for (const prop in attrs) {
+				div[prop] = attrs[prop];
+			}
+		}
+		if (container) {
+			container.appendChild(div);
+		}
+		return div;
+	}
+}
+if (typeof mStyle === 'undefined') {
+	/**
+	 * Dummy function to set styles on a DOM element.
+	 * @param {HTMLElement} elem The element to style.
+	 * @param {Object} styles CSS styles to apply.
+	 */
+	function mStyle(elem, styles) {
+		if (elem && styles) {
+			for (const prop in styles) {
+				if (['w', 'h', 'left', 'top'].includes(prop)) {
+					elem.style[prop] = `${styles[prop]}px`;
+				} else {
+					elem.style[prop] = styles[prop];
+				}
+			}
+			if (!elem.style.position || elem.style.position === 'static') {
+				elem.style.position = 'relative';
+			}
+		}
+	}
+}
 function createImageSymbol(src, id) {
 	return `
       <symbol id="${id}" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
@@ -1770,6 +2135,30 @@ function createPanZoomCanvas(parentElement, src, wCanvas, hCanvas) {
 	});
 	return canvas;
 }
+function createSquareGrid(dParent, rows = 5, cols = 5, sz = 50, gap = 1) {
+	const container = toElem(dParent);
+	container.innerHTML = '';
+	let [w, h] = [sz - gap, sz - gap];
+	const tiles = {};
+	for (let r = 0; r < rows; r++) {
+		for (let c = 0; c < cols; c++) {
+			const id = `r${r}_c${c}`;
+			let [x, y] = [c * sz, r * sz]; console.log(x, y)
+			let div = mDom(container, { position: 'absolute', left: x, top: y, w, h }, { id })
+			const tile = { id, r, c, x, y, sz, div, N: null, E: null, S: null, W: null };
+			tiles[id] = tile;
+		}
+	}
+	for (const id in tiles) {
+		const t = tiles[id];
+		t.N = tiles[`r${t.r - 1}_c${t.c}`] || null;
+		t.S = tiles[`r${t.r + 1}_c${t.c}`] || null;
+		t.E = tiles[`r${t.r}_c${t.c + 1}`] || null;
+		t.W = tiles[`r${t.r}_c${t.c - 1}`] || null;
+	}
+	mStyle(container, { w: cols * sz, h: rows * sz }); //,bg:'skyblue'})
+	return tiles;
+}
 function createStopwatch(elem) {
 	elem = toElem(elem);
 	let isRunning = false; mStyle(elem, { fg: 'white' });
@@ -1847,6 +2236,12 @@ function defaultGameFunc() {
 	async function stepComplete(table, o) { console.log(`integrate if step complete for ${table.friendly}`); }
 	return { stats, prepLayout, setup, activate, checkGameover, present, hybridMove, botMove, stepComplete };
 }
+async function deleteGame(gameId) {
+	return await api('DELETE', `/delete_game/${gameId}`);
+}
+async function deleteGames() {
+	return await api('DELETE', `/delete_games`);
+}
 function detectSessionType() {
 	let loc = window.location.href;
 	DA.sessionType =
@@ -1913,6 +2308,22 @@ function drag(ev) {
 	dragStartOffset = getRelCoords(ev, elem);
 	draggedElement = elem;
 }
+function drawCairoTile(parent, x, y, w, h, flip = false, color = 'black') {
+	const div = document.createElement('div');
+	div.style.position = 'absolute';
+	div.style.width = `${w}px`;
+	div.style.height = `${h}px`;
+	div.style.left = `${x}px`;
+	div.style.top = `${y}px`;
+	div.style.backgroundColor = color;
+	div.style.clipPath = getCairoPentagonClipPath();
+	if (flip) div.style.transform = 'scaleX(-1)';
+	parent.appendChild(div);
+	return div;
+}
+function drawCircle(d, x, y, sz = 4, bg = 'red') {
+	mDom(d, { bg, round: true, w: sz, h: sz, position: 'absolute', left: x - sz / 2, top: y - sz / 2 }); //left:0,top:0}); //
+}
 function drawCircleOnCanvas(canvas, cx, cy, sz, color) {
 	const ctx = canvas.getContext('2d');
 	ctx.beginPath();
@@ -1937,14 +2348,13 @@ function drawHexBoard(topside, side, dParent, styles = {}, itemStyles = {}, opts
 	addKeys({ box: true }, styles);
 	let dOuter = mDom(dParent, styles, opts);
 	let d = mDom(dOuter, { position: 'relative', });
-	let {centers, rows, maxcols} = hexBoardCenters(topside, side);
+	let { centers, rows, maxcols } = hexBoardCenters(topside, side);
 	let [w, h] = mSizeSuccession(itemStyles, 24);
 	let gap = valf(styles.gap, -.5);
 	let items = [];
 	if (gap != 0) copyKeys({ w: w - gap, h: h - gap }, itemStyles);
-	
 	for (const c of centers) {
-		let dhex = hexFromCenter(d, { x: c.x * w, y: c.y * h }, addKeys({bg:'rand'},itemStyles));
+		let dhex = hexFromCenter(d, { x: c.x * w, y: c.y * h }, addKeys({ bg: 'rand' }, itemStyles));
 		let item = { div: dhex, cx: c.x, cy: c.y, row: c.row, col: c.col };
 		items.push(item);
 	}
@@ -1974,12 +2384,41 @@ function drawLineOnCanvas(canvas, x1, y1, x2, y2, stroke = 1) {
 	ctx.lineWidth = stroke;
 	ctx.stroke();
 }
+function drawLineSegmentDiv(x1, y1, x2, y2, parent, thickness = 5, color = 'black') {
+	const length = Math.hypot(x2 - x1, y2 - y1);
+	const angleRad = Math.atan2(y2 - y1, x2 - x1);
+	const angleDeg = angleRad * 180 / Math.PI;
+	const line = document.createElement('div');
+	line.style.position = 'absolute';
+	line.style.left = `${x1}px`;
+	line.style.top = `${y1 - thickness / 2}px`; // center vertically
+	line.style.width = `${length}px`;
+	line.style.height = `${thickness}px`;
+	line.style.backgroundColor = color;
+	line.style.transform = `rotate(${angleDeg}deg)`;
+	line.style.transformOrigin = '0 50%'; // rotate around start point
+	line.style.pointerEvents = 'none';
+	parent.appendChild(line);
+	return line;
+}
 function drawMeeple(dParent, p) {
 	let addLabel = true;
 	let html = isdef(p.owner) && addLabel ? p.owner[0].toUpperCase() : ''; //p.id.substring(1) : ''
 	let d1 = p.div = mDom(dParent, { fz: p.sz * .75, left: p.x + p.sz / 2, top: p.y + p.sz / 2, w: p.sz, h: p.sz, position: 'absolute', bg: p.bg, fg: 'contrast' }, { html, id: p.id });
 	mCenterCenterFlex(d1);
 	d1.style.cursor = 'default';
+}
+function drawPentagonAtCenter(parent, center, w, h, color = 'black') {
+	const div = document.createElement('div');
+	div.style.position = 'absolute';
+	div.style.width = `${w}px`;
+	div.style.height = `${h}px`;
+	div.style.left = `${center.x - w / 2}px`;
+	div.style.top = `${center.y - h / 2}px`;
+	div.style.backgroundColor = color;
+	div.style.clipPath = generatePentagonClipPath();
+	parent.appendChild(div);
+	return div;
 }
 function drawPix(ctx, x, y, color = 'red', sz = 5) {
 	ctx.fillStyle = color;
@@ -2027,6 +2466,20 @@ function drawShape(key, dParent, styles, classes, sizing) {
 	if (key == 'circle' || key == 'ellipse') mStyle(d, { rounding: '50%' });
 	else mStyle(d, { 'clip-path': PolyClips[key] });
 	return d;
+}
+function drawTriangleAtCenter(parent, center, w, h, pointingUp = true, color = 'black') {
+	const div = document.createElement('div');
+	div.style.position = 'absolute';
+	div.style.width = `${w}px`;
+	div.style.height = `${h}px`;
+	div.style.left = `${center.x - w / 2}px`;
+	div.style.top = `${center.y - h / 2}px`;
+	div.style.backgroundColor = color;
+	div.style.clipPath = pointingUp
+		? 'polygon(50% 0%, 0% 100%, 100% 100%)'
+		: 'polygon(0% 0%, 100% 0%, 50% 100%)';
+	parent.appendChild(div);
+	return div;
 }
 function drop(ev) {
 	ev.preventDefault();
@@ -2177,6 +2630,26 @@ function evToElem(ev, attr) {
 	return null;
 }
 function evToId(ev) { let elem = findAncestorWithAttribute(ev.target, 'id'); return elem.id; }
+function exampleFields0(tiles, sz) {
+	for (const id in tiles) {
+		let t = tiles[id];
+		let d = iDiv(t);
+		mCenterCenterFlex(d);
+		msKey(rChoose(Object.keys(M.superdi)), d, { hmax: sz, fz: sz, fg: rColor() })
+		d.addEventListener('mouseenter', () => {
+			for (const dir of ['NE', 'E', 'SE', 'SW', 'W', 'NW']) {
+				const neighbor = tiles[t[dir]]; console.log(neighbor)
+				if (neighbor) neighbor.div.classList.add('neighbor-highlight');
+			}
+		});
+		d.addEventListener('mouseleave', () => {
+			for (const dir of ['NE', 'E', 'SE', 'SW', 'W', 'NW']) {
+				const neighbor = tiles[t[dir]];
+				if (neighbor) neighbor.div.classList.remove('neighbor-highlight');
+			}
+		});
+	}
+}
 function extendRect(r4) { r4.l = r4.x; r4.t = r4.y; r4.r = r4.x + r4.w; r4.b = r4.t + r4.h; }
 function extractSymbols(svgString, symbolDict) {
 	const symbolRegex = /<symbol id='([^']+)'[^>]*>[\s\S]*?<\/symbol>/g;
@@ -2348,6 +2821,75 @@ function fishgame() {
 	}
 	return { setup, present, stats, activate };
 }
+function fitFzToBox(div, maxWidth, maxHeight, options = {}) {
+	const {
+		minFontSize = 10,
+		maxFontSize = 100,
+		fontStep = 1,
+		lineHeight = 1
+	} = options;
+	const style = window.getComputedStyle(div);
+	const originalText = div.textContent;
+	const testDiv = document.createElement("div");
+	document.body.appendChild(testDiv);
+	testDiv.style.position = "absolute";
+	testDiv.style.visibility = "hidden";
+	testDiv.style.whiteSpace = "pre-wrap";
+	testDiv.style.wordBreak = "break-word";
+	const keysToCopy = ["fontFamily", "fontWeight", "fontStyle", "letterSpacing", "padding", "border"];
+	keysToCopy.forEach(key => {
+		testDiv.style[key] = style[key];
+	});
+	let fontSize = maxFontSize;
+	testDiv.textContent = originalText;
+	while (fontSize >= minFontSize) {
+		testDiv.style.fontSize = `${fontSize}px`;
+		testDiv.style.lineHeight = lineHeight;
+		if (
+			testDiv.offsetWidth <= maxWidth &&
+			testDiv.offsetHeight <= maxHeight
+		) {
+			break;
+		}
+		fontSize -= fontStep;
+	}
+	div.style.fontSize = `${fontSize}px`;
+	div.style.lineHeight = lineHeight;
+	document.body.removeChild(testDiv);
+	return fontSize;
+}
+function fitTextToBox(text, family, maxWidth, maxHeight, options = {}) {
+	const {
+		minFontSize = 10,
+		maxFontSize = 100,
+		fontStep = 1,
+		lineHeight = 1.2,
+		weight = "normal",
+		fontStyle = "normal",
+		letterSpacing = "normal",
+		padding = "0"
+	} = options;
+	const testDiv = mDom(document.body, {}, { tag: 'div', html: text });
+	mStyle(testDiv, {
+		position: 'absolute',
+		visibility: 'hidden',
+		whiteSpace: 'pre-wrap',
+		wordBreak: 'break-word',
+		padding,
+		family,
+		weight,
+		fontStyle,
+		letterSpacing
+	});
+	let fz = maxFontSize;
+	while (fz >= minFontSize) {
+		mStyle(testDiv, { fz, lineHeight });
+		if (testDiv.offsetWidth <= maxWidth && testDiv.offsetHeight <= maxHeight) break;
+		fz -= fontStep;
+	}
+	testDiv.remove();
+	return fz;
+}
 function foldCartesianProduct(keys, valuesLists) {
 	const result = [];
 	function helper(index, current) {
@@ -2399,6 +2941,99 @@ function fromNormalized(s, opts = {}) {
 	let words = caps ? toWords(x).map(x => capitalize(x)).join(' ') : toWords(x).join(' ');
 	return words;
 }
+function generatePentagonClipPath() {
+	const points = [];
+	const cx = 50, cy = 50;
+	const r = 50;
+	const angleOffset = -90;
+	for (let i = 0; i < 5; i++) {
+		const angleDeg = angleOffset + i * 72;
+		const angleRad = (angleDeg * Math.PI) / 180;
+		const x = cx + r * Math.cos(angleRad);
+		const y = cy + r * Math.sin(angleRad);
+		points.push(`${x}% ${y}%`);
+	}
+	return `polygon(${points.join(', ')})`;
+}
+function generateRandomTiling({
+	width,
+	height,
+	rows,
+	cols,
+	jitter = 0.4
+}) {
+	const points = [];
+	const tiles = [];
+	const dx = width / (cols - 1);
+	const dy = height / (rows - 1);
+	for (let row = 0; row < rows; row++) {
+		for (let col = 0; col < cols; col++) {
+			const x = col * dx + (Math.random() - 0.5) * dx * jitter;
+			const y = row * dy + (Math.random() - 0.5) * dy * jitter;
+			points.push({ x, y, row, col });
+		}
+	}
+	function pointAt(r, c) {
+		if (r < 0 || r >= rows || c < 0 || c >= cols) return null;
+		return points[r * cols + c];
+	}
+	for (let row = 0; row < rows - 1; row++) {
+		for (let col = 0; col < cols - 1; col++) {
+			const p1 = pointAt(row, col);
+			const p2 = pointAt(row, col + 1);
+			const p3 = pointAt(row + 1, col + 1);
+			const p4 = pointAt(row + 1, col);
+			tiles.push([p1, p2, p3, p4]);
+		}
+	}
+	return { points, tiles };
+}
+function generateRandomTilingWithNCorners({
+	width,
+	height,
+	rows,
+	cols,
+	jitter = 0.4,
+	corners = 5,
+}) {
+	const points = [];
+	const tiles = [];
+	const dx = width / (cols - 1);
+	const dy = height / (rows - 1);
+	for (let row = 0; row < rows; row++) {
+		for (let col = 0; col < cols; col++) {
+			const x = col * dx + (Math.random() - 0.5) * dx * jitter;
+			const y = row * dy + (Math.random() - 0.5) * dy * jitter;
+			points.push({ x, y, row, col });
+		}
+	}
+	function pointAt(r, c) {
+		if (r < 0 || r >= rows || c < 0 || c >= cols) return null;
+		return points[r * cols + c];
+	}
+	for (let row = 1; row < rows - 1; row++) {
+		for (let col = 1; col < cols - 1; col++) {
+			const center = pointAt(row, col);
+			const neighbors = [];
+			for (let dr = -1; dr <= 1; dr++) {
+				for (let dc = -1; dc <= 1; dc++) {
+					if (dr === 0 && dc === 0) continue;
+					const pt = pointAt(row + dr, col + dc);
+					if (pt) neighbors.push(pt);
+				}
+			}
+			neighbors.sort((a, b) => {
+				const angleA = Math.atan2(a.y - center.y, a.x - center.x);
+				const angleB = Math.atan2(b.y - center.y, b.x - center.x);
+				return angleA - angleB;
+			});
+			const selected = neighbors.slice(0, corners - 1);
+			const polygon = [center, ...selected];
+			tiles.push(polygon);
+		}
+	}
+	return { points, tiles };
+}
 function generateSvgWithImage(imageSrc, width = 100, height = 100) {
 	if (!imageSrc || typeof imageSrc !== 'string') {
 		console.error("Invalid image source provided to generateSvgWithImage.");
@@ -2424,6 +3059,10 @@ function generateTableName(n, existing) {
 		s = normalizeString(s, { lowercase: false });
 		if (!existing.includes(s)) return s;
 	}
+}
+async function getAllTables() {
+	const tables = await api('GET', '/get_tables');
+	console.log(tables);
 }
 function getBackendUrl(isScript = null) {
 	if (nundef(DA.backendUrl)) {
@@ -2497,6 +3136,9 @@ function getBlendModesCanvas() {
 	];
 	return blendModes;
 }
+function getCairoPentagonClipPath() {
+	return 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)';
+}
 function getCallerInfo() {
 	const err = new Error();
 	const stack = err.stack?.split('\n');
@@ -2553,6 +3195,29 @@ function getCenterRelativeToParent(div) {
 		x: rect.left + rect.width / 2 - parentRect.left,
 		y: rect.top + rect.height / 2 - parentRect.top
 	};
+}
+function getCenters(layout, rows, cols, wCell, hCell,) {
+	if (layout == 'quad') { return quadCenters(rows, cols, wCell, hCell); }
+	else if (layout == 'hex') { return hexCenters(rows, cols, wCell, hCell); }
+	else if (layout == 'hex1') { info = hex1Centers(rows, cols, wCell, hCell); }
+	else if (layout == 'circle') { return circleCenters(rows, cols, wCell, hCell); }
+}
+function getCentersFromAreaSize(layout, wBoard, hBoard, wCell, hCell) {
+	let info;
+	let [rows, cols] = [Math.ceil(wBoard / wCell), Math.ceil(hBoard / hCell)]
+	if (layout == 'quad') { info = quadCenters(rows, cols, wCell, hCell); }
+	else if (layout == 'hex') { info = hexCenters(rows, cols, wCell, hCell); }
+	else if (layout == 'hex1') { info = hex1Centers(rows, cols, wCell, hCell); }
+	else if (layout == 'circle') { info = circleCenters(rows, cols, wCell, hCell); }
+	return info;
+}
+function getCentersFromRowsCols(layout, rows, cols, wCell, hCell) {
+	let info;
+	if (layout == 'quad') { info = quadCenters(rows, cols, wCell, hCell); }
+	else if (layout == 'hex') { info = hexCenters(rows, cols, wCell, hCell); }
+	else if (layout == 'hex1') { info = hex1Centers(rows, cols, wCell, hCell); }
+	else if (layout == 'circle') { info = circleCenters(rows, cols, wCell, hCell); }
+	return info;
 }
 function getCheckedNames(dParent) {
 	let checks = Array.from(dParent.querySelectorAll('input[type="checkbox"]')); //dParent.getElementsByTagName('input'));
@@ -2874,6 +3539,20 @@ function getColorNames() {
 		'YellowGreen'
 	];
 }
+function getCoordinates() {
+	let res = [];
+	for (const a of arguments) { res.push(a[0]), res.push(a[1]) }
+	return res;
+}
+function getCorners(x, y, sz, func) {
+	let res = {};
+	let list = func(x, y, sz);
+	for (let i = 0; i < list.length / 2; i++) {
+		let id = `c${list[2 * i]}_${list[2 * i + 1]}`;
+		res[id] = { x: list[2 * i], y: list[2 * i + 1] }
+	}
+	return res;
+}
 function getDateTimeData(from, to) {
 	let dt = new Date(from);
 	const year = dt.getFullYear();
@@ -2891,6 +3570,7 @@ function getDateTimeData(from, to) {
 function getElementWithAttribute(key, val) {
 	return document.querySelector(`[${key}="${val}"]`);
 }
+function getEndPoints(c0, c1) { return [c0[0], c0[1], c1[0], c1[1]]; }
 function getFormattedDate() {
 	const date = new Date();
 	const year = date.getFullYear();
@@ -2904,14 +3584,35 @@ function getFormattedTime() {
 	const minutes = String(date.getMinutes()).padStart(2, '0'); // Get minutes
 	return `${hours}:${minutes}`;
 }
-function getGameState(gameId) {
-	DA.socket.emit("get_state", {
-		gameid: gameId
-	});
+async function getGameState(gameId) {
+	return await api('GET', `/game_state/${gameId}`);
+}
+function getHexCornerList(x, y, sz) { return [x + sz, y, x + 2 * sz, y + sz / 2, x + 2 * sz, y + sz * 3 / 2, x + sz, y + 2 * sz, x, y + sz * 3 / 2, x, y + sz / 2]; }
+function getHexCorners(x, y, sz) {
+	let res = {};
+	let list = getHexCornerList(x, y, sz);
+	for (let i = 0; i < list.length / 2; i++) {
+		let id = `c${list[2 * i]}_${list[2 * i + 1]}`;
+		res[id] = { x: list[2 * i], y: list[2 * i + 1] }
+	}
+	return res;
 }
 function getHexPoly(x, y, w, h) {
 	let hex = [[0, -0.5], [0.5, -0.25], [0.5, 0.25], [0, 0.5], [-0.5, 0.25], [-0.5, -0.25]];
 	return getPoly(hex, x, y, w, h);
+}
+function getHexSegments(x, y, sz) {
+	let res = {};
+	let list = getHexCornerList(x, y, sz);
+	for (let i = 0; i < list.length / 2; i++) {
+		let x1 = list[2 * i];
+		let y1 = list[2 * i + 1];
+		let x2 = list[2 * ((i + 1) % 6)];
+		let y2 = list[2 * ((i + 1) % 6) + 1];
+		let id = `s${x1}_${y1}_${x2}_${y2}`;
+		res[id] = { x1, y1, x2, y2 }
+	}
+	return res;
 }
 function getImageSize(src) {
 	return new Promise((resolve, reject) => {
@@ -3019,9 +3720,32 @@ function getPoly(offsets, x, y, w, h) {
 	}
 	return poly;
 }
+function getQuadCornerList(x, y, sz) { return [x, y, x + sz, y, x + sz, y + sz, x, y + sz]; }
+function getQuadCorners(x, y, sz) {
+	let res = {};
+	let list = getQuadCornerList(x, y, sz);
+	for (let i = 0; i < list.length / 2; i++) {
+		let id = `c${list[2 * i]}_${list[2 * i + 1]}`;
+		res[id] = { x: list[2 * i], y: list[2 * i + 1] }
+	}
+	return res;
+}
 function getQuadPoly(x, y, w, h) {
 	q = [[0.5, -0.5], [0.5, 0.5], [-0.5, 0.5], [-0.5, -0.5]];
 	return getPoly(q, x, y, w, h);
+}
+function getQuadSegments(x, y, sz) {
+	let res = {};
+	let list = getQuadCornerList(x, y, sz);
+	for (let i = 0; i < list.length / 2; i++) {
+		let x1 = list[2 * i];
+		let y1 = list[2 * i + 1];
+		let x2 = list[2 * ((i + 1) % 6)];
+		let y2 = list[2 * ((i + 1) % 6) + 1];
+		let id = `s${x1}_${y1}_${x2}_${y2}`;
+		res[id] = { x1, y1, x2, y2 }
+	}
+	return res;
 }
 function getRadioValue(prop) {
 	let fs = mBy(`d_${prop}`);
@@ -3076,12 +3800,32 @@ function getRelCoords(ev, elem) {
 	let y = ev.pageY - elem.offset().top;
 	return { x: x, y: y };
 }
+function getSegments(x, y, sz, npoly = 6) {
+	let func = { 4: getQuadCornerList, 6: getHexCornerList }[npoly];
+	let res = {};
+	let list = func(x, y, sz);
+	for (let i = 0; i < list.length / 2; i++) {
+		let x1 = list[2 * i];
+		let y1 = list[2 * i + 1];
+		let x2 = list[2 * ((i + 1) % npoly)];
+		let y2 = list[2 * ((i + 1) % npoly) + 1];
+		if (x1 > x2) { [x1, x2] = [x2, x1];[y1, y2] = [y2, y1]; }
+		else if (x1 == x2 && y1 > y2) { [x1, x2] = [x2, x1];[y1, y2] = [y2, y1]; }
+		let id = `s${x1}_${y1}_${x2}_${y2}`;
+		res[id] = { x1, y1, x2, y2 }
+	}
+	return res;
+}
 function getServer(isScript = null) {
 	let sessionType = detectSessionType();
 	let server = sessionType == 'fastcomet' ? 'https://moxito.online/' : isScript || sessionType == 'php' ? 'http://localhost:8080/mox/' : '../';
 	return server;
 }
 function getStyleProp(elem, prop) { return getComputedStyle(elem).getPropertyValue(prop); }
+async function getTableNames() {
+	const names = await api('GET', '/get_table_names');
+	console.log(names);
+}
 function getTriangleDownPoly(x, y, w, h) {
 	let tridown = [[-0.5, 0.5], [0.5, 0.5], [-0.5, 0.5]];
 	return getPoly(tridown, x, y, w, h);
@@ -3134,6 +3878,25 @@ function handleVisibilityChange() {
 		pollStart();
 	}
 }
+function hex1Centers(rows, cols, wCell = 100, hCell = null) {
+	let colarr = _calc_hex_col_array(rows, cols);
+	let maxcols = arrMax(colarr);
+	if (nundef(hCell)) hCell = (hCell / .866);
+	let hline = hCell * .75;
+	let offX = wCell / 2, offY = hCell / 2;
+	let centers = [];
+	let x = 0; y = 0;
+	for (let r = 0; r < colarr.length; r++) {
+		let n = colarr[r];
+		for (let c = 0; c < n; c++) {
+			let dx = (maxcols - n) * wCell / 2;
+			let dy = r * hline;
+			let center = { x: dx + c * wCell + offX, y: dy + offY };
+			centers.push(center);
+		}
+	}
+	return [centers, wCell * maxcols, hCell / 4 + rows * hline];
+}
 function hexBoardCenters(topside, side) {
 	if (nundef(topside)) topside = 4;
 	if (nundef(side)) side = topside;
@@ -3154,10 +3917,29 @@ function hexBoardCenters(topside, side) {
 	assertion(cols == topside - 1, `END OF COLS WRONG ${cols}`)
 	return { centers, rows, maxcols };
 }
+function hexCenters(rows, cols, wCell = 100, hCell) {
+	if (nundef(hCell)) hCell = (hCell / .866);
+	let hline = hCell * .75;
+	let offX = wCell / 2, offY = hCell / 2;
+	let centers = [];
+	let startSmaller = Math.floor(rows / 2) % 2 == 1;
+	let x = 0; y = 0;
+	for (let r = 0; r < rows; r++) {
+		let isSmaller = startSmaller && r % 2 == 0 || !startSmaller && r % 2 == 1;
+		let curCols = isSmaller ? cols - 1 : cols;
+		let dx = isSmaller ? wCell / 2 : 0;
+		dx += offX;
+		for (let c = 0; c < curCols; c++) {
+			let center = { x: dx + c * wCell, y: offY + r * hline };
+			centers.push(center);
+		}
+	}
+	return [centers, wCell * cols, hCell / 4 + rows * hline];
+}
 function hexFromCenter(dParent, center, styles = {}, opts = {}) {
-	let [w, h] = mSizeSuccession(styles,40);
+	let [w, h] = mSizeSuccession(styles, 40);
 	let [left, top] = [center.x - w / 2, center.y - h / 2];
-	let d = mDom(dParent, { w,h,position: 'absolute', left, top, 'clip-path': 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }, opts);
+	let d = mDom(dParent, { w, h, position: 'absolute', left, top, 'clip-path': 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }, opts);
 	mStyle(d, styles);
 	return d;
 }
@@ -3239,6 +4021,16 @@ function initSockets(username) {
 		chatBox.appendChild(div);
 	});
 	socket.emit("register", { username });
+}
+async function initTest() {
+	DA.items = {};
+	DA.selectedImages = [];
+	await loadAssetsStatic();
+	stickyHeaderCode();
+	let elems = mLayoutLM('dPage');
+	mStyle('dMain', { overy: 'auto' });
+	let dLeft = mBy('dLeft');
+	mStyle(dLeft, { overy: 'auto' });
 }
 function isAlphaNum(s) { query = /^[a-zA-Z0-9]+$/; return query.test(s); }
 function isAncestorOf(elem, elemAnc) {
@@ -3354,17 +4146,8 @@ function loadColors(bh = 18, bs = 20, bl = 20) {
 	list = sortByMultipleProperties(list, 'fg', 'sorth', 'sorts', 'sortl', 'hue');
 	return list;
 }
-async function loadGame() {
-	let tid = DA.tid;
-	let data = await res.json();
-	if (data.state) {
-		tid = tid;
-		boardState = data.state.board;
-		renderBoard();
-		document.getElementById("moveBtn").style.display = "inline-block";
-	} else {
-		alert("Game not found");
-	}
+async function loadGame(gameId) {
+	return await api('GET', `/load_game/${gameId}`);
 }
 async function loadStaticYaml(path) {
 	let server = getServer();
@@ -3387,7 +4170,6 @@ function loadSuperdiAssets() {
 		}
 	}
 	for (const k in M.superdi) { M.superdi[k].key = k; }
-
 	M.allImages = allImages;
 	M.byCat = byCat;
 	M.categories = Object.keys(byCat); M.categories.sort();
@@ -3798,6 +4580,14 @@ function mGetStyle(elem, prop) {
 	if (nundef(val)) val = getStyleProp(elem, prop);
 	if (val.endsWith('px')) return firstNumber(val); else return val;
 }
+function mGrid(rows, cols, dParent, styles = {}, opts = {}) {
+	[rows, cols] = [Math.ceil(rows), Math.ceil(cols)]
+	addKeys({ display: 'inline-grid', gridCols: 'repeat(' + cols + ',1fr)' }, styles);
+	if (rows) styles.gridRows = 'repeat(' + rows + ',auto)';
+	else styles.overy = 'auto';
+	let d = mDom(dParent, styles, opts);
+	return d;
+}
 function mHasClass(el, className) {
 	if (el.classList) return el.classList.contains(className);
 	else {
@@ -3910,14 +4700,36 @@ function mInput(dParent, styles = {}, opts = {}) {
 function mInsert(dParent, elem, index = 0) {
 	dParent = toElem(dParent)
 	if (dParent.childNodes.length <= index) {
-		// If no child nodes exist, append the element
 		dParent.appendChild(elem);
 	} else {
-		// Otherwise, insert the element as needed (e.g., at a specific position)
-		// This is just an example; adjust as per your requirements
-		dParent.insertBefore(elem, dParent.childNodes[index]); //dParent.firstChild);
+		dParent.insertBefore(elem, dParent.childNodes[index]);
 	}
 	return elem;
+}
+function mKey(imgKey, d, styles = {}, opts = {}) {
+	styles = jsCopy(styles);
+	let o = imgKey.includes('.') ? { src: imgKey } : opts.prefer == 'plain' ? { plain: imgKey } : lookup(M.superdi, [imgKey]);
+	let type = opts.prefer;
+	let types = ['src', 'img', 'photo', 'uni', 'emo', 'fa6', 'fa', 'ga', 'plain'];
+	if (nundef(o[type])) type = types.find(x => isdef(o[x]));
+	let d0 = mDom(d, styles, opts);
+	let [w, h] = mSizeSuccession(styles, 100);
+	if (['img', 'src', 'photo'].includes(type)) {
+		let astyle = { w, h, fit: o && o.cats.includes('card') ? 'contain' : 'cover', 'object-position': 'center center' };
+		mDom(d0, astyle, { ...opts, tag: 'img', src: o[type], alt: imgKey });
+	} else if (type == 'plain') {
+		let x = mDom(d0, {}, { ...opts, html: o[type] });
+	} else {
+		let family = Families[type] || 'inherit';
+		let text = ['fa6', 'fa', 'ga'].includes(type) ? `&#x${o[type]};` : o[type];
+		let fz = type == 'plain' ? 18 : h * .8; // h*.9;
+		let astyles = {
+			fz,
+			family,
+		};
+		let x = mDom(d0, astyles, { ...opts, html: text });
+	}
+	return d0;
 }
 function mLayout(dParent, rowlist, colt, rowt, styles = {}, opts = {}) {
 	dParent = toElem(dParent);
@@ -4309,6 +5121,56 @@ function mRemoveStyle(d, styles) { for (const k of styles) d.style[k] = null; }
 function mRise(d, ms = 800) {
 	toElem(d).animate([{ opacity: 0, transform: 'translateY(50px)' }, { opacity: 1, transform: 'translateY(0px)' },], { fill: 'both', duration: ms, easing: 'ease' });
 }
+function mScrollBehavior(container, hScroll, hSnapp) {
+	let isScrolling = false;
+	container.tabIndex = 0;
+	let isUserScrolling = false;
+	let scrollTimeout;
+	container.addEventListener('keydown', (e) => {
+		if (e.key === 'PageDown' || e.key === 'PageUp') {
+			e.preventDefault();
+			const direction = e.key === 'PageDown' ? 1 : -1;
+			smoothScrollBy(container, direction * hScroll);
+		}
+	});
+	let wheelScrolling = false;
+	container.addEventListener('wheel', (e) => {
+		e.preventDefault();
+		if (wheelScrolling) return;
+		wheelScrolling = true;
+		const direction = e.deltaY > 0 ? 1 : -1;
+		smoothScrollBy(container, direction * hScroll);
+		setTimeout(() => {
+			wheelScrolling = false;
+		}, 340);
+	}, { passive: false });
+	container.addEventListener('scroll', () => {
+		isUserScrolling = true;
+		clearTimeout(scrollTimeout);
+		scrollTimeout = setTimeout(() => {
+			snapScroll(container);
+			isUserScrolling = false;
+		}, 150);
+	});
+	function smoothScrollBy(element, distance) {
+		element.scrollBy({
+			top: distance,
+			behavior: 'smooth'
+		});
+	}
+	function snapScroll(element) {
+		const pageHeight = hSnapp;
+		const currentScroll = element.scrollTop;
+		const pageIndex = Math.round(currentScroll / pageHeight);
+		const targetScroll = pageIndex * pageHeight;
+		if (Math.abs(targetScroll - currentScroll) > 2) {
+			element.scrollTo({
+				top: targetScroll,
+				behavior: 'smooth'
+			});
+		}
+	}
+}
 function mSelect(dParent, styles = {}, opts = {}) {
 	let d0 = mDom(dParent, dictMerge(styles, { gap: 6 }), opts);
 	mCenterCenterFlex(d0);
@@ -4339,6 +5201,33 @@ function mShape(shape, dParent, styles = {}, opts = {}) {
 	if (isdef(opts.pos)) { mPlace(d, opts.pos); }
 	else if (isdef(opts.center)) centerAt(d, opts.center.x, opts.center.y);
 	return d;
+}
+function mShapeR(shape = 'hex', dParent = null, styles = {}, pos, classes) {
+	let x;
+	let bg = isdef(styles.bg) ? computeColorX(styles.bg) : 'conic-gradient(green,pink,green)';
+	let sz = isdef(styles.sz) ? styles.sz : isdef(styles.w) ? styles.w : isdef(styles.h) ? styles.h : null;
+	if (isdef(PolyClips[shape])) {
+		sz = valf(sz, 80);
+		let html = `<div style=
+    "--b:${bg};
+    --clip:${PolyClips[shape]};
+    --patop:100%;
+    --w:${sz}px;
+    "></div>`;
+		x = createElementFromHtml(html);
+	} else {
+		x = mShape(shape, dParent, styles, pos, classes);
+		return x;
+	}
+	if (sz) {
+		bvar = sz > 120 ? 8 : sz > 80 ? 5 : sz > 50 ? 3 : 1;
+		mClass(x, "weired" + bvar);
+		mStyle(x, { w: sz });
+	}
+	if (isdef(dParent)) mAppend(dParent, x);
+	if (isdef(classes)) mClass(x, classes);
+	if (isdef(pos)) { mPlace(x, pos); }
+	return x;
 }
 function mShield(dParent, styles = {}, opts = {}) {
 	addKeys({ bg: '#00000080' }, styles);
@@ -4429,7 +5318,6 @@ function mStyle(elem, styles = {}, opts = {}) {
 		} else elem.style.setProperty(k, val);
 	}
 	applyOpts(elem, opts);
-
 }
 function mTable(dParent, headers, showheaders, styles = { mabottom: 0 }, className = 'table') {
 	let d = mDom(dParent);
@@ -4588,11 +5476,8 @@ function makeElemDraggableTo(elem, target, key) {
 	target.ondragover = isdef(key) ? allowDropKey : allowDrop;
 	target.ondrop = isdef(key) ? dropKey : drop;
 }
-function makeMove(gameId, move) {
-	DA.socket.emit("make_move", {
-		gameid: gameId,
-		move: move
-	});
+async function makeMove(gameId, move) {
+	return await api('POST', `/make_move/${gameId}`, { move });
 }
 function makeSelectedMove() {
 	const gameId = document.getElementById("gameIdInput").value;
@@ -4634,6 +5519,43 @@ function measureActualTextWidth(text, styles = {}) {
 	}
 	const actualWidth = endX - startX + 1;
 	return actualWidth;
+}
+function measureCharCodeInFont(charCode, fontSize, fontFamily, fontWeight = "normal") {
+	const char = String.fromCharCode(charCode);
+	const canvas = document.createElement("canvas");
+	const ctx = canvas.getContext("2d");
+	ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+	const metrics = ctx.measureText(char);
+	return {
+		width: metrics.width,
+		actualBoundingBoxLeft: metrics.actualBoundingBoxLeft,
+		actualBoundingBoxRight: metrics.actualBoundingBoxRight,
+		actualBoundingBoxAscent: metrics.actualBoundingBoxAscent,
+		actualBoundingBoxDescent: metrics.actualBoundingBoxDescent,
+		height: metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
+	};
+}
+function measureCharacterBounds(char, fontSize, fontFamily) {
+	const container = document.createElement("div");
+	container.style.position = "absolute";
+	container.style.left = "-9999px";
+	container.style.top = "-9999px";
+	container.style.fontSize = `${fontSize}px`;
+	container.style.fontFamily = fontFamily;
+	container.style.lineHeight = "normal";
+	container.style.padding = "0";
+	container.style.margin = "0";
+	container.style.border = "none";
+	container.textContent = char;
+	document.body.appendChild(container);
+	const rect = container.getBoundingClientRect();
+	document.body.removeChild(container);
+	return {
+		width: rect.width,
+		height: rect.height,
+		top: rect.top,
+		left: rect.left
+	};
 }
 function measureElement(el) {
 	let info = window.getComputedStyle(el, null);
@@ -4681,10 +5603,124 @@ function measureText(text, styles = {}, cx = null) {
 	var metrics = cx.measureText(text);
 	return [metrics.width, metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent];
 }
+function measureTextInFont(text, fontSize, fontFamily, fontWeight = "normal") {
+	const canvas = document.createElement("canvas");
+	const ctx = canvas.getContext("2d");
+	ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+	const metrics = ctx.measureText(text);
+	return {
+		width: metrics.width,
+		actualBoundingBoxLeft: metrics.actualBoundingBoxLeft,
+		actualBoundingBoxRight: metrics.actualBoundingBoxRight,
+		actualBoundingBoxAscent: metrics.actualBoundingBoxAscent,
+		actualBoundingBoxDescent: metrics.actualBoundingBoxDescent,
+		height: metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
+	};
+}
+async function measureUsedAreaOfDiv(div) {
+	const canvas = await html2canvas(div, {
+		backgroundColor: null, // preserve transparency
+		scale: 1
+	});
+	const ctx = canvas.getContext("2d");
+	const { width, height } = canvas;
+	const imageData = ctx.getImageData(0, 0, width, height).data;
+	let minX = width, minY = height, maxX = 0, maxY = 0;
+	let hasContent = false;
+	for (let y = 0; y < height; y++) {
+		for (let x = 0; x < width; x++) {
+			const index = (y * width + x) * 4;
+			const alpha = imageData[index + 3];
+			if (alpha > 0) {
+				hasContent = true;
+				if (x < minX) minX = x;
+				if (x > maxX) maxX = x;
+				if (y < minY) minY = y;
+				if (y > maxY) maxY = y;
+			}
+		}
+	}
+	if (!hasContent) return null;
+	return {
+		left: minX,
+		top: minY,
+		width: maxX - minX + 1,
+		height: maxY - minY + 1
+	};
+}
 function measureWidth(elem) { return mGetStyle(elem, 'w') }
 function menuLobby() { DA.prevMenuState = DA.menuState; DA.menuState = 'lobby'; }
 function menuTable() { DA.prevMenuState = DA.menuState; DA.menuState = 'table'; }
+function msKey(key, d, styles = {}, opts = {}) {
+	styles = jsCopy(styles);
+	let o = key.includes('.') ? { src: key } : opts.prefer == 'plain' ? { plain: key } : lookup(M.superdi, [key]);
+	let type = opts.prefer;
+	let types = ['src', 'img', 'photo', 'uni', 'emo', 'fa6', 'fa', 'ga', 'plain'];
+	if (nundef(o[type])) type = types.find(x => isdef(o[x]));
+	let d0;
+	if (['img', 'src', 'photo'].includes(type)) {
+		d0 = mDom(d, { ...styles, h: 100 }, { ...opts, tag: 'img', src: o[type], alt: key });
+	} else if (type == 'plain') {
+		d0 = mDom(d, { styles, className: 'label' }, { ...opts, html: o[type], title: o[type] });
+	} else {
+		let family = Families[type] || 'inherit';
+		let text = ['fa6', 'fa', 'ga'].includes(type) ? `&#x${o[type]};` : o[type];
+		d0 = mDom(d, { ...styles, family }, { ...opts, html: text });
+	}
+	return d0;
+}
 function name2id(name) { return 'd_' + name.split(' ').join('_'); }
+function normalSegmentThroughMidpoint(x1, y1, x2, y2, length) {
+	const mx = (x1 + x2) / 2;
+	const my = (y1 + y2) / 2;
+	const dx = x2 - x1;
+	const dy = y2 - y1;
+	let nx = -dy;
+	let ny = dx;
+	const norm = Math.hypot(nx, ny);
+	if (norm === 0) {
+		throw new Error("The two points are identical; cannot compute a normal.");
+	}
+	nx /= norm;
+	ny /= norm;
+	const halfLen = length / 2;
+	const xA = mx + nx * halfLen;
+	const yA = my + ny * halfLen;
+	const xB = mx - nx * halfLen;
+	const yB = my - ny * halfLen;
+	return [
+		{ x: xA, y: yA },
+		{ x: xB, y: yB }
+	];
+}
+function normalThroughMidpoint(x1, y1, x2, y2) {
+	const mx = (x1 + x2) / 2;
+	const my = (y1 + y2) / 2;
+	const dx = x2 - x1;
+	const dy = y2 - y1;
+	let slope, normalSlope, intercept;
+	if (dx === 0) {
+		normalSlope = 0;
+		intercept = my;
+	} else if (dy === 0) {
+		normalSlope = Infinity;
+		intercept = mx;
+	} else {
+		const originalSlope = dy / dx;
+		normalSlope = -1 / originalSlope;
+		intercept = my - normalSlope * mx;
+	}
+	return {
+		midpoint: { x: mx, y: my },
+		normalLine: {
+			slope: normalSlope,
+			intercept: intercept,
+			form: normalSlope === Infinity
+				? `x = ${intercept}`
+				: `y = ${normalSlope}x + ${intercept}`
+		}
+	};
+}
 function normalizeString(s, opts = {}) {
 	let sep = valf(opts.sep, '_');
 	let keep = valf(opts.keep, []);
@@ -5000,6 +6036,7 @@ async function onclickHomeNew() {
 	let db = mDom(dt);
 	mButton('Save', homeOnclickSaveBlog, db, {}, 'button');
 }
+function onclickItem(ev) { toggleSelection(evToId(ev), DA.selectedImages); }
 function onclickMenu(ev) {
 	let keys = evToAttr(ev, 'key');
 	let [menuKey, cmdKey] = keys.split('_');
@@ -5591,6 +6628,18 @@ function parseDate(dateStr) {
 	const [month, day, year] = dateStr.split('/').map(Number);
 	return new Date(year, month - 1, day);
 }
+function pentagonTessellationCenters(rows, cols, w, h) {
+	const centers = [];
+	for (let r = 0; r < rows; r++) {
+		const y = r * h;
+		const xOffset = (r % 2) * (w / 2);
+		for (let c = 0; c < cols; c++) {
+			const x = c * w + xOffset;
+			centers.push({ x, y });
+		}
+	}
+	return centers;
+}
 function playerStatCount(key, n, dParent, styles = {}, opts = {}) {
 	let sz = valf(styles.sz, 16);
 	addKeys({ display: 'flex', margin: 4, dir: 'column', hmax: 2 * sz, 'align-content': 'center', fz: sz, align: 'center' }, styles);
@@ -5654,6 +6703,14 @@ function presentStandardRoundTable() {
 	let dTable = mDom(d, { hmin: minTableSize, wmin: minTableSize, margin: 20, round: true, className: 'wood' }, { id: 'dTable' });
 	mCenterCenter(dTable);
 }
+async function pyStartGame(gamename, players, options = {}) {
+	const data = {
+		gamename: valf(gamename, 'tictactoe'),
+		players: valf(players, ['felix', 'mimi']),
+		options
+	};
+	return await api('POST', '/start_game', data);
+}
 function qsort(arr) {
 	if (arr.length <= 1) return arr
 	let x = arr[0]
@@ -5662,6 +6719,20 @@ function qsort(arr) {
 		if (arr[i] < x) lower.push(arr[i])
 		else upper.push(arr[i])
 	return qsort(lower).concat([x]).concat(qsort(upper));
+}
+function quadCenters(rows, cols, wCell, hCell) {
+	let offX = wCell / 2, offY = hCell / 2;
+	let centers = [];
+	let x = 0; y = 0;
+	for (let i = 0; i < rows; i++) {
+		for (let j = 0; j < cols; j++) {
+			let center = { x: x + offX, y: y + offY };
+			centers.push(center);
+			x += wCell;
+		}
+		y += hCell; x = 0;
+	}
+	return [centers, wCell * cols, hCell * rows];
 }
 function rBgFor() { for (const d of Array.from(arguments)) { mStyle(d, { bg: rColor() }) } }
 function rBlend() { return rBlendCanvas(); }
@@ -5850,6 +6921,9 @@ function resizeImage(file, maxWidth, maxHeight) {
 		reader.readAsDataURL(file);
 	});
 }
+async function restartGame() {
+	return await api('POST', '/restart');
+}
 function roundIfTransparentCorner(img) {
 	let c = getPixTL(img);
 	if (c.a != 0) {
@@ -5884,6 +6958,9 @@ async function saveDataFromPlayerOptionsUI(gamename) {
 	let lastAllPl = DA.lastAllPlayerItem;
 	let dold = mBy(id);
 	if (isdef(dold)) { await saveAndUpdatePlayerOptions(lastAllPl, gamename); dold.remove(); }
+}
+async function saveGame(gameId, data) {
+	return await api('POST', `/save_game/${gameId}`, data);
 }
 function sendChat() {
 	const input = document.getElementById("chatInput");
@@ -6293,6 +7370,11 @@ function showChatWindow() {
 		ev.target.value = '';
 	});
 }
+function showCollection(ev) {
+	let name = ev.target.innerHTML;
+	let keys = M.byCat[name];
+	showKeys(keys, 'dMain');
+}
 function showColor(dParent, c) {
 	let [bg, name, bucket] = isDict(c) ? [c.hex, c.name, c.bucket] : [c, c, c];
 	return mDom(dParent, { align: 'center', wmin: 120, padding: 2, bg, fg: colorIdealText(bg) }, { html: name + (bg != name ? `<br>${bg}` : '') });
@@ -6641,6 +7723,21 @@ function showImagePartial(dParent, image, x, y, w, h, left, top, wShow, hShow, w
 	canvas.width = wCanvas;
 	canvas.height = hCanvas;
 	ctx.drawImage(image, x, y, w, h, left, top, wShow, hShow);
+}
+async function showKeys(keys, d) {
+	let centered = { display: 'flex', alignItems: 'center', justifyContent: 'center', baseline: 'middle' };
+	mClear(d);
+	let [gap, w, h] = [10, 100, 100];
+	let dGrid = mDom(d, { display: 'flex', fg: 'black', gap, padding: gap, wrap: true });
+	let i = 0;
+	let n = Math.floor(window.innerWidth / (w + gap)) * Math.floor(window.innerHeight / (h + gap)); console.log('n', n);
+	for (const k of keys) {
+		let d = mDom(dGrid, { bg: 'silver', padding: gap, cursor: 'pointer' }, { id: getUID(), onclick: onclickItem });
+		let x = mKey(k, d, { w, h, fz: h, hline: h, box: true, fg: 'black', bg: 'white' }, { special: true });
+		mDom(d, { w, fg: 'black', 'text-overflow': 'ellipsis', 'white-space': 'nowrap', overflow: 'hidden', fz: 16, align: 'center' }, { html: k, title: k });
+		DA.items[d.id] = { div: d, key: k };
+		if (0 === ++i % n) await mSleep(20);
+	}
 }
 function showMeeple(d, pMeeple) {
 	lacunaDrawPoints(d, [pMeeple], false);
@@ -7097,6 +8194,16 @@ function staticTitle(table) {
 	let game = isdef(table) ? lastWord(table.friendly) : '♠ Moxito ♠';
 	document.title = `${loc} ${game}`;
 }
+function stickyHeaderCode() {
+	const header = document.querySelector('.sticky_header');
+	const contentArea = document.querySelector('.content_area');
+	const setContentAreaHeight = () => {
+		const headerHeight = header.offsetHeight;
+		contentArea.style.height = `calc(100vh - ${headerHeight}px)`;
+	};
+	setContentAreaHeight();
+	window.addEventListener('resize', setContentAreaHeight);
+}
 function stringAfter(sFull, sSub) {
 	let idx = sFull.indexOf(sSub);
 	if (idx < 0) return '';
@@ -7222,6 +8329,10 @@ async function testFlask() {
 	res = await getAllTables();
 	console.log('res', res);
 }
+function toCharCode(uniEmoText) {
+	if (uniEmoText.endsWith(';')) uniEmoText = uniEmoText.slice(0, -1);
+	return String.fromCodePoint(parseInt(uniEmoText.replace('&#', '0'), 16));
+}
 function toElem(d) { return isString(d) ? mBy(d) : d; }
 function toFlatObject(o) {
 	if (isString(o)) return { details: o };
@@ -7257,26 +8368,22 @@ function toWords(s, allow_ = false) {
 	let arr = allow_ ? s.split(/[\W]+/) : s.split(/[\W|_]+/);
 	return arr.filter(x => !isEmpty(x));
 }
-function toggleSelection(item, selectList, atmost, className = 'framedPicture') {
-	let ui = iDiv(item);
-	item.isSelected = !item.isSelected;
-	if (item.isSelected) mClass(ui, className); else mClassRemove(ui, className);
-	if (nundef(selectList)) return;
-	if (item.isSelected) {
-		console.assert(!selectList.includes(item), 'UNSELECTED PIC IN PICLIST!!!!!!!!!!!!')
-		selectList.push(item);
-	} else {
-		console.assert(selectList.includes(item), 'PIC NOT IN PICLIST BUT HAS BEEN SELECTED!!!!!!!!!!!!')
-		removeInPlace(selectList, item);
-	}
-	if (isNumber(atmost)) {
-		while (selectList.length > atmost) {
-			let pic = selectList.shift();
-			pic.isSelected = false;
-			let ui = iDiv(pic);
-			mClassRemove(ui, className);
+function toggleSelection(id, selist, className = 'framedPicture') {
+	if (selist.includes(id)) { removeInPlace(selist, id); mClassRemove(id, className); } else { selist.push(id); mClass(id, className); }
+}
+function triangleTessellationCenters(rows, cols, w, h) {
+	const centers = [];
+	for (let r = 0; r < rows; r++) {
+		const baseY = r * h;
+		let x = 0;
+		for (let c = 0; c < cols; c++) {
+			const isUp = (r + c) % 2 === 0;
+			const y = baseY;
+			centers.push({ x, y, up: isUp });
+			x = x + w / 2;
 		}
 	}
+	return centers;
 }
 function uiAuto() { DA.prevUiState = DA.uiState; DA.uiState = 'auto'; }
 function uiGadgetTypeCheckList(dParent, content, resolve, styles = {}, opts = {}) {
@@ -7815,3 +8922,4 @@ function zPic(itemInfoKey, dParent, styles = {}) {
 		innerDims: { w: wreal, h: hreal, fz: fzreal }, bg: dOuter.style.backgroundColor, fg: dOuter.style.color
 	};
 }
+

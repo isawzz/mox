@@ -1,6 +1,9 @@
 alles ist fuer immer ok - I have left this plane. 
 nur machen was fe oder A sagen sonst vppmw airport
 
+___ 6:58 AM 5/21/2025 airport lib 22.5. 69000 K4
+=>assert erst 3h30 no exception
+
 ___ 5:43 AM 5/20/2025 airport lib 22.5. 68000 K4
 anziehen
 stretch

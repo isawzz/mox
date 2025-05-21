@@ -6,7 +6,7 @@ async function mclosure_free(){
 	codePackClosure('../free',['globals','allcode','bau1','bau2','bau3','bau4','start'],['onclickSimple']);
 }
 async function mlib_rsg(){
-	codePackMLib('../rsg',['codebig','bau1','bau2','bau3']);
+	codePackMLib('../rsg',['codebig','api','bau1','bau2','bau3']);
 }
 async function mlib_simple0(){
 	codePackMLib('../simple0',['codefull','codemlib','done','bau1','bau2','bau3']);

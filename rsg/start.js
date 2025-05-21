@@ -1,6 +1,42 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { test0_randomTiling(); }
+function start() { API_BASE = getBackendUrl(); test0_tessagon0(); }
+
+async function test0_tessagon0() {
+	let html = `
+	<h1>Tessagon SVG Viewer</h1>
+	<form id="tess-form">
+		<label>Tiles in U: <input type="number" id="u-num" value="10" min="1" /></label>
+		<label>Tiles in V: <input type="number" id="v-num" value="10" min="1" /></label>
+		<button type="submit">Generate</button>
+	</form>
+
+	<svg id="svg2" width="500" height="500" viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg" stroke="black"
+		fill="lightblue" stroke-width="0.005">
+	</svg>
+	`;
+	let dPage = mBy('dPage');
+	dPage.innerHTML = html;
+	document.getElementById('tess-form').addEventListener('submit', async function (e) {
+		e.preventDefault();
+		const u = document.getElementById('u-num').value;
+		const v = document.getElementById('v-num').value;
+
+		const response = await fetch(`http://localhost:5000/tessellate?u=${u}&v=${v}`);
+		console.log(response)
+		const svgText = await response.text();
+		console.log(svgText)
+		let svg = document.getElementById('svg2');
+		svg.innerHTML = svgText;
+		setTimeout(() => {
+			let svg = document.getElementById('svg2');
+			const gElement = svg.querySelector('g');
+			const centers = getPolygonCentersFromG(gElement);
+			console.log(centers);
+		}, 100)
+	});
+}
+
 
 async function test0_voro0() {
 

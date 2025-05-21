@@ -1,3 +1,4 @@
+var API_BASE = null; 
 var A = null;
 var B = {};
 var Menu = null;
