@@ -3,11 +3,14 @@ onload = start; VERBOSE = true; TESTING = true;
 function start() { API_BASE = getBackendUrl(); test0_tessagon0(); }
 
 async function test0_tessagon0() {
+
+	
+
 	let html = `
 	<h1>Tessagon SVG Viewer</h1>
 	<form id="tess-form">
-		<label>Tiles in U: <input type="number" id="u-num" value="10" min="1" /></label>
-		<label>Tiles in V: <input type="number" id="v-num" value="10" min="1" /></label>
+		<label>Tiles in U: <input type="number" id="u-num" value="4" min="1" /></label>
+		<label>Tiles in V: <input type="number" id="v-num" value="4" min="1" /></label>
 		<button type="submit">Generate</button>
 	</form>
 
