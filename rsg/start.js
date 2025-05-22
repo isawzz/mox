@@ -1,6 +1,21 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { API_BASE = getBackendUrl(); test0_createTess(); }
+function start() { API_BASE = getBackendUrl(); test1_mytess(); }
+
+async function test1_mytess() {
+	await initTest();
+
+	let res = generateSvgTessellation(u_num = 2, v_num = 2, shapeFunc = HexTessagon);
+	console.log('res',res);
+
+	// let list = getTessagonList();
+	// for (const k of list) {
+	// 	mDom(dLeft, {}, { tag: 'button', 'html': k, onclick: showTessellation });
+	// 	mLinebreak(dLeft);
+	// }
+	//clickOn('SnubHexTessagon')
+}
+
 
 async function test0_createTess() {
 	const vertices = [
