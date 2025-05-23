@@ -1,4 +1,159 @@
 
+class _AbstractTile extends ValueBlend {
+	constructor(tessagon, options = {}) {
+		super(options);
+		this.tessagon = tessagon;
+		this.f = tessagon.f;
+
+		this.u_symmetric = options.u_symmetric || false;
+		this.v_symmetric = options.v_symmetric || false;
+		this.rot_symmetric = options.rot_symmetry || null;
+
+		this.id = options.id || null;
+		this.fingerprint = options.fingerprint || null;
+
+		this.corners = null;
+		this._initCorners(options);
+
+		this.neighbors = { top: null, bottom: null, left: null, right: null };
+		this.twist = { top: false, bottom: false, left: false, right: false };
+	}
+
+	set_neighbors(neighbors = {}) {
+		for (const key of ['top', 'bottom', 'left', 'right']) {
+			if (neighbors[key]) this.neighbors[key] = neighbors[key];
+		}
+	}
+
+	get_neighbor_tile(neighbor_keys) {
+		let tile = this;
+		for (const key of this._neighbor_path(neighbor_keys)) {
+			if (!tile.neighbors[key]) return null;
+			tile = tile.neighbors[key];
+		}
+		return tile;
+	}
+
+	get left() { return this.get_neighbor_tile(['left']); }
+	get right() { return this.get_neighbor_tile(['right']); }
+	get top() { return this.get_neighbor_tile(['top']); }
+	get bottom() { return this.get_neighbor_tile(['bottom']); }
+
+	inspect(options = {}) {
+		if (!this.id) return;
+		const prefix = options.tile_number ? `Tile #${options.tile_number}` : 'Tile';
+		console.log(`${prefix} (${this.constructor.name}):`);
+		console.log(`  - self:      ${this.id}`);
+		console.log('  - neighbors:');
+		for (const key of ['top', 'left', 'right', 'bottom']) {
+			const neighbor = this.neighbors[key];
+			if (neighbor && neighbor.id) {
+				console.log(`    - ${this._neighbor_str(key)}`);
+			}
+		}
+		console.log(
+			`  - corners: (${this.corners[2][0].toFixed(4)}, ${this.corners[2][1].toFixed(4)})  ` +
+			`(${this.corners[3][0].toFixed(4)}, ${this.corners[3][1].toFixed(4)})`
+		);
+		console.log(
+			`             (${this.corners[0][0].toFixed(4)}, ${this.corners[0][1].toFixed(4)})  ` +
+			`(${this.corners[1][0].toFixed(4)}, ${this.corners[1][1].toFixed(4)})`
+		);
+		console.log('  - twist:', this.twist);
+		if (this.fingerprint) console.log('  - fingerprint:', this.fingerprint);
+		console.log('');
+	}
+
+	_get_nested_list_value(list, keys) {
+		if (!Array.isArray(keys)) return list[keys];
+		return keys.reduce((ref, key) => ref[key], list);
+	}
+
+	_set_nested_list_value(list, keys, value) {
+		if (!Array.isArray(keys)) {
+			list[keys] = value;
+			return;
+		}
+		const lastKey = keys.pop();
+		const ref = this._get_nested_list_value(list, keys);
+		ref[lastKey] = value;
+	}
+
+	_neighbor_path(keys) {
+		if (keys.length < 2) return keys;
+		if (this._should_twist_u(keys) && ['top', 'bottom'].includes(keys[0])) {
+			return [keys[1], keys[0]];
+		}
+		if (this._should_twist_v(keys) && ['left', 'right'].includes(keys[0])) {
+			return [keys[1], keys[0]];
+		}
+		return keys;
+	}
+
+	_index_path(keys, neighbor_keys) {
+		let path = keys;
+		if (this._should_twist_u(neighbor_keys)) path = this._u_flip(path);
+		if (this._should_twist_v(neighbor_keys)) path = this._v_flip(path);
+		return path;
+	}
+
+	_permute_value(keys, vals) {
+		if (Array.isArray(keys)) return keys.map(k => this._permute_value(k, vals));
+		const i = vals.indexOf(keys);
+		return i !== -1 ? vals[(i + 1) % vals.length] : keys;
+	}
+
+	_swap_value(keys, a, b) {
+		return this._permute_value(keys, [a, b]);
+	}
+
+	_u_flip(keys) {
+		return this.u_symmetric ? this._swap_value(keys, 'left', 'right') : keys;
+	}
+
+	_v_flip(keys) {
+		return this.v_symmetric ? this._swap_value(keys, 'top', 'bottom') : keys;
+	}
+
+	_rotate_index(keys) {
+		if (!this.rot_symmetric) return keys;
+		if (this.rot_symmetric === 180) {
+			let rotated = this._permute_value(keys, ['rotate0', 'rotate180']);
+			rotated = this._permute_value(rotated, ['left', 'right']);
+			rotated = this._permute_value(rotated, ['top', 'bottom']);
+			return rotated;
+		}
+		if (this.rot_symmetric === 90) {
+			return this._permute_value(keys, ['rotate0', 'rotate90', 'rotate180', 'rotate270']);
+		}
+		return keys;
+	}
+
+	_v_index(keys) {
+		if (keys.includes('bottom')) return 'bottom';
+		if (keys.includes('top')) return 'top';
+		throw new Error(`No v_index in ${keys}`);
+	}
+
+	_u_index(keys) {
+		if (keys.includes('left')) return 'left';
+		if (keys.includes('right')) return 'right';
+		throw new Error(`No u_index in ${keys}`);
+	}
+
+	_should_twist_u(keys) {
+		return ['top', 'bottom'].some(k => this.twist[k] && keys.includes(k));
+	}
+
+	_should_twist_v(keys) {
+		return ['left', 'right'].some(k => this.twist[k] && keys.includes(k));
+	}
+
+	_neighbor_str(key) {
+		const neighbor = this.neighbors[key];
+		return neighbor ? `${key}: ${neighbor.id}` : `${key}: None`;
+	}
+}
 
 function precomputePolygonNeighbors(groupElement) {
   if (!groupElement || !(groupElement instanceof SVGGElement)) {
