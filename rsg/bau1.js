@@ -4,7 +4,7 @@ function onclickTessName(ev){
 }
 function showTessJs(name){
   let shapeFunc = getTessagonDict()[name]; console.log('shapeFunc', shapeFunc)
-	let res = generateSvgTessellation(4,4, shapeFunc);
+	let res = generateSvgTessellation(2,3, shapeFunc);
 	//console.log('res',res);
 	showSvg('dMain',res);
 
@@ -33,8 +33,8 @@ function showSvg(dParent,gCode){
   dParent = toElem(dParent);
 	mClear(dParent)
 	let html = `
-		<svg id="svg2" width="500" height="500" viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg" stroke="black"
-			fill="lightblue" stroke-width="0.005">
+		<svg id="svg2" width="500" height="500" viewBox="-0.1 -0.1 1.2 1.2" xmlns="http://www.w3.org/2000/svg" stroke="orange"
+			fill="gold" stroke-width="0.005">
 			${gCode}
 		</svg>
 		`;

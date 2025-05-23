@@ -1,6 +1,6 @@
 onload = start; VERBOSE = true; TESTING = true;
 
-function start() { API_BASE = getBackendUrl(); test0_tessagon1(); }
+function start() { API_BASE = getBackendUrl(); test1_mytess(); }
 
 async function test1_mytess() {
 	await initTest();
@@ -9,32 +9,14 @@ async function test1_mytess() {
 	// console.log('res',res);
 	// showSvg('dMain',res);
 
+	mStyle('dMain',{padding:10});
+
 	let list = getTessagonDict();
 	for (const k in list) {
 		mDom(dLeft, {}, { tag: 'button', 'html': k, onclick: onclickTessName });
 		mLinebreak(dLeft);
 	}
-	showTessJs('WeaveTessagon')
-}
-
-
-async function test0_createTess() {
-	const vertices = [
-		[0, 0], [100, 0], [100, 100], [0, 100],  // square corners
-		[50, 50], // center point
-	];
-	const faces = [
-		[0, 1, 4, 3],
-		[1, 2, 4],
-		[2, 3, 4],
-	];
-
-	const container = document.getElementById('dPage');
-	createTessellationDivs(container, faces, vertices, {
-		width: 200,
-		height: 200,
-		backgroundColor: '#88c',
-	});
+	showTessJs('PythagoreanTessagon')
 }
 async function test0_tessagon1() {
 	await initTest();
@@ -76,6 +58,28 @@ async function test0_tessagon1() {
 		mLinebreak(dLeft);
 	}
 	//clickOn('SnubHexTessagon')
+}
+
+
+
+// ***** DEPR *****
+async function test0_createTess() {
+	const vertices = [
+		[0, 0], [100, 0], [100, 100], [0, 100],  // square corners
+		[50, 50], // center point
+	];
+	const faces = [
+		[0, 1, 4, 3],
+		[1, 2, 4],
+		[2, 3, 4],
+	];
+
+	const container = document.getElementById('dPage');
+	createTessellationDivs(container, faces, vertices, {
+		width: 200,
+		height: 200,
+		backgroundColor: '#88c',
+	});
 }
 async function test0_tessagon0() {
 	await initTest();
