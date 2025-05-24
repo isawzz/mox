@@ -9,14 +9,14 @@ async function test1_mytess() {
 	// console.log('res',res);
 	// showSvg('dMain',res);
 
-	mStyle('dMain',{padding:10});
+	mStyle('dMain', { padding: 10 });
 
 	let list = getTessagonDict();
 	for (const k in list) {
 		mDom(dLeft, {}, { tag: 'button', 'html': k, onclick: onclickTessName });
 		mLinebreak(dLeft);
 	}
-	showTessJs('PythagoreanTessagon')
+	showTessJs('WeaveTessagon')
 }
 async function test0_tessagon1() {
 	await initTest();

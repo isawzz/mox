@@ -4,7 +4,7 @@ function onclickTessName(ev){
 }
 function showTessJs(name){
   let shapeFunc = getTessagonDict()[name]; console.log('shapeFunc', shapeFunc)
-	let res = generateSvgTessellation(2,3, shapeFunc);
+	let res = generateSvgTessellation(1,1, shapeFunc);
 	//console.log('res',res);
 	showSvg('dMain',res);
 
@@ -25,7 +25,6 @@ function generateSvgTessellation(u_num = 10, v_num = 10, shapeFunc = HexTessagon
   };
 
   const tessagon = new shapeFunc(options); console.log(tessagon)
-  //const tessagon = new SquareTessagon(options); console.log(tessagon)
   const svg = tessagon.create_mesh();
   return svg;
 }
