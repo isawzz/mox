@@ -4,7 +4,7 @@
     "target": "es6"
   },
   "include": [
-    "rsg",
+    "bella",
   ],
   "exclude": [
     "**/CODE.js",
@@ -13,7 +13,7 @@
     "**/_*/*",
     "**/z_*.js",
     "**/_*/",
-    "rsg/testing",
+    "bella/testing",
     // "a*",
     // "coding",
     // "basejs",

@@ -1,4 +1,60 @@
 
+function precomputePolygonNeighborsFromSvg(groupElement) {
+	if (!groupElement || !(groupElement instanceof SVGGElement)) {
+		console.error("Invalid group element.");
+		return;
+	}
+
+	const polygons = Array.from(groupElement.querySelectorAll('polygon'));
+
+	let nei={};
+	// Ensure each polygon has an ID
+	polygons.forEach((polygon, i) => {
+		if (!polygon.id) {
+			polygon.id = `poly-${i}`;
+			nei[i]=[];
+		}
+	});
+
+	// Helper to parse points into Set of strings "x,y"
+	function getPointSet(polygon) {
+		return new Set(
+			polygon.getAttribute('points')
+				.trim()
+				.split(/\s+/)
+				.map(p => p.trim())
+		);
+	}
+
+	// Map polygon ID to its point set
+	const pointSets = new Map();
+	polygons.forEach(p => {
+		pointSets.set(p.id, getPointSet(p));
+	});
+
+	// Compute neighbors by comparing shared points
+	polygons.forEach(p1 => {
+		const id1 = p1.id;
+		const set1 = pointSets.get(id1);
+		const neighbors = [];
+
+		polygons.forEach(p2 => {
+			const id2 = p2.id;
+			if (id1 === id2) return;
+
+			const set2 = pointSets.get(id2);
+			const shared = [...set1].filter(point => set2.has(point));
+			if (shared.length >= 2) {
+				neighbors.push(id2);
+			}
+		});
+		let i=Number(id1.split('-')[1]); 
+		nei[i]=neighbors.map(x=>Number(x.split('-')[1]));
+		p1.dataset.neighbors = neighbors.join(',');
+	});
+	return nei;
+}
+
 function precomputePolygonNeighbors(groupElement) {
 	if (!groupElement || !(groupElement instanceof SVGGElement)) {
 		console.error("Invalid group element.");
@@ -64,6 +120,7 @@ function addPolygonNeighborClick(groupElement, fillColor = 'yellow') {
 
 			neighbors.forEach(id => {
 				const neighbor = document.getElementById(id.trim());
+				console.log('neighbor', neighbor);
 				if (neighbor) {
 					neighbor.style.fill = fillColor;
 				}

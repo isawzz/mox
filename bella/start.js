@@ -1,7 +1,51 @@
-onload = start; VERBOSE = true; TESTING = true;
+onload = start; VERBOSE = false; TESTING = true;
 
-function start() { API_BASE = getBackendUrl(); test1_mytess(); }
+function start() { API_BASE = getBackendUrl(); test1_neighbors(); }
+async function test1_neighbors() {
+	await initTest();
+	let [cols, rows, tessname] = [10, 7, 'PythagoreanTessagon'];
+	U = generateListTessellation(cols, rows, tessname); console.log(U.list)
+	T = generateSvgTessellation(cols, rows, tessname); console.log(T)
+	showSvg('dMain', T.svg);
 
+	let neinfo = computeFaceNeighborsTwoOrMoreSharedVerts(U.list.face_list);
+	console.log(neinfo);
+
+	let svgElem = document.getElementsByTagName('svg')[1];
+	const gElement = svgElem.querySelector('g'); //console.log(gElement)
+	let nei = precomputePolygonNeighborsFromSvg(gElement);
+	console.log(nei);
+
+	addPolygonNeighborClick(gElement);
+
+}
+async function test1_inspect() {
+	await initTest();
+	let [cols, rows, tessname] = [4, 4, 'HexTessagon'];
+	U = generateListTessellation(cols, rows, tessname); console.log(U.list)
+	T = generateSvgTessellation(cols, rows, tessname); console.log(T)
+	showSvg('dMain', T.svg);
+
+	let svgElem = document.getElementsByTagName('svg')[1];
+
+	add_face_indices_to_svg(svgElem, U.list.face_list, U.list.vert_list);
+
+	const gElement = svgElem.querySelector('g'); console.log(gElement)
+	precomputePolygonNeighbors(gElement);
+	addPolygonNeighborClick(gElement);
+
+	let o = { face_list: U.list.face_list, vert_list: U.list.vert_list };
+	downloadAsYaml(o, 'info');
+
+
+
+	// console.log(svgElem)
+
+
+	// let x = compute_face_neighbors(U.list); console.log(x);
+
+	// setup_face_hover_highlight(svgElem, U.list)
+}
 async function test1_mytess() {
 	await initTest();
 
@@ -16,7 +60,7 @@ async function test1_mytess() {
 		mDom(dLeft, {}, { tag: 'button', 'html': k, onclick: onclickTessName });
 		mLinebreak(dLeft);
 	}
-	showTessJs('WeaveTessagon')
+	showTessJs('HexTessagon');
 }
 async function test0_tessagon1() {
 	await initTest();

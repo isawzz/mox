@@ -126,12 +126,12 @@ class AbstractTile extends ValueBlend {
 		console.log('');
 	}
 	_get_nested_list_value(nested_list, index_keys) {
-		console.log('.....',nested_list,index_keys);
+		//console.log('.....',nested_list,index_keys);
 		if (!Array.isArray(index_keys)) {
 			return nested_list[index_keys];
 		}
 		let value = nested_list;
-		console.log('..value...', value);
+		//console.log('..value...', value);
 		for (const index of index_keys) {
 			value = value[index];
 		}

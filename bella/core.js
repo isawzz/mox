@@ -126,12 +126,12 @@ class AbstractTile extends ValueBlend {
 		console.log('');
 	}
 	_get_nested_list_value(nested_list, index_keys) {
-		console.log('.....',nested_list,index_keys);
+		//console.log('.....',nested_list,index_keys);
 		if (!Array.isArray(index_keys)) {
 			return nested_list[index_keys];
 		}
 		let value = nested_list;
-		console.log('..value...', value);
+		//console.log('..value...', value);
 		for (const index of index_keys) {
 			value = value[index];
 		}
@@ -270,7 +270,7 @@ class Tile extends AbstractTile {
 	}
 	add_vert(index_keys, ratio_u, ratio_v, options = {}) {
 		let vert = this._get_vert(index_keys);
-		console.log('!!!!!Tile.add_vert',vert)
+		//console.log('!!!!!Tile.add_vert',vert)
 		if (vert === null || vert === undefined) {
 			const coords = this.f(...this.blend(ratio_u, ratio_v));
 			vert = this.mesh_adaptor.create_vert(coords);
