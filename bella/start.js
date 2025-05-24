@@ -1,6 +1,40 @@
 onload = start; VERBOSE = false; TESTING = true;
 
-function start() { API_BASE = getBackendUrl(); test1_neighbors(); }
+function start() { API_BASE = getBackendUrl(); test1_path(); }
+
+async function test1_path() {
+	await initTest();
+	let [cols, rows, tessname] = [10, 7, 'PythagoreanTessagon'];
+	U = generateListTessellation(cols, rows, tessname); console.log(U.list)
+	T = generateSvgTessellation(cols, rows, tessname); console.log(T)
+	showSvg('dMain', T.svg);
+
+	let neinfo = computeFaceNeighborsTwoOrMoreSharedVerts(U.list.face_list);
+	console.log(neinfo);
+
+
+
+	return;
+	let svgElem = document.getElementsByTagName('svg')[1];
+	const gElement = svgElem.querySelector('g'); //console.log(gElement)
+	let nei = precomputePolygonNeighborsFromSvg(gElement);
+	console.log(nei);
+
+	//addPolygonNeighborClick(gElement);
+
+	// Globals or closure variables:
+	DA.firstSelected = null;    // index of first highlighted polygon
+	DA.pathHighlighted = null;  // array of polygon indices currently highlighted
+
+	// neighbors: your neighbor dictionary
+	// polygons: map or array of polygon DOM elements indexed by face index
+	DA.polygons = Array.from(gElement.querySelectorAll('polygon'));
+	Object.entries(DA.polygons).forEach(([idx, polygon]) => {
+		polygon.addEventListener('click', () => onPolygonClick(Number(idx)));
+	});
+
+}
+
 async function test1_neighbors() {
 	await initTest();
 	let [cols, rows, tessname] = [10, 7, 'PythagoreanTessagon'];
