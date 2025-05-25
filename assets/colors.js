@@ -3520,6 +3520,7 @@ const dicolor = {
     milk: "#fdfff5",
     mindaro: "#e3f988",
     moss_green: "#8a9a5b",
+    neon_yellow: "#333333",
     old_bamboo: "#5e644f",
     khaki: "#8d9440",
     olive_drab: "#669900",

@@ -1,48 +1,35 @@
 
-
-function unhighlightAll() {
-  if (DA.pathHighlighted) {
-    DA.pathHighlighted.forEach(i => DA.polygons[i].classList.remove('highlight'));
-  } else if (DA.firstSelected !== null) {
-    DA.polygons[DA.firstSelected].classList.remove('highlight');
+function gHighlight(poly, color = 'neon_yellow', mem = true) {
+  if (mem) {
+    let orig = mGetAttr(poly,'orig');
+    if (nundef(orig)) mSetAttr(poly, 'orig', mGetAttr(poly, 'fill'));
   }
-  DA.firstSelected = null;
-  DA.pathHighlighted = null;
+  mSetAttr(poly, 'fill', colorFrom(color));
+}
+function gUnhighlight(poly, color = 'grey', mem = true) {
+  mSetAttr(poly, 'fill', mem ? mGetAttr(poly, 'orig') : color);
 }
 
-function highlightPath(path) {
-  path.forEach(i => DA.polygons[i].classList.add('highlight'));
-  DA.pathHighlighted = path;
-}
-
-// shortestFacePath function from previous answer here
-
-function onPolygonClick(clickedIndex) {
+function onPolygonClick(ev) {
+  let poly = ev.target; //console.log('poly', poly)
   if (DA.firstSelected === null) {
-    // No selection yet, highlight clicked polygon
-    DA.firstSelected = clickedIndex;
-    DA.polygons[clickedIndex].classList.add('highlight');
+    DA.firstSelected = poly;
+    gHighlight(poly);
   } else if (DA.pathHighlighted === null) {
-    // One polygon selected, highlight path from DA.firstSelected to clickedIndex
-    if (clickedIndex === DA.firstSelected) {
-      // Clicked same polygon again: maybe do nothing or unselect
-      return;
-    }
-    const path = shortestFacePath(neighbors, DA.firstSelected, clickedIndex);
+    const path = shortestFacePath(DA.firstSelected, poly);
+    console.log('path', path);
     if (path) {
-      // Remove highlight from DA.firstSelected only
-      DA.polygons[DA.firstSelected].classList.remove('highlight');
-      highlightPath(path);
+      DA.pathHighlighted = path;
+      for (const poly of path) { gHighlight(poly); }
     } else {
-      // No path found, maybe alert or ignore
       console.log('No path found');
     }
   } else {
-    // Path is highlighted, unhighlight everything and start over
-    unhighlightAll();
-    DA.firstSelected = clickedIndex;
-    DA.polygons[clickedIndex].classList.add('highlight');
+    for (const poly of DA.pathHighlighted) gUnhighlight(poly);
+    DA.firstSelected = null;
+    DA.pathHighlighted = null;
   }
+  console.log('first',DA.firstSelected,'path',DA.pathHighlighted)
 }
 
 

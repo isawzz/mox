@@ -50,7 +50,7 @@ function showSvg(dParent, gCode) {
   dParent = toElem(dParent);
   mClear(dParent)
   let html = `
-		<svg id="svg2" width="500" height="500" viewBox="-0.1 -0.1 1.2 1.2" xmlns="http://www.w3.org/2000/svg" stroke="orange"
+		<svg id="svg2" width="800" height="500" viewBox="-0.1 -0.1 1.2 1.2" xmlns="http://www.w3.org/2000/svg" stroke="orange"
 			fill="gold" stroke-width="0.005">
 			${gCode}
 		</svg>

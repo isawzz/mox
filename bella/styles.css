@@ -408,8 +408,3 @@ fieldset .disabled {
   background-color: orange !important;
 }
 
-.highlight {
-  stroke: orange;
-  stroke-width: 2px;
-  fill-opacity: 0.6;
-}

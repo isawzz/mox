@@ -1,5 +1,11 @@
 
-function shortestFacePath(neighbors, face1, face2) {
+function getPolyNeighbors(poly){
+  const neighbors = poly.getAttribute('data-neighbors').split(','); //console.log(neighbors);
+  return neighbors.map(x=>mBy(x));
+
+}
+function shortestFacePath(face1, face2) {
+  console.log(face1.id,'=>',face2.id);
   if (face1 === face2) return [face1];
 
   const queue = [face1];
@@ -10,7 +16,7 @@ function shortestFacePath(neighbors, face1, face2) {
   while (queue.length > 0) {
     const current = queue.shift();
 
-    const nbrs = neighbors[current] || [];
+    const nbrs = getPolyNeighbors(current) || [];
     for (const nbr of nbrs) {
       if (!visited.has(nbr)) {
         visited.add(nbr);

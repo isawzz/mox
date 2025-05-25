@@ -1,4 +1,83 @@
 
+
+
+function unhighlightAll() {
+  if (DA.pathHighlighted) {
+    DA.pathHighlighted.forEach(i => DA.polygons[i].classList.remove('highlight'));
+  } else if (DA.firstSelected !== null) {
+    DA.polygons[DA.firstSelected].classList.remove('highlight');
+  }
+  DA.firstSelected = null;
+  DA.pathHighlighted = null;
+}
+
+function highlightPath(path) {
+  path.forEach(i => DA.polygons[i].classList.add('highlight'));
+  DA.pathHighlighted = path;
+}
+function shortestFacePath(neighbors, face1, face2) {
+  if (face1 === face2) return [face1];
+
+  const queue = [face1];
+  const visited = new Set([face1]);
+  // To reconstruct path: child face → parent face
+  const parentMap = new Map();
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+
+    const nbrs = neighbors[current] || [];
+    for (const nbr of nbrs) {
+      if (!visited.has(nbr)) {
+        visited.add(nbr);
+        parentMap.set(nbr, current);
+        if (nbr === face2) {
+          // reconstruct path from face2 to face1
+          const path = [];
+          let f = face2;
+          while (f !== undefined) {
+            path.push(f);
+            f = parentMap.get(f);
+          }
+          return path.reverse();
+        }
+        queue.push(nbr);
+      }
+    }
+  }
+
+  // No path found
+  return null;
+}
+function onPolygonClick(clickedIndex) {
+  if (DA.firstSelected === null) {
+    // No selection yet, highlight clicked polygon
+    DA.firstSelected = clickedIndex;
+    DA.polygons[clickedIndex].classList.add('highlight');
+  } else if (DA.pathHighlighted === null) {
+    // One polygon selected, highlight path from DA.firstSelected to clickedIndex
+    if (clickedIndex === DA.firstSelected) {
+      // Clicked same polygon again: maybe do nothing or unselect
+      return;
+    }
+    const path = shortestFacePath(neighbors, DA.firstSelected, clickedIndex);
+    if (path) {
+      // Remove highlight from DA.firstSelected only
+      DA.polygons[DA.firstSelected].classList.remove('highlight');
+      highlightPath(path);
+    } else {
+      // No path found, maybe alert or ignore
+      console.log('No path found');
+    }
+  } else {
+    // Path is highlighted, unhighlight everything and start over
+    unhighlightAll();
+    DA.firstSelected = clickedIndex;
+    DA.polygons[clickedIndex].classList.add('highlight');
+  }
+}
+
+
 class _AbstractTile extends ValueBlend {
 	constructor(tessagon, options = {}) {
 		super(options);

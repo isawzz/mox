@@ -4,35 +4,34 @@ function start() { API_BASE = getBackendUrl(); test1_path(); }
 
 async function test1_path() {
 	await initTest();
-	let [cols, rows, tessname] = [10, 7, 'PythagoreanTessagon'];
+	let [cols, rows, tessname] = [10, 10, 'IslamicHexStarsTessagon'];
 	U = generateListTessellation(cols, rows, tessname); console.log(U.list)
 	T = generateSvgTessellation(cols, rows, tessname); console.log(T)
-	showSvg('dMain', T.svg);
 
-	let neinfo = computeFaceNeighborsTwoOrMoreSharedVerts(U.list.face_list);
-	console.log(neinfo);
+	let d=mDom('dMain');//,{w:800,h:800});
+	showSvg(d, T.svg);
 
+	let neinfo = computeFaceNeighborsTwoOrMoreSharedVerts(U.list.face_list);	//console.log(neinfo);
 
-
-	return;
 	let svgElem = document.getElementsByTagName('svg')[1];
 	const gElement = svgElem.querySelector('g'); //console.log(gElement)
 	let nei = precomputePolygonNeighborsFromSvg(gElement);
-	console.log(nei);
+	//console.log(nei);
 
-	//addPolygonNeighborClick(gElement);
-
-	// Globals or closure variables:
 	DA.firstSelected = null;    // index of first highlighted polygon
 	DA.pathHighlighted = null;  // array of polygon indices currently highlighted
-
-	// neighbors: your neighbor dictionary
-	// polygons: map or array of polygon DOM elements indexed by face index
 	DA.polygons = Array.from(gElement.querySelectorAll('polygon'));
-	Object.entries(DA.polygons).forEach(([idx, polygon]) => {
-		polygon.addEventListener('click', () => onPolygonClick(Number(idx)));
-	});
-
+	for (const poly of DA.polygons) {
+		//console.log('poly', poly);
+		poly.setAttribute('fill','black'); //rColor());
+		let i=Number(poly.id.split('-')[1]); //console.log(i);
+		poly.onclick = onPolygonClick;
+		//poly.addEventListener('click', () => onPolygonClick(i));
+		// poly.addEventListener('click', () => onPolygonClick(Number(poly.getAttribute('data-index'))));
+	}
+	// Object.entries(DA.polygons).forEach(([idx, polygon]) => {
+	// 	polygon.addEventListener('click', () => onPolygonClick(Number(idx)));
+	// });
 }
 
 async function test1_neighbors() {
