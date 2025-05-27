@@ -4,13 +4,13 @@ function getPolyNeighbors(poly){
   return neighbors.map(x=>mBy(x));
 
 }
-function shortestFacePath(face1, face2) {
-  console.log(face1.id,'=>',face2.id);
-  if (face1 === face2) return [face1];
+function mShortestPath(elem1, elem2) {
+  //elems must have id and data-neighbors='id1,id2,...'
+  //console.log(elem1.id,'=>',elem2.id);
+  if (elem1 === elem2) return [elem1];
 
-  const queue = [face1];
-  const visited = new Set([face1]);
-  // To reconstruct path: child face → parent face
+  const queue = [elem1];
+  const visited = new Set([elem1]);
   const parentMap = new Map();
 
   while (queue.length > 0) {
@@ -21,10 +21,9 @@ function shortestFacePath(face1, face2) {
       if (!visited.has(nbr)) {
         visited.add(nbr);
         parentMap.set(nbr, current);
-        if (nbr === face2) {
-          // reconstruct path from face2 to face1
+        if (nbr === elem2) {
           const path = [];
-          let f = face2;
+          let f = elem2;
           while (f !== undefined) {
             path.push(f);
             f = parentMap.get(f);

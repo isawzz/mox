@@ -1,203 +1,275 @@
 
-function onclickTessName(ev) {
-  let name = ev.target.innerHTML; showTessJs(name)
+function mStyles(styles) {
+	let res = {};
+	for (const k in styles) {
+		let key = k, val = styles[k];
+		if (k in STYLES) {
+			let dival = STYLES[k];
+			if (typeof dival == 'function') val = dival(val)
+			else if (isList(dival)) [key, val] = dival;
+			else val = dival;
+		}
+		res[key]=val;
+	}
+	return res;
 }
-function showTessJs(d,name,cols,rows) {
-  let {tessagon,svg} = generateSvgTessellation(cols, rows, name);
-  //console.log('res',res);
-  showSvg(d, svg);
-  return tessagon;
+
+function gHighlight(poly, color = 'neon_yellow', mem = true) {
+  if (mem) {
+    let orig = mGetAttr(poly,'orig');
+    if (nundef(orig)) mSetAttr(poly, 'orig', mGetAttr(poly, 'fill'));
+  }
+  mSetAttr(poly, 'fill', colorFrom(color));
+}
+function gUnhighlight(poly, color = 'grey', mem = true) {
+  mSetAttr(poly, 'fill', mem ? mGetAttr(poly, 'orig') : color);
+}
+
+function onclickPolyShortestPath(ev) {
+  let poly = ev.target; //console.log('poly', poly)
+  if (DA.firstSelected === null) {
+    DA.firstSelected = poly;
+    gHighlight(poly);
+  } else if (DA.pathHighlighted === null) {
+    const path = mShortestPath(DA.firstSelected, poly);
+    console.log('path', path);
+    if (path) {
+      DA.pathHighlighted = path;
+      for (const poly of path) { gHighlight(poly); }
+    } else {
+      console.log('No path found');
+    }
+  } else {
+    for (const poly of DA.pathHighlighted) gUnhighlight(poly);
+    DA.firstSelected = null;
+    DA.pathHighlighted = null;
+  }
+  //console.log('first',DA.firstSelected,'path',DA.pathHighlighted)
+}
+function onclickTessName(ev) {
+	let name = ev.target.innerHTML; showTessJs(name)
+}
+function showTessJs(d, name, cols, rows) {
+	let { tessagon, svg } = generateSvgTessellation(cols, rows, name);
+	//console.log('res',res);
+	showSvg(d, svg);
+	return tessagon;
 
 }
 function planeFunction(u, v) {
-  return [u, v, 0]; // flat 2D plane
+	return [u, v, 0]; // flat 2D plane
 }
 function generateSvgTessellation(cols = 10, rows = 10, name = 'HexTessagon') {
-  let shapeFunc = getTessagonDict()[name]; //console.log('shapeFunc', shapeFunc)
-  const options = {
-    function: planeFunction,
-    u_range: [0.0, 1.0],
-    v_range: [0.0, 1.0],
-    u_num: cols,
-    v_num: rows,
-    u_cyclic: false,
-    v_cyclic: false,
-    adaptor_class: SvgAdaptor
-  };
+	let shapeFunc = getTessagonDict()[name]; //console.log('shapeFunc', shapeFunc)
+	const options = {
+		function: planeFunction,
+		u_range: [0.0, 1.0],
+		v_range: [0.0, 1.0],
+		u_num: cols,
+		v_num: rows,
+		u_cyclic: false,
+		v_cyclic: false,
+		adaptor_class: SvgAdaptor
+	};
 
-  const tessagon = new shapeFunc(options); //console.log(tessagon)
-  const svg = tessagon.create_mesh();
-  return {tessagon,svg};
+	const tessagon = new shapeFunc(options); //console.log(tessagon)
+	const svg = tessagon.create_mesh();
+	return { tessagon, svg };
 }
 function generateListTessellation(cols = 10, rows = 10, name = 'HexTessagon') {
-  let shapeFunc = getTessagonDict()[name]
-  const options = {
-    function: planeFunction,
-    u_range: [0.0, 1.0],
-    v_range: [0.0, 1.0],
-    u_num: cols,
-    v_num: rows,
-    u_cyclic: false,
-    v_cyclic: false,
-    adaptor_class: ListAdaptor
-  };
+	let shapeFunc = getTessagonDict()[name]
+	const options = {
+		function: planeFunction,
+		u_range: [0.0, 1.0],
+		v_range: [0.0, 1.0],
+		u_num: cols,
+		v_num: rows,
+		u_cyclic: false,
+		v_cyclic: false,
+		adaptor_class: ListAdaptor
+	};
 
-  const tessagon = new shapeFunc(options); //console.log(tessagon)
-  const list = tessagon.create_mesh();
-  return {tessagon,list};
+	const tessagon = new shapeFunc(options); //console.log(tessagon)
+	const list = tessagon.create_mesh();
+	return { tessagon, list };
+}
+function showChatMessage(data){
+		var chatBox = document.getElementById("chatBox");
+		var newMessage = document.createElement("div");
+		newMessage.textContent = data.username + ": " + data.message;
+		chatBox.appendChild(newMessage);
+		chatBox.scrollTop = chatBox.scrollHeight;
+
+}
+function showGamesList(games){
+		console.log("Games list:", games);
+		let dsel=mDom('dMain',{},{tag:'select'})
+		const sel = document.getElementById("gameSelect");
+		sel.innerHTML = "";
+		console.log('games', games)
+		games.forEach(g => {
+			const opt = document.createElement("option");
+			opt.value = g;
+			opt.textContent = g;
+			sel.appendChild(opt);
+		});
+		if (games.length > 0) {
+			sel.value = arrLast(games);
+		}
+
 }
 function showSvg(dParent, gCode) {
-  dParent = toElem(dParent);
-  mClear(dParent)
-  let html = `
+	dParent = toElem(dParent);
+	mClear(dParent);
+	let html = `
 		<svg id="svg2" width="800" height="500" viewBox="-0.1 -0.1 1.2 1.2" xmlns="http://www.w3.org/2000/svg" stroke="orange"
 			fill="gold" stroke-width="0.005">
 			${gCode}
 		</svg>
 		`;
-  dParent.innerHTML = html;
+	dParent.innerHTML = html;
 
 
 }
 function getTessagonDict() {
-  return {
-    BigHexTriTessagon: BigHexTriTessagon,
-    BrickTessagon: BrickTessagon,
-    CloverdaleTessagon: CloverdaleTessagon,
-    DissectedHexQuadTessagon: DissectedHexQuadTessagon,
-    DissectedHexTriTessagon: DissectedHexTriTessagon,
-    DissectedSquareTessagon: DissectedSquareTessagon,
-    DissectedTriangleTessagon: DissectedTriangleTessagon,
-    DodecaTessagon: DodecaTessagon,
-    DodecaTriTessagon: DodecaTriTessagon,
-    FloretTessagon: FloretTessagon,
-    HexBigTriTessagon: HexBigTriTessagon,
-    HexSquareTriTessagon: HexSquareTriTessagon,
-    HexTessagon: HexTessagon,
-    HexTriTessagon: HexTriTessagon,
-    IslamicHexStarsTessagon: IslamicHexStarsTessagon,
-    IslamicStarsCrossesTessagon: IslamicStarsCrossesTessagon,
-    OctoTessagon: OctoTessagon,
-    PentaTessagon: PentaTessagon,
-    Penta2Tessagon: Penta2Tessagon,
-    PythagoreanTessagon: PythagoreanTessagon,
-    RhombusTessagon: RhombusTessagon,
-    SquareTessagon: SquareTessagon,
-    SquareTriTessagon: SquareTriTessagon,
-    SquareTri2Tessagon: SquareTri2Tessagon,
-    StanleyParkTessagon: StanleyParkTessagon,
-    TriTessagon: TriTessagon,
-    ValemountTessagon: ValemountTessagon,
-    WeaveTessagon: WeaveTessagon,
-    ZigZagTessagon: ZigZagTessagon,
-  };
+	return {
+		BigHexTriTessagon: BigHexTriTessagon,
+		BrickTessagon: BrickTessagon,
+		CloverdaleTessagon: CloverdaleTessagon,
+		DissectedHexQuadTessagon: DissectedHexQuadTessagon,
+		DissectedHexTriTessagon: DissectedHexTriTessagon,
+		DissectedSquareTessagon: DissectedSquareTessagon,
+		DissectedTriangleTessagon: DissectedTriangleTessagon,
+		DodecaTessagon: DodecaTessagon,
+		DodecaTriTessagon: DodecaTriTessagon,
+		FloretTessagon: FloretTessagon,
+		HexBigTriTessagon: HexBigTriTessagon,
+		HexSquareTriTessagon: HexSquareTriTessagon,
+		HexTessagon: HexTessagon,
+		HexTriTessagon: HexTriTessagon,
+		IslamicHexStarsTessagon: IslamicHexStarsTessagon,
+		IslamicStarsCrossesTessagon: IslamicStarsCrossesTessagon,
+		OctoTessagon: OctoTessagon,
+		PentaTessagon: PentaTessagon,
+		Penta2Tessagon: Penta2Tessagon,
+		PythagoreanTessagon: PythagoreanTessagon,
+		RhombusTessagon: RhombusTessagon,
+		SquareTessagon: SquareTessagon,
+		SquareTriTessagon: SquareTriTessagon,
+		SquareTri2Tessagon: SquareTri2Tessagon,
+		StanleyParkTessagon: StanleyParkTessagon,
+		TriTessagon: TriTessagon,
+		ValemountTessagon: ValemountTessagon,
+		WeaveTessagon: WeaveTessagon,
+		ZigZagTessagon: ZigZagTessagon,
+	};
 
 }
 
 function getTessagonList() {
-  return [
-    'BigHexTriTessagon',
-    'BrickTessagon',
-    'CloverdaleTessagon',
-    'DissectedHexQuadTessagon',
-    "DissectedHexTriTessagon",
-    "DissectedSquareTessagon",
-    "DissectedTriangleTessagon",
-    "DodecaTessagon",
-    "DodecaTriTessagon",
-    "FloretTessagon",
-    "HexBigTriTessagon",
-    "HexSquareTriTessagon",
-    "HexTessagon",
-    "HexTriTessagon",
-    "IslamicHexStarsTessagon",
-    "IslamicStarsCrossesTessagon",
-    "OctoTessagon",
-    "PentaTessagon",
-    "Penta2Tessagon",
-    "PythagoreanTessagon",
-    "RhombusTessagon",
-    "SquareTessagon",
-    "SquareTriTessagon",
-    "SquareTri2Tessagon",
-    "StanleyParkTessagon",
-    "TriTessagon",
-    "ValemountTessagon",
-    "WeaveTessagon",
-    "ZigZagTessagon",
-  ];
+	return [
+		'BigHexTriTessagon',
+		'BrickTessagon',
+		'CloverdaleTessagon',
+		'DissectedHexQuadTessagon',
+		"DissectedHexTriTessagon",
+		"DissectedSquareTessagon",
+		"DissectedTriangleTessagon",
+		"DodecaTessagon",
+		"DodecaTriTessagon",
+		"FloretTessagon",
+		"HexBigTriTessagon",
+		"HexSquareTriTessagon",
+		"HexTessagon",
+		"HexTriTessagon",
+		"IslamicHexStarsTessagon",
+		"IslamicStarsCrossesTessagon",
+		"OctoTessagon",
+		"PentaTessagon",
+		"Penta2Tessagon",
+		"PythagoreanTessagon",
+		"RhombusTessagon",
+		"SquareTessagon",
+		"SquareTriTessagon",
+		"SquareTri2Tessagon",
+		"StanleyParkTessagon",
+		"TriTessagon",
+		"ValemountTessagon",
+		"WeaveTessagon",
+		"ZigZagTessagon",
+	];
 }
 
 
 
 
 function computeFaceNeighborsTwoOrMoreSharedVerts(face_list) {
-  // Map vertex -> set of face indices containing it
-  const vertexToFaces = new Map();
+	// Map vertex -> set of face indices containing it
+	const vertexToFaces = new Map();
 
-  face_list.forEach((faceVerts, faceIdx) => {
-    faceVerts.forEach((v) => {
-      if (!vertexToFaces.has(v)) vertexToFaces.set(v, new Set());
-      vertexToFaces.get(v).add(faceIdx);
-    });
-  });
+	face_list.forEach((faceVerts, faceIdx) => {
+		faceVerts.forEach((v) => {
+			if (!vertexToFaces.has(v)) vertexToFaces.set(v, new Set());
+			vertexToFaces.get(v).add(faceIdx);
+		});
+	});
 
-  const neighbors = {};
+	const neighbors = {};
 
-  face_list.forEach((faceVerts, faceIdx) => {
-    // Count how many shared vertices each other face has with current face
-    const sharedCount = new Map();
+	face_list.forEach((faceVerts, faceIdx) => {
+		// Count how many shared vertices each other face has with current face
+		const sharedCount = new Map();
 
-    faceVerts.forEach((v) => {
-      const facesWithV = vertexToFaces.get(v);
-      facesWithV.forEach((otherFaceIdx) => {
-        if (otherFaceIdx !== faceIdx) {
-          sharedCount.set(otherFaceIdx, (sharedCount.get(otherFaceIdx) || 0) + 1);
-        }
-      });
-    });
+		faceVerts.forEach((v) => {
+			const facesWithV = vertexToFaces.get(v);
+			facesWithV.forEach((otherFaceIdx) => {
+				if (otherFaceIdx !== faceIdx) {
+					sharedCount.set(otherFaceIdx, (sharedCount.get(otherFaceIdx) || 0) + 1);
+				}
+			});
+		});
 
-    // Only keep faces with 2 or more shared vertices
-    const neighborsList = [];
-    for (const [otherFaceIdx, count] of sharedCount.entries()) {
-      if (count >= 2) neighborsList.push(otherFaceIdx);
-    }
+		// Only keep faces with 2 or more shared vertices
+		const neighborsList = [];
+		for (const [otherFaceIdx, count] of sharedCount.entries()) {
+			if (count >= 2) neighborsList.push(otherFaceIdx);
+		}
 
-    neighbors[faceIdx] = neighborsList.sort((a, b) => a - b);
-  });
+		neighbors[faceIdx] = neighborsList.sort((a, b) => a - b);
+	});
 
-  return neighbors;
+	return neighbors;
 }
 function computeFaceNeighbors(face_list) {
-  // Map vertex -> set of face indices containing it
-  const vertexToFaces = new Map();
+	// Map vertex -> set of face indices containing it
+	const vertexToFaces = new Map();
 
-  face_list.forEach((faceVerts, faceIdx) => {
-    faceVerts.forEach((v) => {
-      if (!vertexToFaces.has(v)) vertexToFaces.set(v, new Set());
-      vertexToFaces.get(v).add(faceIdx);
-    });
-  });
+	face_list.forEach((faceVerts, faceIdx) => {
+		faceVerts.forEach((v) => {
+			if (!vertexToFaces.has(v)) vertexToFaces.set(v, new Set());
+			vertexToFaces.get(v).add(faceIdx);
+		});
+	});
 
-  const neighbors = {};
+	const neighbors = {};
 
-  face_list.forEach((faceVerts, faceIdx) => {
-    const neighborSet = new Set();
+	face_list.forEach((faceVerts, faceIdx) => {
+		const neighborSet = new Set();
 
-    faceVerts.forEach((v) => {
-      const facesWithV = vertexToFaces.get(v);
-      facesWithV.forEach((neighborFaceIdx) => {
-        if (neighborFaceIdx !== faceIdx) {
-          neighborSet.add(neighborFaceIdx);
-        }
-      });
-    });
+		faceVerts.forEach((v) => {
+			const facesWithV = vertexToFaces.get(v);
+			facesWithV.forEach((neighborFaceIdx) => {
+				if (neighborFaceIdx !== faceIdx) {
+					neighborSet.add(neighborFaceIdx);
+				}
+			});
+		});
 
-    // Convert Set to sorted Array for consistency
-    neighbors[faceIdx] = Array.from(neighborSet).sort((a, b) => a - b);
-  });
+		// Convert Set to sorted Array for consistency
+		neighbors[faceIdx] = Array.from(neighborSet).sort((a, b) => a - b);
+	});
 
-  return neighbors;
+	return neighbors;
 }
 
 
@@ -243,64 +315,64 @@ function compute_face_neighbors(mesh) {
 }
 
 function setup_face_hover_highlight(svg, mesh) {
-  const face_neighbors = compute_face_neighbors(mesh);console.log(face_neighbors)
+	const face_neighbors = compute_face_neighbors(mesh); console.log(face_neighbors)
 
-  // Map face index to SVG element
-  const face_elements = Array.from(svg.querySelectorAll('polygon'));
-  const face_map = {};
-  face_elements.forEach(el => {
-    const index = parseInt(el.dataset.faceIndex, 10);
-    face_map[index] = el;
-  });
+	// Map face index to SVG element
+	const face_elements = Array.from(svg.querySelectorAll('polygon'));
+	const face_map = {};
+	face_elements.forEach(el => {
+		const index = parseInt(el.dataset.faceIndex, 10);
+		face_map[index] = el;
+	});
 
-  function highlight_neighbors(face_index) {
-    const neighbors = face_neighbors[face_index];
-    neighbors.forEach(i => {
-      if (face_map[i]) {
-        face_map[i].classList.add('highlight');
-      }
-    });
-  }
+	function highlight_neighbors(face_index) {
+		const neighbors = face_neighbors[face_index];
+		neighbors.forEach(i => {
+			if (face_map[i]) {
+				face_map[i].classList.add('highlight');
+			}
+		});
+	}
 
-  function unhighlight_neighbors() {
-    face_elements.forEach(el => el.classList.remove('highlight'));
-  }
+	function unhighlight_neighbors() {
+		face_elements.forEach(el => el.classList.remove('highlight'));
+	}
 
-  // Attach hover listeners
-  face_elements.forEach(el => {
-    const index = parseInt(el.dataset.faceIndex, 10);
-    el.addEventListener('mouseenter', () => highlight_neighbors(index));
-    el.addEventListener('mouseleave', unhighlight_neighbors);
-  });
+	// Attach hover listeners
+	face_elements.forEach(el => {
+		const index = parseInt(el.dataset.faceIndex, 10);
+		el.addEventListener('mouseenter', () => highlight_neighbors(index));
+		el.addEventListener('mouseleave', unhighlight_neighbors);
+	});
 }
 
 
 function add_face_indices_to_svg(svg, face_list, vert_list) {
-  const polygons = Array.from(svg.querySelectorAll('polygon'));
+	const polygons = Array.from(svg.querySelectorAll('polygon'));
 
-  // Normalize polygon points for comparison (string of rounded x,y pairs)
-  function normalize_coords(coords) {
-    return coords.map(([x, y]) => `${x.toFixed(6)},${y.toFixed(6)}`).join(' ');
-  }
+	// Normalize polygon points for comparison (string of rounded x,y pairs)
+	function normalize_coords(coords) {
+		return coords.map(([x, y]) => `${x.toFixed(6)},${y.toFixed(6)}`).join(' ');
+	}
 
-  // Create normalized point strings for each face in face_list
-  const face_coords_map = face_list.map((face) => {
-    const coords = face.map(i => vert_list[i].slice(0, 2));  // ignore z
-    return normalize_coords(coords);
-  });
+	// Create normalized point strings for each face in face_list
+	const face_coords_map = face_list.map((face) => {
+		const coords = face.map(i => vert_list[i].slice(0, 2));  // ignore z
+		return normalize_coords(coords);
+	});
 
-  polygons.forEach(polygon => {
-    const pointsAttr = polygon.getAttribute('points').trim();
-    const points = pointsAttr.split(/\s+/).map(pt => pt.split(',').map(Number));
-    const norm = normalize_coords(points);
+	polygons.forEach(polygon => {
+		const pointsAttr = polygon.getAttribute('points').trim();
+		const points = pointsAttr.split(/\s+/).map(pt => pt.split(',').map(Number));
+		const norm = normalize_coords(points);
 
-    const face_index = face_coords_map.findIndex(f => f === norm);
-    if (face_index !== -1) {
-      polygon.setAttribute('data-face-index', face_index);
-    } else {
-      console.warn('Polygon did not match any face in face_list:', norm);
-    }
-  });
+		const face_index = face_coords_map.findIndex(f => f === norm);
+		if (face_index !== -1) {
+			polygon.setAttribute('data-face-index', face_index);
+		} else {
+			console.warn('Polygon did not match any face in face_list:', norm);
+		}
+	});
 }
 
 
@@ -313,12 +385,12 @@ function precomputePolygonNeighborsFromSvg(groupElement) {
 
 	const polygons = Array.from(groupElement.querySelectorAll('polygon'));
 
-	let nei={};
+	let nei = {};
 	// Ensure each polygon has an ID
 	polygons.forEach((polygon, i) => {
 		if (!polygon.id) {
 			polygon.id = `poly-${i}`;
-			nei[i]=[];
+			nei[i] = [];
 		}
 	});
 
@@ -354,8 +426,8 @@ function precomputePolygonNeighborsFromSvg(groupElement) {
 				neighbors.push(id2);
 			}
 		});
-		let i=Number(id1.split('-')[1]); 
-		nei[i]=neighbors.map(x=>Number(x.split('-')[1]));
+		let i = Number(id1.split('-')[1]);
+		nei[i] = neighbors.map(x => Number(x.split('-')[1]));
 		p1.dataset.neighbors = neighbors.join(',');
 	});
 	return nei;

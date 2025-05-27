@@ -1,15 +1,36 @@
 onload = start; VERBOSE = false; TESTING = true;
 
-function start() { API_BASE = getBackendUrl(); test1_path(); }
+function start() { test1_connect(); }
 
-async function test1_path() {
+async function test1_connect() {
 	await initTest();
-	let [cols, rows, tessname] = [10, 10, 'IslamicHexStarsTessagon'];
+	quickUi('dMain');
+	const username = 'felix'; //prompt("Enter your username:") || "Guest";
+	DA.username = username;
+	initSockets(username);
+	fetchGamesList();
+
+}
+async function test1_preserveAspectRatio() {
+	await initTest();
+	let [cols, rows, tessname] = [20, 15, 'HexTessagon'];
 	U = generateListTessellation(cols, rows, tessname); console.log(U.list)
 	T = generateSvgTessellation(cols, rows, tessname); console.log(T)
 
-	let d=mDom('dMain');//,{w:800,h:800});
-	showSvg(d, T.svg);
+	let [w, h, xmin, ymin, wv, hv, ratio, stroke, fill, border, wstroke] = [96, 140, 0.1, 0.1, .8, .8, 'none', 'blue', 'red', 'green 2', 0.01,]; //stroke-width:"0.005"
+	// preserveAspectRatio="xMidYMid meet" (default): centered, scaled to fit entirely
+	// preserveAspectRatio="xMinYMin slice": top-left aligned, scaled to fill, possibly cropped
+	// preserveAspectRatio="none": stretches to exactly fit the SVG element size — no aspect ratio preserved
+	let html = `
+		<svg id="svg2" width="100%" height="100%" viewBox="${xmin} ${ymin} ${wv} ${hv}" xmlns="http://www.w3.org/2000/svg" stroke="${stroke}"
+			fill="${fill}" stroke-width="${wstroke}" preserveAspectRatio="${ratio}" >
+			${T.svg}
+		</svg>
+		`;
+	let d = mDom('dMain', { margin: 20, padding: 0, bg: stroke, w, h, rounding: w / 20, border, overy: 'hidden', overx: 'hidden' }, { html });
+	return;
+	//showSvg(d, T.svg);
+
 
 	let neinfo = computeFaceNeighborsTwoOrMoreSharedVerts(U.list.face_list);	//console.log(neinfo);
 
@@ -23,9 +44,48 @@ async function test1_path() {
 	DA.polygons = Array.from(gElement.querySelectorAll('polygon'));
 	for (const poly of DA.polygons) {
 		//console.log('poly', poly);
-		poly.setAttribute('fill','black'); //rColor());
-		let i=Number(poly.id.split('-')[1]); //console.log(i);
-		poly.onclick = onPolygonClick;
+		poly.setAttribute('fill', 'black'); //rColor());
+		let i = Number(poly.id.split('-')[1]); //console.log(i);
+		poly.onclick = onclickPolyShortestPath;
+		//poly.addEventListener('click', () => onPolygonClick(i));
+		// poly.addEventListener('click', () => onPolygonClick(Number(poly.getAttribute('data-index'))));
+	}
+	// Object.entries(DA.polygons).forEach(([idx, polygon]) => {
+	// 	polygon.addEventListener('click', () => onPolygonClick(Number(idx)));
+	// });
+}
+async function test1_path() {
+	await initTest();
+	let [cols, rows, tessname] = [10, 10, 'IslamicHexStarsTessagon'];
+	U = generateListTessellation(cols, rows, tessname); console.log(U.list)
+	T = generateSvgTessellation(cols, rows, tessname); console.log(T)
+
+	let [w, h, xmin, ymin, wv, hv, ratio] = [500, 400, 0, 0, 1, 1, 'none'];
+	let html = `
+		<svg id="svg2" width="${w}" height="${h}" viewBox="${xmin} ${ymin} ${wv} ${hv}" xmlns="http://www.w3.org/2000/svg" stroke="orange"
+			fill="gold" stroke-width="0.005" preserveAspectRatio="${ratio}" >
+			${T.svg}
+		</svg>
+		`;
+	let d = mDom('dMain', { margin: 20, padding: 0, bg: 'red', w, h }, { html });
+	//showSvg(d, T.svg);
+
+
+	let neinfo = computeFaceNeighborsTwoOrMoreSharedVerts(U.list.face_list);	//console.log(neinfo);
+
+	let svgElem = document.getElementsByTagName('svg')[1];
+	const gElement = svgElem.querySelector('g'); //console.log(gElement)
+	let nei = precomputePolygonNeighborsFromSvg(gElement);
+	//console.log(nei);
+
+	DA.firstSelected = null;    // index of first highlighted polygon
+	DA.pathHighlighted = null;  // array of polygon indices currently highlighted
+	DA.polygons = Array.from(gElement.querySelectorAll('polygon'));
+	for (const poly of DA.polygons) {
+		//console.log('poly', poly);
+		poly.setAttribute('fill', 'black'); //rColor());
+		let i = Number(poly.id.split('-')[1]); //console.log(i);
+		poly.onclick = onclickPolyShortestPath;
 		//poly.addEventListener('click', () => onPolygonClick(i));
 		// poly.addEventListener('click', () => onPolygonClick(Number(poly.getAttribute('data-index'))));
 	}

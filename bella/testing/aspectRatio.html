@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>preserveAspectRatio Demo</title>
+	<style>
+		svg {
+			border: 1px solid #ccc;
+			width: 400px;
+			height: 200px;
+			background: #f0f0f0;
+		}
+
+		#controls {
+			margin-top: 1em;
+		}
+
+		label {
+			margin-right: 1em;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h2>SVG preserveAspectRatio Demo</h2>
+
+	<svg id="demoSvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+		<rect x="0" y="0" width="100" height="100" fill="#eee" />
+		<circle cx="50" cy="50" r="40" fill="#ffcc00" />
+		<text x="50" y="55" font-size="10" text-anchor="middle" fill="#000">Circle</text>
+	</svg>
+
+	<div id="controls">
+		<label>
+			Align:
+			<select id="align">
+				<option>xMinYMin</option>
+				<option>xMidYMin</option>
+				<option>xMaxYMin</option>
+				<option>xMinYMid</option>
+				<option selected>xMidYMid</option>
+				<option>xMaxYMid</option>
+				<option>xMinYMax</option>
+				<option>xMidYMax</option>
+				<option>xMaxYMax</option>
+				<option>none</option>
+			</select>
+		</label>
+
+		<label>
+			Meet/Slice:
+			<select id="meetOrSlice">
+				<option value="meet" selected>meet</option>
+				<option value="slice">slice</option>
+			</select>
+		</label>
+	</div>
+
+	<script>
+		const svg = document.getElementById('demoSvg');
+		const align = document.getElementById('align');
+		const meetOrSlice = document.getElementById('meetOrSlice');
+
+		function update() {
+			const a = align.value;
+			const m = meetOrSlice.value;
+			svg.setAttribute('preserveAspectRatio',
+				a === 'none' ? 'none' : `${a} ${m}`);
+		}
+
+		align.addEventListener('change', update);
+		meetOrSlice.addEventListener('change', update);
+	</script>
+
+</body>
+
+</html>

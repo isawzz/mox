@@ -1980,27 +1980,6 @@ if (typeof mDom === 'undefined') {
 		return div;
 	}
 }
-if (typeof mStyle === 'undefined') {
-	/**
-	 * Dummy function to set styles on a DOM element.
-	 * @param {HTMLElement} elem The element to style.
-	 * @param {Object} styles CSS styles to apply.
-	 */
-	function mStyle(elem, styles) {
-		if (elem && styles) {
-			for (const prop in styles) {
-				if (['w', 'h', 'left', 'top'].includes(prop)) {
-					elem.style[prop] = `${styles[prop]}px`;
-				} else {
-					elem.style[prop] = styles[prop];
-				}
-			}
-			if (!elem.style.position || elem.style.position === 'static') {
-				elem.style.position = 'relative';
-			}
-		}
-	}
-}
 function createImageSymbol(src, id) {
 	return `
       <symbol id="${id}" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
@@ -3973,26 +3952,10 @@ function initSockets(username) {
 		console.log("Connected to server");
 	});
 	socket.on("chat_message", function (data) {
-		var chatBox = document.getElementById("chatBox");
-		var newMessage = document.createElement("div");
-		newMessage.textContent = data.username + ": " + data.message;
-		chatBox.appendChild(newMessage);
-		chatBox.scrollTop = chatBox.scrollHeight;
+		showChatMessage(data);
 	});
 	socket.on("games_list", games => {
-		console.log("Games list:", games);
-		const sel = document.getElementById("gameSelect");
-		sel.innerHTML = "";
-		console.log('games', games)
-		games.forEach(g => {
-			const opt = document.createElement("option");
-			opt.value = g;
-			opt.textContent = g;
-			sel.appendChild(opt);
-		});
-		if (games.length > 0) {
-			sel.value = arrLast(games);
-		}
+		showGamesList(games);
 	});
 	socket.on("game_started", data => {
 		console.log("Game started:", data);
@@ -4023,6 +3986,7 @@ function initSockets(username) {
 	socket.emit("register", { username });
 }
 async function initTest() {
+	API_BASE = getBackendUrl(); 
 	DA.items = {};
 	DA.selectedImages = [];
 	await loadAssetsStatic();
@@ -5270,7 +5234,7 @@ function mStyle(elem, styles = {}, opts = {}) {
 	styles = jsCopy(styles);
 	let noUnit = ['opacity', 'flex', 'grow', 'shrink', 'grid', 'z', 'iteration', 'count', 'orphans', 'widows', 'weight', 'order', 'index'];
 	const STYLE_PARAMS_3 = {
-		border: (elem, v) => elem.style.border = v.includes(' ') ? v : `1px solid ${v}`,
+		border: (elem, v) => {elem.style.border = v.includes('px') ? v : v.includes(' ')?`${v.split(' ')[1]}px solid ${v.split(' ')[0]}`:v},
 		outline: (elem, v) => elem.style.outline = v.includes(' ') ? v : `1px solid ${v}`,
 		box: (elem, v) => elem.style.boxSizing = v ? 'border-box' : 'content-box',
 		bgSrc: (elem, v) => elem.style.backgroundImage = `url(${v})`,

@@ -1,8 +1,24 @@
 alles ist fuer immer ok - I have left this plane. 
 nur machen was fe oder A sagen sonst vppmw airport
 
-___ 6:34 AM 5/25/2025 airport lib 13.6. 73000 K4
+___ 6:19 AM 5/27/2025 airport lib 13.6. 76000 K4
 
+___ 6:34 AM 5/26/2025 airport lib 13.6. 75000 K4
+=>mStyle besser
+=>bg,fg,... besser
+=>colors besser
+aspectRatio
+=>key handlers und svg handlers besser!
+soll ich d3 verwenden???
+Examples:
+preserveAspectRatio="xMidYMid meet" (default): centered, scaled to fit entirely
+
+preserveAspectRatio="xMinYMin slice": top-left aligned, scaled to fill, possibly cropped
+
+preserveAspectRatio="none": stretches to exactly fit the SVG element size — no aspect ratio preserved
+
+
+___ 6:34 AM 5/25/2025 airport lib 13.6. 74000 K4
 ___ 6:12 AM 5/24/2025 airport lib 22.5. 73000 K4
 I have this function for my tessagon library, ported to javascript: 
 function generateSvgTessellation(u_num = 10, v_num = 10, shapeFunc = HexTessagon) {
