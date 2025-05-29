@@ -3,7 +3,8 @@ onload = start; VERBOSE = false; TESTING = true;
 function start() { test1_genT(); }
 
 async function test1_genT(){
-	genTTT4(); //genT,genTT,genTTT
+	genTTTT();
+	//genTTT4(); //genT,genTT,genTTT
 }
 async function test1_genttt() {
 	const players = ['X', 'O', 'A'];

@@ -1,7 +1,6 @@
 
-
-function genT() {
-	// Generalized Multi-player Tic Tac Toe (n x m board, k in a row to win)
+function genTT() {
+	// Generalized Multi-player Tic Tac Toe (n x m board, k in a row to win) with UI and Minimax AI
 
 	const players = ['X', 'O', 'A']; // Up to 8 players
 	const winLength = 4;
@@ -12,10 +11,6 @@ function genT() {
 
 	function initializeBoard(rows, cols) {
 		return Array.from({ length: rows }, () => Array(cols).fill(null));
-	}
-
-	function printBoard(board) {
-		console.log(board.map(row => row.map(cell => cell || '.').join(' ')).join('\n'));
 	}
 
 	function getLegalMoves(board) {
@@ -117,59 +112,92 @@ function genT() {
 		return count;
 	}
 
-	// Example play loop for console:
-	function playGame() {
-		while (!isTerminal(board, players, winLength)) {
-			printBoard(board);
-			const player = players[currentPlayerIdx];
-			const moves = getLegalMoves(board);
-			const move = moves[Math.floor(Math.random() * moves.length)]; // replace with AI later
-			board = applyMove(board, move, player);
-			if (hasWon(board, player, winLength)) {
-				printBoard(board);
-				console.log(`Player ${player} wins!`);
-				return;
+	function minimax(board, depth, maximizingPlayerIdx) {
+		if (depth === 0 || isTerminal(board, players, winLength)) {
+			const evals = evaluate(board, players, winLength);
+			return { score: evals[maximizingPlayerIdx], move: null };
+		}
+		const legalMoves = getLegalMoves(board);
+		let bestMove = null;
+		let bestScore = -Infinity;
+		for (let move of legalMoves) {
+			const newBoard = applyMove(board, move, players[maximizingPlayerIdx]);
+			const nextIdx = (maximizingPlayerIdx + 1) % players.length;
+			const result = minimax(newBoard, depth - 1, nextIdx);
+			const score = -result.score; // Simplified Max^n turn structure
+			if (score > bestScore) {
+				bestScore = score;
+				bestMove = move;
 			}
+		}
+		return { score: bestScore, move: bestMove };
+	}
+
+	function makeAIMove() {
+		const currentPlayer = players[currentPlayerIdx];
+		const { move } = minimax(board, 2, currentPlayerIdx); // Adjustable depth
+		if (move) {
+			board = applyMove(board, move, currentPlayer);
 			currentPlayerIdx = (currentPlayerIdx + 1) % players.length;
+			renderBoard();
+			checkGameEnd();
 		}
-		printBoard(board);
-		console.log("It's a draw!");
 	}
 
-	playGame();
-}
+	function renderBoard() {
+		const boardDiv = document.getElementById("board");
+		boardDiv.innerHTML = '';
+		board.forEach((row, r) => {
+			const rowDiv = document.createElement("div");
+			rowDiv.className = "row";
+			row.forEach((cell, c) => {
+				const cellDiv = document.createElement("div");
+				cellDiv.className = "cell";
+				cellDiv.textContent = cell || '';
+				if (cell === null) {
+					cellDiv.addEventListener("click", () => {
+						board = applyMove(board, { row: r, col: c }, players[currentPlayerIdx]);
+						currentPlayerIdx = (currentPlayerIdx + 1) % players.length;
+						renderBoard();
+						checkGameEnd();
+						if (players[currentPlayerIdx] === 'A') {
+							setTimeout(makeAIMove, 300);
+						}
+					});
+				}
+				rowDiv.appendChild(cellDiv);
+			});
+			boardDiv.appendChild(rowDiv);
+		});
+	}
 
-
-class Game {
-	constructor(players, options = null) {
-		this.players = players;
-		this.turn = 0;
-		this.state = "setup";
-	}
-	serialize() {
-		return {
-			players: this.players,
-			turn: this.turn,
-			state: this.state,
-		};
-	}
-	deserialize(data) {
-		this.players = data.players;
-		this.turn = data.turn;
-		this.state = data.state;
-	}
-	get_state() {
-		return {
-			state: this.serialize(),
-			possible_moves: ["roll_dice", "build_road", "end_turn"],
-			current_players: this.players,
-		};
-	}
-	make_move(move) {
-		const action = move.action;
-		if (action === "end_turn") {
-			this.turn = (this.turn + 1) % this.players.length;
+	function checkGameEnd() {
+		const currentPlayer = players[(currentPlayerIdx - 1 + players.length) % players.length];
+		if (hasWon(board, currentPlayer, winLength)) {
+			alert(`Player ${currentPlayer} wins!`);
+		} else if (getLegalMoves(board).length === 0) {
+			alert("It's a draw!");
 		}
-		return this.get_state();
 	}
+
+	document.body.innerHTML = `
+				<style>
+					.row { display: flex; }
+					.cell {
+						width: 40px;
+						height: 40px;
+						border: 1px solid #999;
+						display: flex;
+						justify-content: center;
+						align-items: center;
+						font-size: 20px;
+						cursor: pointer;
+					}
+				</style>
+				<div id="board"></div>
+			`;
+
+	renderBoard();
+	if (players[currentPlayerIdx] === 'A') makeAIMove();
+
 }

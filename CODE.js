@@ -1,80 +1,462 @@
 
+//#region minimax ALL
+
+function maxNttt() {
+	function maxN(state, depth, players, currentPlayerIdx, evaluate, getLegalMoves, applyMove, isTerminal) {
+		if (depth === 0 || isTerminal(state)) {
+			return {
+				move: null,
+				score: evaluate(state)
+			};
+		}
+
+		const currentPlayer = players[currentPlayerIdx];
+		let bestScore = null;
+		let bestMove = null;
+
+		for (const move of getLegalMoves(state, currentPlayer)) {
+			const newState = applyMove(state, move, currentPlayer);
+			const result = maxN(
+				newState,
+				depth - 1,
+				players,
+				(currentPlayerIdx + 1) % players.length,
+				evaluate,
+				getLegalMoves,
+				applyMove,
+				isTerminal
+			);
+
+			if (
+				!bestScore ||
+				result.score[currentPlayerIdx] > bestScore[currentPlayerIdx]
+			) {
+				bestScore = result.score;
+				bestMove = move;
+			}
+		}
+
+		return { move: bestMove, score: bestScore };
+	}
+	function getLegalMoves(board, player) {
+		const moves = [];
+		for (let r = 0; r < board.length; r++) {
+			for (let c = 0; c < board[0].length; c++) {
+				if (board[r][c] === null) {
+					moves.push({ row: r, col: c });
+				}
+			}
+		}
+		return moves;
+	}
+
+	function applyMove(board, move, player) {
+		const newBoard = board.map(row => row.slice()); // deep copy
+		newBoard[move.row][move.col] = player;
+		return newBoard;
+	}
+
+	function isTerminal(board) {
+		return board.flat().every(cell => cell !== null);
+	}
+
+	function evaluate(board) {
+		// Dummy evaluation: count number of cells each player owns
+		const scores = {};
+		for (let row of board) {
+			for (let cell of row) {
+				if (cell != null) {
+					scores[cell] = (scores[cell] || 0) + 1;
+				}
+			}
+		}
+
+		// Return scores as a vector ordered by player ID
+		return ['A', 'B', 'C'].map(p => scores[p] || 0);
+	}
+}
+
+function minimaxAlphaBeta(board, depth, alpha, beta, isMaximizingPlayer, get_possible_moves, evaluate_board, apply_move) {
+	const possibleMoves = get_possible_moves(board, isMaximizingPlayer);
+
+	if (depth === 0 || possibleMoves.length === 0) {
+		return evaluate_board(board, depth);
+	}
+
+	if (isMaximizingPlayer) {
+		let maxEval = -Infinity;
+		for (const move of possibleMoves) {
+			// Apply the move to get a new board state
+			// IMPORTANT: apply_move must return a NEW board object, not modify the original.
+			const newBoard = apply_move(board, move);
+
+			// Recursively call minimax for the opponent's turn
+			const evalScore = minimaxAlphaBeta(newBoard, depth - 1, alpha, beta, false, get_possible_moves, evaluate_board, apply_move);
+			maxEval = Math.max(maxEval, evalScore);
+			alpha = Math.max(alpha, evalScore);
+
+			// Alpha-Beta Pruning: if beta <= alpha, the minimizing player (parent)
+			// already has a better option, so we can prune this branch.
+			if (beta <= alpha) {
+				break;
+			}
+		}
+		return maxEval;
+	} else { // Minimizing player
+		let minEval = Infinity;
+		for (const move of possibleMoves) {
+			// Apply the move to get a new board state
+			const newBoard = apply_move(board, move);
+
+			// Recursively call minimax for the opponent's turn
+			const evalScore = minimaxAlphaBeta(newBoard, depth - 1, alpha, beta, true, get_possible_moves, evaluate_board, apply_move);
+			minEval = Math.min(minEval, evalScore);
+			beta = Math.min(beta, evalScore);
+
+			// Alpha-Beta Pruning: if beta <= alpha, the maximizing player (parent)
+			// already has a better option, so we can prune this branch.
+			if (beta <= alpha) {
+				break;
+			}
+		}
+		return minEval;
+	}
+}
+
+function findBestMove(initialBoard, depth, get_possible_moves, evaluate_board, apply_move, isMaximizingPlayerInitially = true) {
+	if (depth <= 0) {
+		console.error("Search depth must be greater than 0.");
+		return { move: null, score: evaluate_board(initialBoard, 0) };
+	}
+
+	let bestMove = null;
+	let bestValue;
+
+	const possibleMoves = get_possible_moves(initialBoard, isMaximizingPlayerInitially);
+
+	if (possibleMoves.length === 0) {
+		// No moves possible from the initial state (e.g., game already over)
+		return { move: null, score: evaluate_board(initialBoard, depth) };
+	}
+
+	if (isMaximizingPlayerInitially) {
+		bestValue = -Infinity;
+		for (const move of possibleMoves) {
+			const newBoard = apply_move(initialBoard, move);
+			// For the next level, it's the opponent's turn (minimizing player)
+			// Initial alpha is -Infinity, initial beta is Infinity for the children of the root.
+			const value = minimaxAlphaBeta(newBoard, depth - 1, -Infinity, Infinity, false, get_possible_moves, evaluate_board, apply_move);
+			if (value > bestValue) {
+				bestValue = value;
+				bestMove = move;
+			}
+			// Note: No alpha/beta update at the root for choosing the *best move* itself,
+			// alpha/beta is for pruning *within* the minimaxAlphaBeta calls.
+			// However, if you wanted to pass the root's evolving alpha/beta to its children,
+			// you could, but the standard approach is to re-initialize for each child's minimax call.
+		}
+	} else { // Initial player is minimizing
+		bestValue = Infinity;
+		for (const move of possibleMoves) {
+			const newBoard = apply_move(initialBoard, move);
+			// For the next level, it's the opponent's turn (maximizing player)
+			const value = minimaxAlphaBeta(newBoard, depth - 1, -Infinity, Infinity, true, get_possible_moves, evaluate_board, apply_move);
+			if (value < bestValue) {
+				bestValue = value;
+				bestMove = move;
+			}
+		}
+	}
+
+	return { move: bestMove, score: bestValue };
+}
+
+// --- Example Placeholder Functions (User must implement these for their specific game) ---
+
+/*
+function example_get_possible_moves(board, isMaximizingPlayer) {
+		// CONSOLE LOGGING FOR DEBUG PURPOSES
+		// console.log(`get_possible_moves called for player: ${isMaximizingPlayer ? 'Maximizing' : 'Minimizing'} on board:`, JSON.stringify(board));
+
+		// Implement game-specific logic to find all valid moves
+		// Example for a simple linear game where moves are just numbers to add/subtract
+		const moves = [];
+		if (board.value < 10 && board.value > -10) { // Some arbitrary game condition
+				moves.push({ action: 'add', amount: 1 });
+				moves.push({ action: 'add', amount: 2 });
+				if (isMaximizingPlayer) {
+						 moves.push({ action: 'special_max_move', amount: 5 });
+				} else {
+						 moves.push({ action: 'special_min_move', amount: -3 });
+				}
+		}
+		// console.log("Possible moves:", moves);
+		return moves;
+}
+
+function example_apply_move(board, move) {
+		// CONSOLE LOGGING FOR DEBUG PURPOSES
+		// console.log(`apply_move called with move:`, move, `on board:`, JSON.stringify(board));
+
+		// IMPORTANT: Create a DEEP COPY of the board to avoid modifying the original
+		const newBoard = JSON.parse(JSON.stringify(board)); // Simple deep copy for object/array based boards
+
+		// Implement game-specific logic to apply the move
+		if (move.action === 'add') {
+				newBoard.value += move.amount;
+		} else if (move.action === 'special_max_move') {
+				newBoard.value += move.amount;
+				newBoard.max_used_special = true;
+		} else if (move.action === 'special_min_move') {
+				newBoard.value += move.amount;
+				newBoard.min_used_special = true;
+		}
+		// console.log("New board state:", newBoard);
+		return newBoard;
+}
+
+function example_evaluate_board(board, currentDepth) {
+		// CONSOLE LOGGING FOR DEBUG PURPOSES
+		// console.log(`evaluate_board called at depth ${currentDepth} for board:`, JSON.stringify(board));
+
+		// Implement game-specific heuristic evaluation
+		// Higher score is better for the maximizing player
+		// Check for terminal states (win/loss/draw)
+		if (board.value >= 10) return Infinity; // Max player wins
+		if (board.value <= -10) return -Infinity; // Min player wins (Max loses)
+
+		let score = board.value;
+		// Example heuristic: give bonus for using special move
+		if (board.max_used_special) score += 2;
+		if (board.min_used_special) score -= 1; // Assuming this is bad for max player
+
+		// console.log("Evaluated score:", score);
+		return score;
+}
+*/
+
+function setupGame() {
+	// --- Example Usage (Illustrative - requires the example functions above to be uncommented and adapted) ---
+	const initialBoardState = { value: 0 }; // Example board state
+	const searchDepth = 3; // How many moves ahead to look
+
+	console.log("Finding best move for Maximizing Player...");
+	const resultMax = findBestMove(
+		initialBoardState,
+		searchDepth,
+		example_get_possible_moves,
+		example_evaluate_board,
+		example_apply_move,
+		true // isMaximizingPlayerInitially
+	);
+	console.log("Best move for Maximizing Player:", resultMax.move, "with score:", resultMax.score);
+
+	/*    
+	const slightlyDifferentBoard = { value: 1 };
+	console.log("\nFinding best move for Minimizing Player (if they were to start)...");
+	const resultMin = findBestMove(
+			slightlyDifferentBoard,
+			searchDepth,
+			example_get_possible_moves,
+			example_evaluate_board,
+			example_apply_move,
+			false // isMaximizingPlayerInitially
+	);
+	console.log("Best move for Minimizing Player:", resultMin.move, "with score:", resultMin.score);
+	*/
+
+
+}
+
+//#endregion
+
+
+function genttt() {
+	function initializeBoard(rows, cols) {
+		return Array.from({ length: rows }, () => Array(cols).fill(null));
+	}
+	function getLegalMoves(board) {
+		const moves = [];
+		for (let r = 0; r < board.length; r++) {
+			for (let c = 0; c < board[0].length; c++) {
+				if (board[r][c] === null) {
+					moves.push({ row: r, col: c });
+				}
+			}
+		}
+		return moves;
+	}
+	function isTerminal(board, players, winLength) {
+		return players.some(p => hasWon(board, p, winLength)) || getLegalMoves(board).length === 0;
+	}
+	function evaluate(board, players, winLength) {
+		const scores = players.map(p => {
+			if (hasWon(board, p, winLength)) return 1000;
+			let partialLines = countPartialLines(board, p, winLength - 1);
+			return partialLines;
+		});
+		return scores;
+	}
+	function hasWon(board, player, winLength) {
+		const rows = board.length;
+		const cols = board[0].length;
+
+		const directions = [
+			{ dr: 0, dc: 1 },   // horizontal
+			{ dr: 1, dc: 0 },   // vertical
+			{ dr: 1, dc: 1 },   // diagonal down-right
+			{ dr: 1, dc: -1 }   // diagonal down-left
+		];
+
+		for (let r = 0; r < rows; r++) {
+			for (let c = 0; c < cols; c++) {
+				if (board[r][c] !== player) continue;
+
+				for (let { dr, dc } of directions) {
+					let count = 0;
+					for (let k = 0; k < winLength; k++) {
+						const nr = r + dr * k;
+						const nc = c + dc * k;
+						if (
+							nr >= 0 && nr < rows &&
+							nc >= 0 && nc < cols &&
+							board[nr][nc] === player
+						) {
+							count++;
+						} else {
+							break;
+						}
+					}
+					if (count === winLength) return true;
+				}
+			}
+		}
+		return false;
+	}
+	function countPartialLines(board, player, targetLength) {
+		const directions = [
+			{ dr: 0, dc: 1 },
+			{ dr: 1, dc: 0 },
+			{ dr: 1, dc: 1 },
+			{ dr: 1, dc: -1 }
+		];
+
+		const rows = board.length;
+		const cols = board[0].length;
+		let count = 0;
+
+		for (let r = 0; r < rows; r++) {
+			for (let c = 0; c < cols; c++) {
+				for (let { dr, dc } of directions) {
+					let playerCount = 0;
+					let emptyCount = 0;
+					let blocked = false;
+
+					for (let k = 0; k < targetLength; k++) {
+						const nr = r + dr * k;
+						const nc = c + dc * k;
+						if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) {
+							blocked = true;
+							break;
+						}
+
+						const cell = board[nr][nc];
+						if (cell === player) playerCount++;
+						else if (cell === null) emptyCount++;
+						else {
+							blocked = true;
+							break;
+						}
+					}
+
+					if (!blocked && playerCount + emptyCount === targetLength) {
+						count++;
+					}
+				}
+			}
+		}
+		return count;
+	}
+
+}
+
+
 
 
 function unhighlightAll() {
-  if (DA.pathHighlighted) {
-    DA.pathHighlighted.forEach(i => DA.polygons[i].classList.remove('highlight'));
-  } else if (DA.firstSelected !== null) {
-    DA.polygons[DA.firstSelected].classList.remove('highlight');
-  }
-  DA.firstSelected = null;
-  DA.pathHighlighted = null;
+	if (DA.pathHighlighted) {
+		DA.pathHighlighted.forEach(i => DA.polygons[i].classList.remove('highlight'));
+	} else if (DA.firstSelected !== null) {
+		DA.polygons[DA.firstSelected].classList.remove('highlight');
+	}
+	DA.firstSelected = null;
+	DA.pathHighlighted = null;
 }
 
 function highlightPath(path) {
-  path.forEach(i => DA.polygons[i].classList.add('highlight'));
-  DA.pathHighlighted = path;
+	path.forEach(i => DA.polygons[i].classList.add('highlight'));
+	DA.pathHighlighted = path;
 }
 function shortestFacePath(neighbors, face1, face2) {
-  if (face1 === face2) return [face1];
+	if (face1 === face2) return [face1];
 
-  const queue = [face1];
-  const visited = new Set([face1]);
-  // To reconstruct path: child face → parent face
-  const parentMap = new Map();
+	const queue = [face1];
+	const visited = new Set([face1]);
+	// To reconstruct path: child face → parent face
+	const parentMap = new Map();
 
-  while (queue.length > 0) {
-    const current = queue.shift();
+	while (queue.length > 0) {
+		const current = queue.shift();
 
-    const nbrs = neighbors[current] || [];
-    for (const nbr of nbrs) {
-      if (!visited.has(nbr)) {
-        visited.add(nbr);
-        parentMap.set(nbr, current);
-        if (nbr === face2) {
-          // reconstruct path from face2 to face1
-          const path = [];
-          let f = face2;
-          while (f !== undefined) {
-            path.push(f);
-            f = parentMap.get(f);
-          }
-          return path.reverse();
-        }
-        queue.push(nbr);
-      }
-    }
-  }
+		const nbrs = neighbors[current] || [];
+		for (const nbr of nbrs) {
+			if (!visited.has(nbr)) {
+				visited.add(nbr);
+				parentMap.set(nbr, current);
+				if (nbr === face2) {
+					// reconstruct path from face2 to face1
+					const path = [];
+					let f = face2;
+					while (f !== undefined) {
+						path.push(f);
+						f = parentMap.get(f);
+					}
+					return path.reverse();
+				}
+				queue.push(nbr);
+			}
+		}
+	}
 
-  // No path found
-  return null;
+	// No path found
+	return null;
 }
 function onPolygonClick(clickedIndex) {
-  if (DA.firstSelected === null) {
-    // No selection yet, highlight clicked polygon
-    DA.firstSelected = clickedIndex;
-    DA.polygons[clickedIndex].classList.add('highlight');
-  } else if (DA.pathHighlighted === null) {
-    // One polygon selected, highlight path from DA.firstSelected to clickedIndex
-    if (clickedIndex === DA.firstSelected) {
-      // Clicked same polygon again: maybe do nothing or unselect
-      return;
-    }
-    const path = shortestFacePath(neighbors, DA.firstSelected, clickedIndex);
-    if (path) {
-      // Remove highlight from DA.firstSelected only
-      DA.polygons[DA.firstSelected].classList.remove('highlight');
-      highlightPath(path);
-    } else {
-      // No path found, maybe alert or ignore
-      console.log('No path found');
-    }
-  } else {
-    // Path is highlighted, unhighlight everything and start over
-    unhighlightAll();
-    DA.firstSelected = clickedIndex;
-    DA.polygons[clickedIndex].classList.add('highlight');
-  }
+	if (DA.firstSelected === null) {
+		// No selection yet, highlight clicked polygon
+		DA.firstSelected = clickedIndex;
+		DA.polygons[clickedIndex].classList.add('highlight');
+	} else if (DA.pathHighlighted === null) {
+		// One polygon selected, highlight path from DA.firstSelected to clickedIndex
+		if (clickedIndex === DA.firstSelected) {
+			// Clicked same polygon again: maybe do nothing or unselect
+			return;
+		}
+		const path = shortestFacePath(neighbors, DA.firstSelected, clickedIndex);
+		if (path) {
+			// Remove highlight from DA.firstSelected only
+			DA.polygons[DA.firstSelected].classList.remove('highlight');
+			highlightPath(path);
+		} else {
+			// No path found, maybe alert or ignore
+			console.log('No path found');
+		}
+	} else {
+		// Path is highlighted, unhighlight everything and start over
+		unhighlightAll();
+		DA.firstSelected = clickedIndex;
+		DA.polygons[clickedIndex].classList.add('highlight');
+	}
 }
 
 
@@ -235,80 +617,80 @@ class _AbstractTile extends ValueBlend {
 }
 
 function precomputePolygonNeighbors(groupElement) {
-  if (!groupElement || !(groupElement instanceof SVGGElement)) {
-    console.error("Invalid group element.");
-    return;
-  }
+	if (!groupElement || !(groupElement instanceof SVGGElement)) {
+		console.error("Invalid group element.");
+		return;
+	}
 
-  const polygons = Array.from(groupElement.querySelectorAll('polygon'));
+	const polygons = Array.from(groupElement.querySelectorAll('polygon'));
 
-  // Ensure each polygon has an ID
-  polygons.forEach((polygon, i) => {
-    if (!polygon.id) {
-      polygon.id = `poly-${i}`;
-    }
-  });
+	// Ensure each polygon has an ID
+	polygons.forEach((polygon, i) => {
+		if (!polygon.id) {
+			polygon.id = `poly-${i}`;
+		}
+	});
 
-  // Helper to parse points into Set of strings "x,y"
-  function getPointSet(polygon) {
-    return new Set(
-      polygon.getAttribute('points')
-        .trim()
-        .split(/\s+/)
-        .map(p => p.trim())
-    );
-  }
+	// Helper to parse points into Set of strings "x,y"
+	function getPointSet(polygon) {
+		return new Set(
+			polygon.getAttribute('points')
+				.trim()
+				.split(/\s+/)
+				.map(p => p.trim())
+		);
+	}
 
-  // Map polygon ID to its point set
-  const pointSets = new Map();
-  polygons.forEach(p => {
-    pointSets.set(p.id, getPointSet(p));
-  });
+	// Map polygon ID to its point set
+	const pointSets = new Map();
+	polygons.forEach(p => {
+		pointSets.set(p.id, getPointSet(p));
+	});
 
-  // Compute neighbors by comparing shared points
-  polygons.forEach(p1 => {
-    const id1 = p1.id;
-    const set1 = pointSets.get(id1);
-    const neighbors = [];
+	// Compute neighbors by comparing shared points
+	polygons.forEach(p1 => {
+		const id1 = p1.id;
+		const set1 = pointSets.get(id1);
+		const neighbors = [];
 
-    polygons.forEach(p2 => {
-      const id2 = p2.id;
-      if (id1 === id2) return;
+		polygons.forEach(p2 => {
+			const id2 = p2.id;
+			if (id1 === id2) return;
 
-      const set2 = pointSets.get(id2);
-      const shared = [...set1].filter(point => set2.has(point));
-      if (shared.length >= 2) {
-        neighbors.push(id2);
-      }
-    });
+			const set2 = pointSets.get(id2);
+			const shared = [...set1].filter(point => set2.has(point));
+			if (shared.length >= 2) {
+				neighbors.push(id2);
+			}
+		});
 
-    p1.dataset.neighbors = neighbors.join(',');
-  });
+		p1.dataset.neighbors = neighbors.join(',');
+	});
 }
 function addPolygonNeighborClick(groupElement, fillColor = 'yellow') {
-  if (!groupElement || !(groupElement instanceof SVGGElement)) {
-    console.error("Invalid group element.");
-    return;
-  }
+	if (!groupElement || !(groupElement instanceof SVGGElement)) {
+		console.error("Invalid group element.");
+		return;
+	}
 
-  const polygons = groupElement.querySelectorAll('polygon');
+	const polygons = groupElement.querySelectorAll('polygon');
 
-  polygons.forEach(polygon => {
-    polygon.addEventListener('click', () => {
-      const neighbors = polygon.dataset.neighbors?.split(',') || [];
+	polygons.forEach(polygon => {
+		polygon.addEventListener('click', () => {
+			const neighbors = polygon.dataset.neighbors?.split(',') || [];
 
-      neighbors.forEach(id => {
-        const neighbor = document.getElementById(id.trim());
-        if (neighbor) {
-          neighbor.style.fill = fillColor;
-        }
-      });
-    });
+			neighbors.forEach(id => {
+				const neighbor = document.getElementById(id.trim());
+				if (neighbor) {
+					neighbor.style.fill = fillColor;
+				}
+			});
+		});
 
-    polygon.addEventListener('mouseover', () => {
-      polygon.style.cursor = 'pointer';
-    });
-  });
+		polygon.addEventListener('mouseover', () => {
+			polygon.style.cursor = 'pointer';
+		});
+	});
 }
 
 
@@ -477,508 +859,508 @@ function addPolygonEvents(groupElement, onClickHandler, onEnterHandler, onLeaveH
 }
 
 function _triangleTessellationCenters(rows, cols, w, h) {
-  const centers = [];
+	const centers = [];
 
-  for (let r = 0; r < rows; r++) {
-    const baseY = r * (h / 2); // every row is half-height offset
-    const startX = (r % 2 === 1) ? w / 2 : 0; // staggered rows
+	for (let r = 0; r < rows; r++) {
+		const baseY = r * (h / 2); // every row is half-height offset
+		const startX = (r % 2 === 1) ? w / 2 : 0; // staggered rows
 
-    for (let c = 0; c < cols; c++) {
-      const x = startX + c * w;
-      const isUp = (r % 2 === 0);
-      const y = baseY + (isUp ? h / 3 : (2 * h) / 3);
+		for (let c = 0; c < cols; c++) {
+			const x = startX + c * w;
+			const isUp = (r % 2 === 0);
+			const y = baseY + (isUp ? h / 3 : (2 * h) / 3);
 
-      centers.push({ x, y, up: isUp });
-    }
-  }
+			centers.push({ x, y, up: isUp });
+		}
+	}
 
-  return centers;
+	return centers;
 }
 
 function _triangleTessellationCenters(rows, cols, n) {
-  const centers = [];
-  const h = (Math.sqrt(3) / 2) * n;
+	const centers = [];
+	const h = (Math.sqrt(3) / 2) * n;
 
-  for (let r = 0; r < rows; r++) {
-    const y = r * h;
-    for (let c = 0; c < cols; c++) {
-      const x = c * n + ((r % 2) * n) / 2;
-      const isPointingUp = (r + c) % 2 === 0;
-      centers.push({ x, y: isPointingUp ? y + h / 3 : y + (2 * h) / 3, up: isPointingUp });
-    }
-  }
+	for (let r = 0; r < rows; r++) {
+		const y = r * h;
+		for (let c = 0; c < cols; c++) {
+			const x = c * n + ((r % 2) * n) / 2;
+			const isPointingUp = (r + c) % 2 === 0;
+			centers.push({ x, y: isPointingUp ? y + h / 3 : y + (2 * h) / 3, up: isPointingUp });
+		}
+	}
 
-  return centers;
+	return centers;
 }
 function _drawTriangleAtCenter(parent, center, n, pointingUp = true, color = 'black') {
-  const h = (Math.sqrt(3) / 2) * n;
-  const div = document.createElement('div');
+	const h = (Math.sqrt(3) / 2) * n;
+	const div = document.createElement('div');
 
-  div.style.position = 'absolute';
-  div.style.width = `${n}px`;
-  div.style.height = `${h}px`;
-  div.style.left = `${center.x - n / 2}px`;
-  div.style.top = `${center.y - h / 2}px`;
-  div.style.backgroundColor = color;
-  div.style.clipPath = pointingUp
-    ? 'polygon(50% 0%, 0% 100%, 100% 100%)'
-    : 'polygon(0% 0%, 100% 0%, 50% 100%)';
+	div.style.position = 'absolute';
+	div.style.width = `${n}px`;
+	div.style.height = `${h}px`;
+	div.style.left = `${center.x - n / 2}px`;
+	div.style.top = `${center.y - h / 2}px`;
+	div.style.backgroundColor = color;
+	div.style.clipPath = pointingUp
+		? 'polygon(50% 0%, 0% 100%, 100% 100%)'
+		: 'polygon(0% 0%, 100% 0%, 50% 100%)';
 
-  parent.appendChild(div);
-  return div;
+	parent.appendChild(div);
+	return div;
 }
 //hexgrid versuche
 function createHexShapedGridX(containerId, rows = 5, maxCols = 5, sz = 50, gap = 1) {
-  if (rows % 2 === 0) {
-    console.error("Number of rows must be odd for a symmetrical hexagon grid.");
-    return;
-  }
+	if (rows % 2 === 0) {
+		console.error("Number of rows must be odd for a symmetrical hexagon grid.");
+		return;
+	}
 
-  const container = toElem(containerId);
-  //const frag=document.createDocumentFragment();
-  container.innerHTML = '';
+	const container = toElem(containerId);
+	//const frag=document.createDocumentFragment();
+	container.innerHTML = '';
 
-  const hexWidth = sz * 2;
-  const hexHeight = hexWidth; //Math.sqrt(3) * sideLength;
-  const vertSpacing = hexHeight * 0.75;
+	const hexWidth = sz * 2;
+	const hexHeight = hexWidth; //Math.sqrt(3) * sideLength;
+	const vertSpacing = hexHeight * 0.75;
 
-  const midRow = Math.floor(rows / 2);
-  const tiles = {}; // id -> tile object
-  let [w, h] = [hexWidth - gap, hexHeight - gap];
+	const midRow = Math.floor(rows / 2);
+	const tiles = {}; // id -> tile object
+	let [w, h] = [hexWidth - gap, hexHeight - gap];
 
-  for (let r = 0; r < rows; r++) {
-    const offsetFromMiddle = Math.abs(midRow - r);
-    const cols = maxCols - offsetFromMiddle;
-    const totalRowOffset = ((maxCols - cols) / 2) * hexWidth;
-    const horizontalOffset = (r % 2 === 1) ? hexWidth / 2 : 0;
-    const y = r * vertSpacing;
-    for (let i = 0; i < cols; i++) {
-      const x = i * hexWidth + totalRowOffset;// + horizontalOffset;
-      const c = Math.round(x / (hexWidth / 2)); // GLOBAL COLUMN INDEX
-      const id = `r${r}_c${c}`;
+	for (let r = 0; r < rows; r++) {
+		const offsetFromMiddle = Math.abs(midRow - r);
+		const cols = maxCols - offsetFromMiddle;
+		const totalRowOffset = ((maxCols - cols) / 2) * hexWidth;
+		const horizontalOffset = (r % 2 === 1) ? hexWidth / 2 : 0;
+		const y = r * vertSpacing;
+		for (let i = 0; i < cols; i++) {
+			const x = i * hexWidth + totalRowOffset;// + horizontalOffset;
+			const c = Math.round(x / (hexWidth / 2)); // GLOBAL COLUMN INDEX
+			const id = `r${r}_c${c}`;
 
-      let div = mDom(container, { className: 'hex', left: x, top: y, w, h }, { id })
-      const tile = { id, div, x, y, sz, c, r, NE: null, E: null, SE: null, SW: null, W: null, NW: null };
+			let div = mDom(container, { className: 'hex', left: x, top: y, w, h }, { id })
+			const tile = { id, div, x, y, sz, c, r, NE: null, E: null, SE: null, SW: null, W: null, NW: null };
 
-      tiles[id] = tile;
-    }
+			tiles[id] = tile;
+		}
 
-  }
+	}
 
-  // After all tiles are created, link neighbors
-  for (const id in tiles) {
-    const tile = tiles[id];
-    let [r, c] = [tile.r, tile.c];
+	// After all tiles are created, link neighbors
+	for (const id in tiles) {
+		const tile = tiles[id];
+		let [r, c] = [tile.r, tile.c];
 
-    function getTile(rr, cc) { return tiles[`r${rr}_c${cc}`] || null; }
-    //   if (isdef(tiles[`r${rr}_c${cc}`])) return `r${rr}_c${cc}`; //tileMap[`r${rr}_c${cc}`];
-    //   else return null;
-    // }
+		function getTile(rr, cc) { return tiles[`r${rr}_c${cc}`] || null; }
+		//   if (isdef(tiles[`r${rr}_c${cc}`])) return `r${rr}_c${cc}`; //tileMap[`r${rr}_c${cc}`];
+		//   else return null;
+		// }
 
-    // Neighbor lookup varies by row parity
-    tile.E = getTile(r, c + 2);
-    tile.W = getTile(r, c - 2);
-    tile.NE = getTile(r - 1, c + 1);
-    tile.NW = getTile(r - 1, c - 1);
-    tile.SE = getTile(r + 1, c + 1);
-    tile.SW = getTile(r + 1, c - 1);
+		// Neighbor lookup varies by row parity
+		tile.E = getTile(r, c + 2);
+		tile.W = getTile(r, c - 2);
+		tile.NE = getTile(r - 1, c + 1);
+		tile.NW = getTile(r - 1, c - 1);
+		tile.SE = getTile(r + 1, c + 1);
+		tile.SW = getTile(r + 1, c - 1);
 
-  }
+	}
 
-  // container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
-  let hGrid = rows * vertSpacing + hexHeight * 0.25;
-  let wGrid = maxCols * hexWidth;
-  console.log(w, h)
-  mStyle(container, { w: wGrid, h: hGrid }); //,bg:'skyblue'})
-  //container.appendChild(frag);
+	// container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
+	let hGrid = rows * vertSpacing + hexHeight * 0.25;
+	let wGrid = maxCols * hexWidth;
+	console.log(w, h)
+	mStyle(container, { w: wGrid, h: hGrid }); //,bg:'skyblue'})
+	//container.appendChild(frag);
 
-  return tiles;
+	return tiles;
 }
 function getHexCorners(x, y, radius) {
-  const corners = [];
-  for (let i = 0; i < 6; i++) {
-    const angle = Math.PI / 3 * i - Math.PI / 6; // -30° to make flat top
-    const cornerX = x + radius * Math.cos(angle);
-    const cornerY = y + radius * Math.sin(angle);
-    corners.push([cornerX, cornerY]);
-  }
-  return corners;
+	const corners = [];
+	for (let i = 0; i < 6; i++) {
+		const angle = Math.PI / 3 * i - Math.PI / 6; // -30° to make flat top
+		const cornerX = x + radius * Math.cos(angle);
+		const cornerY = y + radius * Math.sin(angle);
+		corners.push([cornerX, cornerY]);
+	}
+	return corners;
 }
 function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50, gap = 1) {
-  if (rows % 2 === 0) {
-    console.error("Number of rows must be odd for a symmetrical hexagon grid.");
-    return;
-  }
+	if (rows % 2 === 0) {
+		console.error("Number of rows must be odd for a symmetrical hexagon grid.");
+		return;
+	}
 
-  const container = toElem(containerId);
-  container.innerHTML = '';
+	const container = toElem(containerId);
+	container.innerHTML = '';
 
-  const hexWidth = sideLength * 2;
-  const hexHeight = hexWidth; //Math.sqrt(3) * sideLength;
-  const vertSpacing = hexHeight * 0.75;
+	const hexWidth = sideLength * 2;
+	const hexHeight = hexWidth; //Math.sqrt(3) * sideLength;
+	const vertSpacing = hexHeight * 0.75;
 
-  const midRow = Math.floor(rows / 2);
-  const tiles = {}; // id -> tile object
+	const midRow = Math.floor(rows / 2);
+	const tiles = {}; // id -> tile object
 
-  for (let r = 0; r < rows; r++) {
-    const offsetFromMiddle = Math.abs(midRow - r);
-    const cols = maxCols - offsetFromMiddle;
+	for (let r = 0; r < rows; r++) {
+		const offsetFromMiddle = Math.abs(midRow - r);
+		const cols = maxCols - offsetFromMiddle;
 
-    for (let i = 0; i < cols; i++) {
+		for (let i = 0; i < cols; i++) {
 
 
-      const horizontalOffset = (r % 2 === 1) ? hexWidth / 2 : 0;
-      const totalRowOffset = ((maxCols - cols) / 2) * hexWidth;
+			const horizontalOffset = (r % 2 === 1) ? hexWidth / 2 : 0;
+			const totalRowOffset = ((maxCols - cols) / 2) * hexWidth;
 
-      const x = i * hexWidth + totalRowOffset;// + horizontalOffset;
-      const y = r * vertSpacing;
-      const c = Math.round(x / (hexWidth / 2)); // GLOBAL COLUMN INDEX
-      const id = `r${r}_c${c}`;
+			const x = i * hexWidth + totalRowOffset;// + horizontalOffset;
+			const y = r * vertSpacing;
+			const c = Math.round(x / (hexWidth / 2)); // GLOBAL COLUMN INDEX
+			const id = `r${r}_c${c}`;
 
-      // const div = document.createElement('div');
-      // div.className = 'hex';
-      // div.style.width = `${hexWidth - gap}px`;
-      // div.style.height = `${hexHeight - gap}px`;
-      // div.style.left = `${x}px`;
-      // div.style.top = `${y}px`;
-      // div.id = id;
-      // container.appendChild(div);
+			// const div = document.createElement('div');
+			// div.className = 'hex';
+			// div.style.width = `${hexWidth - gap}px`;
+			// div.style.height = `${hexHeight - gap}px`;
+			// div.style.left = `${x}px`;
+			// div.style.top = `${y}px`;
+			// div.id = id;
+			// container.appendChild(div);
 
-      let div=mDom(container,{className:'hex',left:x,top:y,w:hexWidth-gap,h:hexHeight-gap},{id})
-      const tile = { id, div, x, y, c, r, NE: null, E: null, SE: null, SW: null, W: null, NW: null };
+			let div = mDom(container, { className: 'hex', left: x, top: y, w: hexWidth - gap, h: hexHeight - gap }, { id })
+			const tile = { id, div, x, y, c, r, NE: null, E: null, SE: null, SW: null, W: null, NW: null };
 
-      tiles[id] = tile;
-    }
+			tiles[id] = tile;
+		}
 
-  }
+	}
 
-  // After all tiles are created, link neighbors
-  for (const id in tiles) {
-    const tile = tiles[id];
-    let [r, c] = [tile.r, tile.c];
-    const isOdd = r % 2 === 1;
+	// After all tiles are created, link neighbors
+	for (const id in tiles) {
+		const tile = tiles[id];
+		let [r, c] = [tile.r, tile.c];
+		const isOdd = r % 2 === 1;
 
-    function getTile(rr, cc) {
-      if (isdef(tiles[`r${rr}_c${cc}`])) return `r${rr}_c${cc}`; //tileMap[`r${rr}_c${cc}`];
-      else return null;
-    }
+		function getTile(rr, cc) {
+			if (isdef(tiles[`r${rr}_c${cc}`])) return `r${rr}_c${cc}`; //tileMap[`r${rr}_c${cc}`];
+			else return null;
+		}
 
-    // Neighbor lookup varies by row parity
-    tile.E = getTile(r, c + 2);
-    tile.W = getTile(r, c - 2);
-    tile.NE = getTile(r - 1, c + 1);
-    tile.NW = getTile(r - 1, c - 1);
-    tile.SE = getTile(r + 1, c + 1);
-    tile.SW = getTile(r + 1, c - 1);
+		// Neighbor lookup varies by row parity
+		tile.E = getTile(r, c + 2);
+		tile.W = getTile(r, c - 2);
+		tile.NE = getTile(r - 1, c + 1);
+		tile.NW = getTile(r - 1, c - 1);
+		tile.SE = getTile(r + 1, c + 1);
+		tile.SW = getTile(r + 1, c - 1);
 
-  }
+	}
 
-  // container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
-  let h = rows * vertSpacing + hexHeight * 0.25;
-  let w = maxCols * hexWidth;
-  console.log(w,h)
-  mStyle(container,{w,h}); //,bg:'skyblue'})
+	// container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
+	let h = rows * vertSpacing + hexHeight * 0.25;
+	let w = maxCols * hexWidth;
+	console.log(w, h)
+	mStyle(container, { w, h }); //,bg:'skyblue'})
 
-  return tiles;
+	return tiles;
 }
 function addCities(container, grid, sideLength) {
-  const cityMap = {}; // key: `r_c` => city object
+	const cityMap = {}; // key: `r_c` => city object
 
-  for (const row of grid) {
-    for (const tile of row) {
-      const { x, y, r, c } = tile;
-      //let [tx,ty]=[x+sideLength/2,y+sideLength/2];
-      for (let i = 0; i < 6; i++) {
-        const angle_deg = 60 * i - 30;
-        const angle_rad = Math.PI / 180 * angle_deg;
-        const cx = x + sideLength * Math.cos(angle_rad);
-        const cy = y + sideLength * Math.sin(angle_rad); // - sideLength / 2;
+	for (const row of grid) {
+		for (const tile of row) {
+			const { x, y, r, c } = tile;
+			//let [tx,ty]=[x+sideLength/2,y+sideLength/2];
+			for (let i = 0; i < 6; i++) {
+				const angle_deg = 60 * i - 30;
+				const angle_rad = Math.PI / 180 * angle_deg;
+				const cx = x + sideLength * Math.cos(angle_rad);
+				const cy = y + sideLength * Math.sin(angle_rad); // - sideLength / 2;
 
-        // Determine index of the tile *below* and to the *left* of the corner
-        // Here, we use angle to determine ownership
-        let rowIndex = r;
-        let colIndex = c;
-        if (i === 2 || i === 3) rowIndex += 1; // bottom corners
-        if (i === 3 || i === 4 || i === 5) colIndex -= 1; // left side
+				// Determine index of the tile *below* and to the *left* of the corner
+				// Here, we use angle to determine ownership
+				let rowIndex = r;
+				let colIndex = c;
+				if (i === 2 || i === 3) rowIndex += 1; // bottom corners
+				if (i === 3 || i === 4 || i === 5) colIndex -= 1; // left side
 
-        addCity(cityMap, container, rowIndex, colIndex, 0 - 10, 0 - 10); //cx, cy);
-        return;
-      }
-      return;
-    }
-  }
+				addCity(cityMap, container, rowIndex, colIndex, 0 - 10, 0 - 10); //cx, cy);
+				return;
+			}
+			return;
+		}
+	}
 
-  return cityMap;
+	return cityMap;
 }
 
 function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50, gap = 1) {
-  if (rows % 2 === 0) {
-    console.error("Number of rows must be odd for a symmetrical hexagon grid.");
-    return;
-  }
+	if (rows % 2 === 0) {
+		console.error("Number of rows must be odd for a symmetrical hexagon grid.");
+		return;
+	}
 
-  const container = toElem(containerId);
-  container.innerHTML = '';
+	const container = toElem(containerId);
+	container.innerHTML = '';
 
-  const hexWidth = sideLength * 2;
-  const hexHeight = hexWidth; //Math.sqrt(3) * sideLength;
-  const vertSpacing = hexHeight * 0.75;
+	const hexWidth = sideLength * 2;
+	const hexHeight = hexWidth; //Math.sqrt(3) * sideLength;
+	const vertSpacing = hexHeight * 0.75;
 
-  const midRow = Math.floor(rows / 2);
-  const tileMap = {}; // id -> tile object
-  const boardRows = [];    // row-wise storage
+	const midRow = Math.floor(rows / 2);
+	const tileMap = {}; // id -> tile object
+	const boardRows = [];    // row-wise storage
 
-  for (let r = 0; r < rows; r++) {
-    const offsetFromMiddle = Math.abs(midRow - r);
-    const cols = maxCols - offsetFromMiddle;
-    const row = [];
+	for (let r = 0; r < rows; r++) {
+		const offsetFromMiddle = Math.abs(midRow - r);
+		const cols = maxCols - offsetFromMiddle;
+		const row = [];
 
-    for (let i = 0; i < cols; i++) {
-      const div = document.createElement('div');
-      div.className = 'hex';
-      div.style.width = `${hexWidth - gap}px`;
-      div.style.height = `${hexHeight - gap}px`;
+		for (let i = 0; i < cols; i++) {
+			const div = document.createElement('div');
+			div.className = 'hex';
+			div.style.width = `${hexWidth - gap}px`;
+			div.style.height = `${hexHeight - gap}px`;
 
-      const horizontalOffset = (r % 2 === 1) ? hexWidth / 2 : 0;
-      const totalRowOffset = ((maxCols - cols) / 2) * hexWidth;
+			const horizontalOffset = (r % 2 === 1) ? hexWidth / 2 : 0;
+			const totalRowOffset = ((maxCols - cols) / 2) * hexWidth;
 
-      const x = i * hexWidth + totalRowOffset;// + horizontalOffset;
-      const y = r * vertSpacing;
+			const x = i * hexWidth + totalRowOffset;// + horizontalOffset;
+			const y = r * vertSpacing;
 
-      const c = Math.round(x / (hexWidth / 2)); // GLOBAL COLUMN INDEX
+			const c = Math.round(x / (hexWidth / 2)); // GLOBAL COLUMN INDEX
 
-      div.style.left = `${x}px`;
-      div.style.top = `${y}px`;
+			div.style.left = `${x}px`;
+			div.style.top = `${y}px`;
 
-      const id = `r${r}_c${c}`;
-      const tile = { id, div, x, y, c, r, NE: null, E: null, SE: null, SW: null, W: null, NW: null };
+			const id = `r${r}_c${c}`;
+			const tile = { id, div, x, y, c, r, NE: null, E: null, SE: null, SW: null, W: null, NW: null };
 
-      div.addEventListener('mouseenter', () => {
-        for (const dir of ['NE', 'E', 'SE', 'SW', 'W', 'NW']) {
-          const neighbor = tileMap[tile[dir]];
-          if (neighbor) neighbor.div.classList.add('neighbor-highlight');
-        }
-      });
+			div.addEventListener('mouseenter', () => {
+				for (const dir of ['NE', 'E', 'SE', 'SW', 'W', 'NW']) {
+					const neighbor = tileMap[tile[dir]];
+					if (neighbor) neighbor.div.classList.add('neighbor-highlight');
+				}
+			});
 
-      div.addEventListener('mouseleave', () => {
-        for (const dir of ['NE', 'E', 'SE', 'SW', 'W', 'NW']) {
-          const neighbor = tileMap[tile[dir]];
-          if (neighbor) neighbor.div.classList.remove('neighbor-highlight');
-        }
-      });
-      tileMap[id] = tile;
-      row.push(tile);
-      container.appendChild(div);
-    }
+			div.addEventListener('mouseleave', () => {
+				for (const dir of ['NE', 'E', 'SE', 'SW', 'W', 'NW']) {
+					const neighbor = tileMap[tile[dir]];
+					if (neighbor) neighbor.div.classList.remove('neighbor-highlight');
+				}
+			});
+			tileMap[id] = tile;
+			row.push(tile);
+			container.appendChild(div);
+		}
 
-    boardRows.push(row);
-  }
+		boardRows.push(row);
+	}
 
-  // After all tiles are created, link neighbors
-  for (let r = 0; r < boardRows.length; r++) {
-    for (let i = 0; i < boardRows[r].length; i++) {
-      const tile = boardRows[r][i];
-      let c = tile.c;
-      const isOdd = r % 2 === 1;
+	// After all tiles are created, link neighbors
+	for (let r = 0; r < boardRows.length; r++) {
+		for (let i = 0; i < boardRows[r].length; i++) {
+			const tile = boardRows[r][i];
+			let c = tile.c;
+			const isOdd = r % 2 === 1;
 
-      function getTile(rr, cc) {
-        if (isdef(tileMap[`r${rr}_c${cc}`])) return `r${rr}_c${cc}`; //tileMap[`r${rr}_c${cc}`];
-        else return null;
-      }
+			function getTile(rr, cc) {
+				if (isdef(tileMap[`r${rr}_c${cc}`])) return `r${rr}_c${cc}`; //tileMap[`r${rr}_c${cc}`];
+				else return null;
+			}
 
-      // Neighbor lookup varies by row parity
-      tile.E = getTile(r, c + 2);
-      tile.W = getTile(r, c - 2);
-      tile.NE = getTile(r - 1, c + 1);
-      tile.NW = getTile(r - 1, c - 1);
-      tile.SE = getTile(r + 1, c + 1);
-      tile.SW = getTile(r + 1, c - 1);
-      // tile.E = getTile(r, c + 1);
-      // tile.W = getTile(r, c - 1);
-      // tile.NE = getTile(r - 1, c + (isOdd ? 0 : -1));
-      // tile.NW = getTile(r - 1, c + (isOdd ? -1 : 0));
-      // tile.SE = getTile(r + 1, c + (isOdd ? 0 : -1));
-      // tile.SW = getTile(r + 1, c + (isOdd ? -1 : 0));
+			// Neighbor lookup varies by row parity
+			tile.E = getTile(r, c + 2);
+			tile.W = getTile(r, c - 2);
+			tile.NE = getTile(r - 1, c + 1);
+			tile.NW = getTile(r - 1, c - 1);
+			tile.SE = getTile(r + 1, c + 1);
+			tile.SW = getTile(r + 1, c - 1);
+			// tile.E = getTile(r, c + 1);
+			// tile.W = getTile(r, c - 1);
+			// tile.NE = getTile(r - 1, c + (isOdd ? 0 : -1));
+			// tile.NW = getTile(r - 1, c + (isOdd ? -1 : 0));
+			// tile.SE = getTile(r + 1, c + (isOdd ? 0 : -1));
+			// tile.SW = getTile(r + 1, c + (isOdd ? -1 : 0));
 
-    }
-  }
+		}
+	}
 
-  container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
+	container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
 
-  return { boardRows, tileMap, tiles:arrFlatten(boardRows) };
+	return { boardRows, tileMap, tiles: arrFlatten(boardRows) };
 }
 function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50, gap = 1) {
-  if (rows % 2 === 0) {
-    console.error("Number of rows must be odd for a symmetrical hexagon grid.");
-    return;
-  }
+	if (rows % 2 === 0) {
+		console.error("Number of rows must be odd for a symmetrical hexagon grid.");
+		return;
+	}
 
-  const container = toElem(containerId);
-  container.innerHTML = '';
+	const container = toElem(containerId);
+	container.innerHTML = '';
 
-  const hexWidth = sideLength * 2;
-  const hexHeight = hexWidth; //Math.sqrt(3) * sideLength;
-  const vertSpacing = hexHeight * 0.75;
+	const hexWidth = sideLength * 2;
+	const hexHeight = hexWidth; //Math.sqrt(3) * sideLength;
+	const vertSpacing = hexHeight * 0.75;
 
-  const midRow = Math.floor(rows / 2);
+	const midRow = Math.floor(rows / 2);
 
-  let tiles = [];
+	let tiles = [];
 
-  for (let r = 0; r < rows; r++) {
-    const offsetFromMiddle = Math.abs(midRow - r);
-    const cols = maxCols - offsetFromMiddle;
+	for (let r = 0; r < rows; r++) {
+		const offsetFromMiddle = Math.abs(midRow - r);
+		const cols = maxCols - offsetFromMiddle;
 
-    for (let c = 0; c < cols; c++) {
-      const hex = document.createElement('div');
-      hex.className = 'hex';
-      hex.style.width = `${hexWidth - gap}px`;
-      hex.style.height = `${hexHeight - gap}px`;
+		for (let c = 0; c < cols; c++) {
+			const hex = document.createElement('div');
+			hex.className = 'hex';
+			hex.style.width = `${hexWidth - gap}px`;
+			hex.style.height = `${hexHeight - gap}px`;
 
-      const horizontalOffset = (r % 2 === 1) ? hexWidth / 2 : 0;
-      const totalRowOffset = ((maxCols - cols) / 2) * hexWidth;
+			const horizontalOffset = (r % 2 === 1) ? hexWidth / 2 : 0;
+			const totalRowOffset = ((maxCols - cols) / 2) * hexWidth;
 
-      const x = c * hexWidth + totalRowOffset; // + horizontalOffset - (r%2 == 1?hexWidth/2:0);
-      const y = r * vertSpacing;
+			const x = c * hexWidth + totalRowOffset; // + horizontalOffset - (r%2 == 1?hexWidth/2:0);
+			const y = r * vertSpacing;
 
-      hex.style.left = `${x}px`;
-      hex.style.top = `${y}px`;
+			hex.style.left = `${x}px`;
+			hex.style.top = `${y}px`;
 
-      container.appendChild(hex);
-      tiles.push({ div: hex, x, y, c, r })
-    }
-  }
+			container.appendChild(hex);
+			tiles.push({ div: hex, x, y, c, r })
+		}
+	}
 
-  container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
-  return tiles;
+	container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
+	return tiles;
 }
 function createHexGrid(d, rows, cols, sideLength = 50) {
-  const container = toElem(d)
-  container.innerHTML = ''; // clear previous grid
+	const container = toElem(d)
+	container.innerHTML = ''; // clear previous grid
 
-  const hexWidth = sideLength * 2;
-  const hexHeight = hexWidth; // Math.sqrt(3) * sideLength;
+	const hexWidth = sideLength * 2;
+	const hexHeight = hexWidth; // Math.sqrt(3) * sideLength;
 
-  for (let r = 0; r < rows; r++) {
-    const row = document.createElement('div');
-    row.className = 'hex-row' + (r % 2 ? ' offset' : '');
-    for (let c = 0; c < cols; c++) {
-      const hex = document.createElement('div');
-      hex.className = 'hex';
-      hex.style.width = `${hexWidth}px`;
-      hex.style.height = `${hexHeight}px`;
-      row.appendChild(hex);
-    }
-    container.appendChild(row);
-  }
+	for (let r = 0; r < rows; r++) {
+		const row = document.createElement('div');
+		row.className = 'hex-row' + (r % 2 ? ' offset' : '');
+		for (let c = 0; c < cols; c++) {
+			const hex = document.createElement('div');
+			hex.className = 'hex';
+			hex.style.width = `${hexWidth}px`;
+			hex.style.height = `${hexHeight}px`;
+			row.appendChild(hex);
+		}
+		container.appendChild(row);
+	}
 }
 function createHexGrid(d, rows, cols, sideLength = 50) {
-  const container = toElem(d);
-  container.innerHTML = '';
-  const hexWidth = sideLength * 2;
-  const hexHeight = Math.sqrt(3) * sideLength;
-  const vertSpacing = hexHeight * 0.75;
+	const container = toElem(d);
+	container.innerHTML = '';
+	const hexWidth = sideLength * 2;
+	const hexHeight = Math.sqrt(3) * sideLength;
+	const vertSpacing = hexHeight * 0.75;
 
-  container.style.height = `${vertSpacing * rows + hexHeight * 0.25}px`;
+	container.style.height = `${vertSpacing * rows + hexHeight * 0.25}px`;
 
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const hex = document.createElement('div');
-      hex.className = 'hex';
-      hex.style.width = `${hexWidth - 1}px`;
-      hex.style.height = `${hexHeight - 1}px`;
+	for (let r = 0; r < rows; r++) {
+		for (let c = 0; c < cols; c++) {
+			const hex = document.createElement('div');
+			hex.className = 'hex';
+			hex.style.width = `${hexWidth - 1}px`;
+			hex.style.height = `${hexHeight - 1}px`;
 
-      const xOffset = (r % 2) * (hexWidth / 2);
-      const x = c * hexWidth + xOffset;
-      const y = r * vertSpacing;
+			const xOffset = (r % 2) * (hexWidth / 2);
+			const x = c * hexWidth + xOffset;
+			const y = r * vertSpacing;
 
-      hex.style.left = `${x}px`;
-      hex.style.top = `${y}px`;
+			hex.style.left = `${x}px`;
+			hex.style.top = `${y}px`;
 
-      container.appendChild(hex);
-    }
-  }
+			container.appendChild(hex);
+		}
+	}
 }
 
-function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50, gap=1) {
-  if (rows % 2 === 0) {
-    console.error("Number of rows must be odd for a symmetrical hexagon grid.");
-    return;
-  }
+function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50, gap = 1) {
+	if (rows % 2 === 0) {
+		console.error("Number of rows must be odd for a symmetrical hexagon grid.");
+		return;
+	}
 
-  const container = toElem(containerId);
-  container.innerHTML = '';
+	const container = toElem(containerId);
+	container.innerHTML = '';
 
-  const hexWidth = sideLength * 2;
-  const hexHeight = Math.sqrt(3) * sideLength;
-  const vertSpacing = hexHeight * 0.75;
+	const hexWidth = sideLength * 2;
+	const hexHeight = Math.sqrt(3) * sideLength;
+	const vertSpacing = hexHeight * 0.75;
 
-  const midRow = Math.floor(rows / 2);
+	const midRow = Math.floor(rows / 2);
 
-  for (let r = 0; r < rows; r++) {
-    // Number of columns in this row (symmetric)
-    const offsetFromMiddle = Math.abs(midRow - r);
-    const cols = maxCols - offsetFromMiddle;
+	for (let r = 0; r < rows; r++) {
+		// Number of columns in this row (symmetric)
+		const offsetFromMiddle = Math.abs(midRow - r);
+		const cols = maxCols - offsetFromMiddle;
 
-    for (let c = 0; c < cols; c++) {
-      const hex = document.createElement('div');
-      hex.className = 'hex';
-      hex.style.width = `${hexWidth}px`;
-      hex.style.height = `${hexHeight}px`;
+		for (let c = 0; c < cols; c++) {
+			const hex = document.createElement('div');
+			hex.className = 'hex';
+			hex.style.width = `${hexWidth}px`;
+			hex.style.height = `${hexHeight}px`;
 
-      // Center the row horizontally
-      const rowOffset = ((maxCols - cols) / 2) * hexWidth + ((r % 2) * hexWidth / 2);
-      const x = c * hexWidth + rowOffset;
-      const y = r * vertSpacing;
+			// Center the row horizontally
+			const rowOffset = ((maxCols - cols) / 2) * hexWidth + ((r % 2) * hexWidth / 2);
+			const x = c * hexWidth + rowOffset;
+			const y = r * vertSpacing;
 
-      hex.style.left = `${x}px`;
-      hex.style.top = `${y}px`;
+			hex.style.left = `${x}px`;
+			hex.style.top = `${y}px`;
 
-      container.appendChild(hex);
-    }
-  }
+			container.appendChild(hex);
+		}
+	}
 
-  // Set container height and maybe width
-  container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
+	// Set container height and maybe width
+	container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
 }
 function createHexShapedGrid(containerId, rows = 5, maxCols = 5, sideLength = 50) {
-  if (rows % 2 === 0) {
-    console.error("Number of rows must be odd for a symmetrical hexagon grid.");
-    return;
-  }
+	if (rows % 2 === 0) {
+		console.error("Number of rows must be odd for a symmetrical hexagon grid.");
+		return;
+	}
 
-  const container = toElem(containerId);
-  container.innerHTML = '';
+	const container = toElem(containerId);
+	container.innerHTML = '';
 
-  const hexWidth = sideLength * 2;
-  const hexHeight = Math.sqrt(3) * sideLength;
-  const vertSpacing = hexHeight * 0.75;
+	const hexWidth = sideLength * 2;
+	const hexHeight = Math.sqrt(3) * sideLength;
+	const vertSpacing = hexHeight * 0.75;
 
-  const midRow = Math.floor(rows / 2);
+	const midRow = Math.floor(rows / 2);
 
-  for (let r = 0; r < rows; r++) {
-    const offsetFromMiddle = Math.abs(midRow - r);
-    const cols = maxCols - offsetFromMiddle;
+	for (let r = 0; r < rows; r++) {
+		const offsetFromMiddle = Math.abs(midRow - r);
+		const cols = maxCols - offsetFromMiddle;
 
-    for (let c = 0; c < cols; c++) {
-      const hex = document.createElement('div');
-      hex.className = 'hex';
-      hex.style.width = `${hexWidth}px`;
-      hex.style.height = `${hexHeight}px`;
+		for (let c = 0; c < cols; c++) {
+			const hex = document.createElement('div');
+			hex.className = 'hex';
+			hex.style.width = `${hexWidth}px`;
+			hex.style.height = `${hexHeight}px`;
 
-      // CORRECTED: Even rows are offset by half a hex width
-      const evenRow = r % 2 === 0;
-      const centerOffset = ((maxCols - cols) / 2) * hexWidth;
-      const x = c * hexWidth + centerOffset + (evenRow ? hexWidth / 2 : 0);
-      const y = r * vertSpacing;
+			// CORRECTED: Even rows are offset by half a hex width
+			const evenRow = r % 2 === 0;
+			const centerOffset = ((maxCols - cols) / 2) * hexWidth;
+			const x = c * hexWidth + centerOffset + (evenRow ? hexWidth / 2 : 0);
+			const y = r * vertSpacing;
 
-      hex.style.left = `${x}px`;
-      hex.style.top = `${y}px`;
+			hex.style.left = `${x}px`;
+			hex.style.top = `${y}px`;
 
-      container.appendChild(hex);
-    }
-  }
+			container.appendChild(hex);
+		}
+	}
 
-  container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
+	container.style.height = `${rows * vertSpacing + hexHeight * 0.25}px`;
 }
 class _hexgridY {
 	constructor({
