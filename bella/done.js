@@ -14,6 +14,90 @@ function mStyles(styles) {
 	return res;
 }
 
+function quickUi(dParent) {
+  dParent = toElem(dParent);
+  let html = `
+    <div>
+      <h1>Game Interface</h1>
+
+      <section>
+        <h2>Start a Game</h2>
+        <label for="gameSelect">Game:</label>
+        <select id="gameSelect"></select>
+        <button id="startGameBtn">Start</button>
+      </section>
+
+      <section>
+        <h2>Make a Move</h2>
+        <label for="gameIdInput">Game ID:</label>
+        <input type="text" id="gameIdInput" placeholder="Enter game ID" />
+        <label for="moveInput">Move (JSON):</label>
+        <input type="text" id="moveInput" value='{"row":0,"col":1}' />
+        <button id="makeMoveBtn">Submit Move</button>
+      </section>
+
+      <section>
+        <h2>Game State</h2>
+        <label for="stateGameId">Game ID:</label>
+        <input type="text" id="stateGameId" />
+        <button id="fetchStateBtn">Get State</button>
+        <pre id="gameState"></pre>
+      </section>
+
+      <section>
+        <h2>Global Chat</h2>
+        <div id="chatBox" style="border:1px solid #ccc; height:150px; overflow-y:scroll; padding:5px;"></div>
+        <input type="text" id="chatInput" placeholder="Say something..." />
+        <button id="sendChatBtn">Send</button>
+      </section>
+    </div>
+    `;
+  dParent.innerHTML = html;
+}
+
+function getPolyNeighbors(poly){
+  const neighbors = poly.getAttribute('data-neighbors').split(','); //console.log(neighbors);
+  return neighbors.map(x=>mBy(x));
+
+}
+function mShortestPath(elem1, elem2) {
+  //elems must have id and data-neighbors='id1,id2,...'
+  //console.log(elem1.id,'=>',elem2.id);
+  if (elem1 === elem2) return [elem1];
+
+  const queue = [elem1];
+  const visited = new Set([elem1]);
+  const parentMap = new Map();
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+
+    const nbrs = getPolyNeighbors(current) || [];
+    for (const nbr of nbrs) {
+      if (!visited.has(nbr)) {
+        visited.add(nbr);
+        parentMap.set(nbr, current);
+        if (nbr === elem2) {
+          const path = [];
+          let f = elem2;
+          while (f !== undefined) {
+            path.push(f);
+            f = parentMap.get(f);
+          }
+          return path.reverse();
+        }
+        queue.push(nbr);
+      }
+    }
+  }
+
+  // No path found
+  return null;
+}
+
+
+function mSetAttr(elem,prop,val){elem.setAttribute(prop,val);}
+function mGetAttr(elem,prop){return elem.getAttribute(prop);}
 function gHighlight(poly, color = 'neon_yellow', mem = true) {
   if (mem) {
     let orig = mGetAttr(poly,'orig');

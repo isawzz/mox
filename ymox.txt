@@ -1,122 +1,21 @@
-alles ist fuer immer ok - I have left this plane. 
+alles ist fuer immer ok - I have left this plane. imdissoc
 nur machen was fe oder A sagen sonst vppmw airport
 
+___ 5:48 AM 5/29/2251 airport lib 13.6. 78000 K4
+
+___ 5:52 AM 5/28/2025 airport lib 13.6. 77000 K4
+meine antwort: eval heutistisch,
 ___ 6:19 AM 5/27/2025 airport lib 13.6. 76000 K4
-
 ___ 6:34 AM 5/26/2025 airport lib 13.6. 75000 K4
-=>mStyle besser
-=>bg,fg,... besser
-=>colors besser
-aspectRatio
-=>key handlers und svg handlers besser!
-soll ich d3 verwenden???
-Examples:
-preserveAspectRatio="xMidYMid meet" (default): centered, scaled to fit entirely
-
-preserveAspectRatio="xMinYMin slice": top-left aligned, scaled to fill, possibly cropped
-
-preserveAspectRatio="none": stretches to exactly fit the SVG element size — no aspect ratio preserved
-
-
 ___ 6:34 AM 5/25/2025 airport lib 13.6. 74000 K4
 ___ 6:12 AM 5/24/2025 airport lib 22.5. 73000 K4
-I have this function for my tessagon library, ported to javascript: 
-function generateSvgTessellation(u_num = 10, v_num = 10, shapeFunc = HexTessagon) {
-  const options = {
-    function: planeFunction,
-    u_range: [0.0, 1.0],
-    v_range: [0.0, 1.0],
-    u_num: u_num,
-    v_num: v_num,
-    u_cyclic: false,
-    v_cyclic: false,
-    adaptor_class: SvgAdaptor
-  };
-
-  const tessagon = new shapeFunc(options); console.log(tessagon)
-  const svg = tessagon.create_mesh();
-  return svg;
-}
-write a js function that returns all neighbors for a given face index
 ___ 6:29 AM 5/23/2025 airport lib 22.5. 72000 K4
 is echt ein dream come true!!!!
 translate the following 
 ___ 6:58 AM 5/21/2025 airport lib 22.5. 70000 K4
-	list = [
-		'HexTessagon',
-		'SquareTessagon',
-		'TriangleTessagon',
-		'BrickTessagon',
-		'DiamondTessagon',
-		'RhombusTessagon',
-		'ParallelogramTessagon',
-		'RectangleTessagon',
-		'IsoTriangleTessagon',
-		'RightTriangleTessagon',
-		'TrapezoidTessagon',
-		'CairoTessagon',
-		'PentagonTessagon',
-		'HexHexDualTessagon',
-		'HexTriangleDualTessagon',
-		'OctoDiamondTessagon',
-		'OctoSquareTessagon',
-		'WeaveTessagon',
-		'ZigZagTessagon',
-		'SnubSquareTessagon',
-		'SnubHexTessagon',
-		'RhombusTriangleTessagon',
-		'RhombusHexTessagon',
-		'WindmillTessagon'
-	].sort();
-
-9:44 AM 5/21/2025
-der call muss gemacht werden!!!
-9:01 AM 5/21/2025
-goto app.py
-8:29 AM 5/21/2025 
-ich moecht eine sidebar haben wo all die types sind
-7:54 AM 5/21/2025 anziehen
-7:55 AM 5/21/2025 stretch
-8:00 AM 5/21/2025 finger
-- postponed tune
-- postponed schradiek
-=>weiter pl!
-=>wie kann man gleich alle importen? vielleicht noch ein modul dazu?
-=>assert erst 3h30 no exception
-this is a dream come true!!!!!!! lauter tessagons!!!!!
-
 ___ 5:43 AM 5/20/2025 airport lib 22.5. 68000 K4
-anziehen
-stretch
-finger
-tune
-schradiek
-muell raus
-1 runde1w
-paganini
-=>pause!
-8:54 AM 5/20/2025
-=>tesselation frage nach libraries
-3 triangles sind 2xw
-
 ___ 4:21 PM 5/19/2025 airport lib 22.5. 66000 K4
 ___ 5:24 AM 5/18/2025 airport lib 22.5. 65000 K4
-given a list of 
-anziehen
-stretch
-finger
-tune
-schradiek
-muell raus
-1 runde1w
-paganini
-1 runde2c
-bach G
-1 rundeB milch
-karotten kochen
-tschaik
-tee,>f2
-F2+geo:
 =>mach alles wieder mit den grundwerten! 
 =>code lacuna
 ___ 5:46 AM 5/17/2025 airport lib 22.5. 64000 K4
@@ -141,64 +40,9 @@ ok - soll ich byType machen? ja
 ___ 10:57 AM 5/14/2025 airport lib 19.5. 61000 K4
 ___ 5:42 AM 5/13/2025 airport lib 19.5. 60000 K4
 ___ 5:31 AM 5/12/2025 airport lib 19.5. 59000 K4
-soll ich innerStyles und outerStyles machen bei mKey?
-hand_with_index_finger_and_thumb_crossed
-the things that torture me are ALL ego things: pride, greed, self-hatred, etc...
-nothing ever tortures me it is just helping me to learn letting go - stay with it in solitude is the discipline
-
 ___ 6:34 AM 5/11/2025 airport lib 19.5. 58000 K4
-=>nimm das cats_final und das superdi, ergaenze cats und schau ob es was aendert!
-was mach ich mit dieser info:
-  lifespan: 13-15 years on average
-  habitat: Domesticated; commonly found in homes, originating from North America
-  weight: 3-7 kg
-  size: 30-38 cm in length excluding tail, 25-30 cm in height at the shoulders
-  food: >-
-    Carnivorous: primarily feeds on commercially prepared cat food, small
-    mammals, and birds
-  species: Felis catus (American Bobtail breed)
-  color: >-
-    Varies widely; common colors include brown, black, white, blue, red, and
-    various patterns such as tabby, calico, and bicolor
-  reproduction: Viviparous
-  offsprings: >-
-    Females give birth to 2-6 kittens per litter after a gestation period of
-    about 64-67 days
-  class: Mammal
-from the keys.txt file list the keys that are symbols of characters
-ich brauch das erweiterte superdi
-=>programm dass die ganze nacht schoene musik spielt und schoene geschichten erzaehlt oder philosophien und beratung
 ___ 6:07 AM 5/10/2025 airport lib 19.5. 57000 K4
-gelbe sonnenbrille
-=>A aber vorher sachen rausnehmen
-4 capsules
-1. 6:09 AM 5/10/2025 pr
-I want you to output the following keys, each with a list of matching categories from the ones I listed, in yaml format:
-here is a list of categories: accessory, action, animal, building, card, clothing, emotion, event, food(include drink), game, gesture, location, math, music, nature, object, person, plant, role, sport, symbol, technology, tool, transport. for each key of the uploaded file (if the key has _ chars, convert it into a phrase), I want 1-3 matching categories that best relate to that key. then I want you to create a dictionary key:list_of_categories in yaml format and save it to a file 
-please categorize the keys again, this time understand a key that contains '_' as a phrase and do your best to assign at least one category to each key! 
-
-no! if the key contains 'abstract' it should be a 'symbol'. and an ardvaark is an animal! look up the word parts in a dictionary to identify animals. an object is NOT a living creature (animal, person). also, add another category 'art' and assign it to all keys that start with 'amanda'.
-
-
-
-cats.yaml 
-categories:
-accessory, action, animal, building, card, clothing, emotion, event, food(include drink), game, gesture, location, math, music, nature, object, person, plant, role, sport, symbol, technology, tool, transport,
-prompt fuer neues superdi:
-for each of the following words name 3 categories: smiling, baseball, horse, cheese, house, policeman
-eliminate colls und cats
-each object should have: friendly,
-img photo emo fa fa6 ga uni 
-
 ___ 6:03 AM 5/9/2025 airport lib 19.5. 56000 K4
-5 capsules => 10 units:
-1. 6:05 AM 5/9/2025 pr
-2. 6:32 AM 5/9/2025 pr
-3. 7:04 AM 5/9/2025 pr
-4. 7:25 AM 5/9/2025 pr
-5. 8:06 AM 5/9/2025 pr
-6. 8:25 AM 5/9/2025 hybrid:start v
-=>fix mKey!!! SUPER gemacht hat das der copilot!
 ___ 5:17 AM 5/8/2025 airport lib 19.5. 55000 K4
 3capsules
 1. 5:19 AM 5/8/2025 pr
@@ -303,102 +147,7 @@ ___ 5:18 AM 5/5/2025 airport lib 19.5. 51000 K2
 5 capsules: soup,semmel,kaese,obst,muesli =>28/7=4
 29-32 walk nochmal das ganze!
 33: 2:41 PM 5/5/2025 pr
-
-- brauch den path fuer club!
-
-=> walk++ und wenn zurueckkomme: essen aber nur soup, 1 brot, cola, muesli, rest coffee, 1 coffee praline, 1 banane (=7 capsules)
-aufteilen auf rest des tages! karotten limitless!
-- anziehen,math+comp mit,wasserdicht! bis akh und retour
-=> sollte 20 schaffen vor essen!
-bis jetzt habe nur 2 capsules: coffee,striezel
-ich darf nicht unter 
-ich brauche min 10h=60 units per day
-dafuer kann haben 12 capsules
-also NIE unter 5/capsule gehen!
-bis jetzt habe 14u/2c = 7D
-
-
-make a div w/ positioning and sizing of symbols like in svg
-ok - get the svg of 'TC' 
-=> TC in testing (rsg/mox)
-ok - copy past into chat
-ok - prompt: can you replace this svg by a div using the text '10' instead of the symbol 'VTC' and the character for 'Club suit' instead of the symbol 'SCT'. replicate the absolute positioning and sizing of the symbols on the card. the div should look almost the same as the card
-=>card.html in testing (rsg/mox)
-ok - what is more efficient in a web app: using svg for cards or divs?
-for dynamic creation, divs are more efficient
-- 
-
-choices: v,pr,pi,w,m oder rolladie
-capsule boiledegg,handful nuts,bread+cheese,
-eis,cup muesli,cup oatmeal, 1 striezel, 1toast, 1 cake,
-cup soup, cup carrots, cup tomatoes, cup anything
-=>use magic cup!
-=>mag,tee,soda
-slow steps!
-<svg>
-  <symbol id="imgSymbol_card1">...</symbol>
-  <use href="#imgSymbol_card1" ... />
-</svg>
-
-<svg>
-  <symbol id="imgSymbol_card2">...</symbol>
-  <use href="#imgSymbol_card2" ... />
-</svg>
-
-<svg style="display:none">
-  <symbol id="imgSymbol" viewBox="0 0 100 100">
-    <image href="img.png" width="100" height="100" />
-  </symbol>
-</svg>
-
-<svg width="120" height="120">
-  <use href="#imgSymbol" x="10" y="10" width="100" height="100" />
-</svg>
-
-<svg width="60" height="60">
-  <use href="#imgSymbol" x="0" y="0" width="60" height="60" />
-</svg>
-
-- schau was rauskommt wenn man ein symbol als image macht
-<svg style="display: none;">
-  <symbol id="myImageSymbol" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
-    <image href="your-image.png" x="0" y="0" width="100" height="100" />
-  </symbol>
-</svg>
-
-<svg width="200" height="200">
-  <use href="#myImageSymbol" x="50" y="50" width="100" height="100" />
-</svg>
-ok - schau wie bei einer echten card das symbol gemacht wird
-1. hol mir 1 symbol
-___ 5:09 AM 5/3/2025 airport lib 9.5. 50000 K1
-isEmo and hasImage
-suit: SH2 fuer suit haben fill aber nicht stroke
-
-value: VH2
-V fuer value haben stroke und fill none
-2.letter is suit beeinflusst aber nur die farbe!
-3. letter ist val (2..9,T,J,Q,K,A)
-
-HK1-6
-SK1-6
-CQ1-6
-... sind die teile von figuren
-1.letter:suit,2.letter:val (JQK), 3.letter zahl
-
-J an erster stelle: joker J1n, J2n
-
-card back hat kein symbol!
-
-	"2D": "<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='card' face='2D' height='100%' preserveAspectRatio='none' viewBox='-120 -168 240 336' width='100%'><symbol id='SD2' viewBox='-600 -600 1200 1200' preserveAspectRatio='xMinYMid'><path d='M-400 0C-350 0 0 -450 0 -500C0 -450 350 0 400 0C350 0 0 450 0 500C0 450 -350 0 -400 0Z' fill='red'></path></symbol><symbol id='VD2' viewBox='-500 -500 1000 1000' preserveAspectRatio='xMinYMid'><path d='M-225 -225C-245 -265 -200 -460 0 -460C 200 -460 225 -325 225 -225C225 -25 -225 160 -225 460L225 460L225 300' stroke='red' stroke-width='80' stroke-linecap='square' stroke-miterlimit='1.5' fill='none'></path></symbol><rect width='239' height='335' x='-119.5' y='-167.5' rx='12' ry='12' fill='white' stroke='black'></rect><use xlink:href='#VD2' height='32' x='-114.4' y='-156'></use><use xlink:href='#SD2' height='26.769' x='-111.784' y='-119'></use><use xlink:href='#SD2' height='70' x='-35' y='-135.501'></use><g transform='rotate(180)'><use xlink:href='#VD2' height='32' x='-114.4' y='-156'></use><use xlink:href='#SD2' height='26.769' x='-111.784' y='-119'></use><use xlink:href='#SD2' height='70' x='-35' y='-135.501'></use></g></svg>",
-
 ___ 5:09 AM 5/3/2025 airport lib 9.5. 50000 K4
-ok - repair flask
-ok - cleanup code
-ok - hol den code!
-ok - client => start + ai
-ok - DEBUG!!!!!
-ok - chat geht noch nicht!
 ___ 5:02 AM 5/2/2025 airport lib 2.5. 49000 K4
 8:04 AM 5/2/2025
 was will ich als naechstes machen?
@@ -436,6 +185,7 @@ humpack
 ludwig?
 rsgLastJoined
 rsgtest
+
 source /home3/moxitoon/virtualenv/at0/3.11/bin/activate && cd /home3/moxitoon/at0
 
 ___ 5:57 AM 4/29/2025 airport lib 4.5. 46000 K4

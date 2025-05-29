@@ -1,7 +1,61 @@
 onload = start; VERBOSE = false; TESTING = true;
 
-function start() { test1_connect(); }
+function start() { test1_genT(); }
 
+async function test1_genT(){
+	genTTT4(); //genT,genTT,genTTT
+}
+async function test1_genttt() {
+	const players = ['X', 'O', 'A'];
+	const winLength = 4;
+	const board = initializeBoard(6, 7);
+
+	console.log(getLegalMoves(board));
+	console.log(isTerminal(board, players, winLength));
+	console.log(evaluate(board, players, winLength));
+
+}
+async function test1_maxN0() {
+	const board = [
+		[null, null, null],
+		[null, null, null],
+		[null, null, null]
+	];
+
+	const players = ['A', 'B', 'C'];
+	const result = maxN(
+		board,
+		3, // depth
+		players,
+		0, // starting with player 'A'
+		evaluate,
+		getLegalMoves,
+		applyMove,
+		isTerminal
+	);
+
+	console.log("Best move for player A:", result.move);
+
+}
+async function test1_minimax1() {
+	setupGame();
+}
+
+//************************** DEPRECATED ******************************* */
+async function test1_minimax0() {
+	const board = [
+		[null, null, null],
+		[null, null, null],
+		[null, null, null],
+		// ['X', null, null],
+		// ['O', 'X', null],
+		// ['O', null, null]
+	];
+
+	const move = getBestMove(board);
+	console.log("AI should play at:", move);
+	// Output: { row: 2, col: 2 } or similar optimal move
+}
 async function test1_connect() {
 	await initTest();
 	quickUi('dMain');
