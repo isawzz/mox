@@ -1,9 +1,15 @@
 onload = start; VERBOSE = false; TESTING = true;
 
-function start() { test1_genT(); }
+function start() { test1_neu(); }
 
-async function test1_genT(){
-	genTTTT();
+async function test1_neu() {
+	await initTest1();
+	// await clickOn('games');
+	// if (TESTING) await clickOn(rChoose(['gul', 'felix', 'amanda', 'lauren', 'mimi']));
+
+}
+async function test1_genT() {
+	genTTT();
 	//genTTT4(); //genT,genTT,genTTT
 }
 async function test1_genttt() {

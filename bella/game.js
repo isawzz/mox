@@ -1,21 +1,23 @@
 
 
-function genT() {
-	// Generalized Multi-player Tic Tac Toe (n x m board, k in a row to win)
+function genTTT() {
 
-	const players = ['X', 'O', 'A']; // Up to 8 players
-	const winLength = 4;
-	const rows = 6;
-	const cols = 7;
+	const settings = {
+		rows: 6,
+		cols: 6,
+		winLength: 4,
+		players: [
+			{ symbol: 'X', isAI: true, level: 'hard', color: 'red' },
+			{ symbol: 'O', isAI: false, level: 'easy', color: 'blue' },
+			{ symbol: 'A', isAI: true, level: 'easy', color: 'gold' },
+		]
+	};
+
+	let board = initializeBoard(settings.rows, settings.cols);
 	let currentPlayerIdx = 0;
-	let board = initializeBoard(rows, cols);
 
 	function initializeBoard(rows, cols) {
 		return Array.from({ length: rows }, () => Array(cols).fill(null));
-	}
-
-	function printBoard(board) {
-		console.log(board.map(row => row.map(cell => cell || '.').join(' ')).join('\n'));
 	}
 
 	function getLegalMoves(board) {
@@ -30,20 +32,20 @@ function genT() {
 		return moves;
 	}
 
-	function applyMove(board, move, player) {
+	function applyMove(board, move, playerSymbol) {
 		const newBoard = board.map(row => row.slice());
-		newBoard[move.row][move.col] = player;
+		newBoard[move.row][move.col] = playerSymbol;
 		return newBoard;
 	}
 
-	function isTerminal(board, players, winLength) {
-		return players.some(p => hasWon(board, p, winLength)) || getLegalMoves(board).length === 0;
+	function isTerminal(board) {
+		return settings.players.some(p => hasWon(board, p.symbol, settings.winLength)) || getLegalMoves(board).length === 0;
 	}
 
-	function evaluate(board, players, winLength) {
-		return players.map(p => {
-			if (hasWon(board, p, winLength)) return 1000;
-			return countPartialLines(board, p, winLength - 1);
+	function evaluate(board) {
+		return settings.players.map(p => {
+			if (hasWon(board, p.symbol, settings.winLength)) return 1000;
+			return countPartialLines(board, p.symbol, settings.winLength - 1);
 		});
 	}
 
@@ -117,26 +119,99 @@ function genT() {
 		return count;
 	}
 
-	// Example play loop for console:
-	function playGame() {
-		while (!isTerminal(board, players, winLength)) {
-			printBoard(board);
-			const player = players[currentPlayerIdx];
-			const moves = getLegalMoves(board);
-			const move = moves[Math.floor(Math.random() * moves.length)]; // replace with AI later
-			board = applyMove(board, move, player);
-			if (hasWon(board, player, winLength)) {
-				printBoard(board);
-				console.log(`Player ${player} wins!`);
-				return;
-			}
-			currentPlayerIdx = (currentPlayerIdx + 1) % players.length;
+	function minimax(board, depth, maximizingPlayerIdx) {
+		if (depth === 0 || isTerminal(board)) {
+			const evals = evaluate(board);
+			return { score: evals[maximizingPlayerIdx], move: null };
 		}
-		printBoard(board);
-		console.log("It's a draw!");
+		const legalMoves = getLegalMoves(board);
+		let bestMove = null;
+		let bestScore = -Infinity;
+		for (let move of legalMoves) {
+			const newBoard = applyMove(board, move, settings.players[maximizingPlayerIdx].symbol);
+			const nextIdx = (maximizingPlayerIdx + 1) % settings.players.length;
+			const result = minimax(newBoard, depth - 1, nextIdx);
+			const score = -result.score; // Simplified Max^n turn structure
+			if (score > bestScore) {
+				bestScore = score;
+				bestMove = move;
+			}
+		}
+		return { score: bestScore, move: bestMove };
 	}
 
-	playGame();
+	function makeAIMove() {
+		const currentPlayer = settings.players[currentPlayerIdx];
+		const { move } = minimax(board, 2, currentPlayerIdx); // Adjustable depth
+		if (move) {
+			board = applyMove(board, move, currentPlayer.symbol);
+			currentPlayerIdx = (currentPlayerIdx + 1) % settings.players.length;
+			renderBoard();
+			checkGameEnd();
+			requestNextTurn();
+		}
+	}
+
+	function requestNextTurn() {
+		if (settings.players[currentPlayerIdx].isAI) {
+			setTimeout(makeAIMove, 300);
+		}
+	}
+
+	function renderBoard() {
+		const boardDiv = document.getElementById("board");
+		boardDiv.innerHTML = '';
+		board.forEach((row, r) => {
+			const rowDiv = document.createElement("div");
+			rowDiv.className = "row";
+			row.forEach((cell, c) => {
+				const cellDiv = document.createElement("div");
+				cellDiv.className = "cell";
+				cellDiv.textContent = cell || '';
+				if (cell === null && !settings.players[currentPlayerIdx].isAI) {
+					cellDiv.addEventListener("click", () => {
+						board = applyMove(board, { row: r, col: c }, settings.players[currentPlayerIdx].symbol);
+						currentPlayerIdx = (currentPlayerIdx + 1) % settings.players.length;
+						renderBoard();
+						checkGameEnd();
+						requestNextTurn();
+					});
+				}
+				rowDiv.appendChild(cellDiv);
+			});
+			boardDiv.appendChild(rowDiv);
+		});
+	}
+
+	function checkGameEnd() {
+		const prevPlayer = settings.players[(currentPlayerIdx - 1 + settings.players.length) % settings.players.length];
+		if (hasWon(board, prevPlayer.symbol, settings.winLength)) {
+			alert(`Player ${prevPlayer.symbol} wins!`);
+		} else if (getLegalMoves(board).length === 0) {
+			alert("It's a draw!");
+		}
+	}
+
+	document.body.innerHTML = `
+			<style>
+				.row { display: flex; }
+				.cell {
+					width: 40px;
+					height: 40px;
+					border: 1px solid #999;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					font-size: 20px;
+					cursor: pointer;
+				}
+			</style>
+			<div id="board"></div>
+		`;
+
+	renderBoard();
+	requestNextTurn();
+
 }
 
 
