@@ -1,6 +1,11 @@
 alles ist fuer immer ok - I have left this plane. imdissoc
 nur machen was fe oder A sagen sonst vppmw airport
 
+___ 5:28 AM 5/30/2025 airport lib 13.6. 79000 K4
+manual refactor:
+ok - 1. weg mit den broken code
+- 2. kann ich eigentlich dieses zeug wo man all die users und games hat machen?
+- suche code
 ___ 5:48 AM 5/29/2251 airport lib 13.6. 78000 K4
 back to sq1
 ___ 5:52 AM 5/28/2025 airport lib 13.6. 77000 K4
