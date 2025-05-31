@@ -5220,13 +5220,13 @@ function mSleep(ms = 1000) {
 			if (ms > 10000) { ms = 10000; }
 			if (isdef(TO.SLEEPTIMEOUT)) clearTimeout(TO.SLEEPTIMEOUT);
 			TO.SLEEPTIMEOUT = setTimeout(res, ms);
-			setTimeout(() => {
-				try {
-					rej(`PROMISE REJECT ${isdef(TO.SLEEPTIMEOUT)}`);
-				} catch (err) {
-					console.log(`WTF!!!!!!!!!!!!!!!!!!`, err);
-				}
-			}, ms + 1);
+			// setTimeout(() => {
+			// 	try {
+			// 		rej(`PROMISE REJECT ${isdef(TO.SLEEPTIMEOUT)}`);
+			// 	} catch (err) {
+			// 		console.log(`WTF!!!!!!!!!!!!!!!!!!`, err);
+			// 	}
+			// }, ms + 1);
 		});
 }
 function mStyle(elem, styles = {}, opts = {}) {

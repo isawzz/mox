@@ -1,19 +1,4 @@
 
-function mStyles(styles) {
-	let res = {};
-	for (const k in styles) {
-		let key = k, val = styles[k];
-		if (k in STYLES) {
-			let dival = STYLES[k];
-			if (typeof dival == 'function') val = dival(val)
-			else if (isList(dival)) [key, val] = dival;
-			else val = dival;
-		}
-		res[key]=val;
-	}
-	return res;
-}
-
 function quickUi(dParent) {
   dParent = toElem(dParent);
   let html = `
@@ -53,6 +38,18 @@ function quickUi(dParent) {
     </div>
     `;
   dParent.innerHTML = html;
+}
+
+
+function findAncestorWith(elem, { attribute = null, className = null, id = null }) {
+	elem = toElem(elem);
+	while (elem) {
+		if ((attribute && elem.hasAttribute && elem.hasAttribute(attribute))
+			|| (className && elem.classList && elem.classList.contains(className))
+			|| (id && isdef(elem.id))) { return elem; }
+		elem = elem.parentNode;
+	}
+	return null;
 }
 
 function getPolyNeighbors(poly){

@@ -296,7 +296,8 @@ fieldset .disabled {
 }
 
 .content_area {
-  width: 100%;
+  width: 100vw;
+  background:green;
   overflow-y: hidden;
   box-sizing: border-box;
   padding: 0;
