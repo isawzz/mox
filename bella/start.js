@@ -1,14 +1,38 @@
 onload = start; VERBOSE = false; TESTING = true;
 
-function start() { test1_stylesPerformance0(); }
+function start() { test1_styles1(); }
 
+async function test1_styles1() {
+	let [dTop,dMain] = mLayoutTM('dPage');
+	mStyle('dPage',{bg:'red',overflow:'hidden'});mFlex(dMain);
+	mStyle(dMain,{overy:'auto'})
+	//mStyle(dTop,{position:'sticky'});
+	//mStyle('dPage',{bg:'red',overy:'hidden'});
+	let dg=mDom(dMain,{bg:'green',w100:true,justifyContent:'center',display:'grid',autoCols:100,autoRows:100,gap:10,overy:'auto',padding:10, box:true});
+	for(const i of range(100)){
+		let d = mDom(dg, {bg:rColor(), w:100, h:100});
+		d.innerHTML = i;
+	}
+
+	mDom(dTop,{fg:'white',margin:10,align:'center'},{tag:'h1',html:'BEAUTIFUL WORLD'})
+
+	// mStyle('dAll',{margin:0,padding:0,w100:true,h100:true,bg:'blue'})
+	// await loadColors(); let bg = rChoose(M.colorNames); let fg = colorIdealText(bg);
+	// stickyHeaderCode();
+	// let elemsTop = mLayoutLMR('dSticky');
+	// elemsTop.map(x=>x.innerHTML=x.id)
+	//let elems = mLayoutM('dPage');
+	//let d=mBy('dPage');
+	//mStyle(d,{bg,fg});
+
+}
 async function test1_stylesPerformance0() {
 	await loadColors();
-	let n = 5000, d, ms = 1000, sz = 3;
+	let n = 1000, d, ms = 50, sz = 3;
 
 	console.log('direct setting:')
 	let t = getNow();
-	document.innerHTML = `<div style="height:100vh;background:blue;" id='dPage'>`; d = mBy('dPage'); mStyle(d, { display: 'grid', autoCols: 10, autoRows: 10 });
+	document.innerHTML = `<div style="height:100vh;background:blue;" id='dPage'>`; d = mBy('dPage'); mStyle(d, { display: 'grid', autoCols: sz, autoRows: sz });
 	for (const i of range(n)) {
 		let d1 = document.createElement('div');
 		d1.style.backgroundColor = rColor();
@@ -22,7 +46,7 @@ async function test1_stylesPerformance0() {
 
 	console.log('X individual setting:')
 	t = getNow();
-	document.innerHTML = `<div style="height:100vh;background:blue;" id='dPage'>`; d = mBy('dPage'); mStyle(d, { display: 'grid', autoCols: 10, autoRows: 10 });
+	document.innerHTML = `<div style="height:100vh;background:blue;" id='dPage'>`; d = mBy('dPage'); mStyle(d, { display: 'grid', autoCols: sz, autoRows: sz });
 	for (const i of range(n)) {
 		let d1 = document.createElement('div');
 		mStyleX(d1, { bg: rColor(), w: sz, h: sz });
@@ -34,7 +58,7 @@ async function test1_stylesPerformance0() {
 
 	console.log('X shared setting:')
 	t = getNow();
-	document.innerHTML = `<div style="height:100vh;background:blue;" id='dPage'>`; d = mBy('dPage'); mStyle(d, { display: 'grid', autoCols: 10, autoRows: 10 });
+	document.innerHTML = `<div style="height:100vh;background:blue;" id='dPage'>`; d = mBy('dPage'); mStyle(d, { display: 'grid', autoCols: sz, autoRows: sz });
 	let shared = mStylesX({ w: sz, h: sz });
 	for (const i of range(n)) {
 		let d1 = document.createElement('div');
@@ -48,7 +72,7 @@ async function test1_stylesPerformance0() {
 
 	console.log('orig indiv setting:')
 	t = getNow();
-	document.innerHTML = `<div style="height:100vh;background:blue;" id='dPage'>`; d = mBy('dPage'); mStyle(d, { display: 'grid', autoCols: 10, autoRows: 10 });
+	document.innerHTML = `<div style="height:100vh;background:blue;" id='dPage'>`; d = mBy('dPage'); mStyle(d, { display: 'grid', autoCols: sz, autoRows: sz });
 	for (const i of range(n)) {
 		let d1 = document.createElement('div');
 		mStyle(d1, { bg: rColor(), w: sz, h: sz });
@@ -60,7 +84,7 @@ async function test1_stylesPerformance0() {
 
 	console.log('orig shared setting:')
 	t = getNow();
-	document.innerHTML = `<div style="height:100vh;background:blue;" id='dPage'>`; d = mBy('dPage'); mStyle(d, { display: 'grid', autoCols: 10, autoRows: 10 });
+	document.innerHTML = `<div style="height:100vh;background:blue;" id='dPage'>`; d = mBy('dPage'); mStyle(d, { display: 'grid', autoCols: sz, autoRows: sz });
 	shared = mStyles({ w: sz, h: sz });
 	for (const i of range(n)) {
 		let d1 = document.createElement('div');
@@ -72,18 +96,27 @@ async function test1_stylesPerformance0() {
 	await mSleep(ms);
 	console.log("::", t1 - t);
 
-
-
+	console.log('OLD indiv setting:')
+	t = getNow();
+	document.innerHTML = `<div style="height:100vh;background:blue;" id='dPage'>`; d = mBy('dPage'); mStyle(d, { display: 'grid', autoCols: sz, autoRows: sz });
+	for (const i of range(n)) {
+		let d1 = document.createElement('div');
+		mStyle_old(d1, { bg: rColor(), w: sz, h: sz });
+		d.appendChild(d1);
+	}
+	t1 = getNow();
+	await mSleep(ms);
+	console.log("::", t1 - t);
 
 }
 async function test1_styles0() {
 	//stickyHeaderCode();
 	// let els = mLayoutM('dPage'); els.map(x => console.log(x));
 	await loadColors();//console.log(M.colorNames);
-	let n = 5000, d, ms = 1000;
+	let n = 5000, d, ms = 1000, sz=5;
 
 	let t = getNow();
-	document.innerHTML = `<div style="height:100vh;background:blue;" id='dPage'>`; d = mBy('dPage'); mStyle(d, { display: 'grid', autoCols: 10, autoRows: 10 });
+	document.innerHTML = `<div style="height:100vh;background:blue;" id='dPage'>`; d = mBy('dPage'); mStyle(d, { display: 'grid', autoCols: sz, autoRows: sz });
 	for (const i of range(n)) {
 		let d1 = document.createElement('div');
 		d1.style.backgroundColor = rColor();

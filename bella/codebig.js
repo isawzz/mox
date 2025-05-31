@@ -4702,7 +4702,7 @@ function mLayout(dParent, rowlist, colt, rowt, styles = {}, opts = {}) {
 	rowt = rowt.replaceAll('@', valf(opts.hrow, 30));
 	colt = colt.replaceAll('@', valf(opts.wcol, 30));
 	let areas = `'${rowlist.join("' '")}'`;
-	if (dParent.id == 'dPage') M.divNames = [];
+	if (nundef(M.divNames)) M.divNames = [];
 	let newNames = mAreas(dParent, areas, colt, rowt);
 	let names = M.divNames = Array.from(new Set(M.divNames.concat(newNames)));
 	if (nundef(styles.bgSrc)) mShade(newNames, 2, 1);
@@ -5229,7 +5229,7 @@ function mSleep(ms = 1000) {
 			// }, ms + 1);
 		});
 }
-function mStyle(elem, styles = {}, opts = {}) {
+function mStyle_old(elem, styles = {}, opts = {}) {
 	elem = toElem(elem);
 	styles = jsCopy(styles);
 	let noUnit = ['opacity', 'flex', 'grow', 'shrink', 'grid', 'z', 'iteration', 'count', 'orphans', 'widows', 'weight', 'order', 'index'];
