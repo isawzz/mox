@@ -8,7 +8,7 @@ function mStyles(styles) {
 			let dival = STYLES[k];
 			//console.log('dival', dival);
 			if (typeof dival == 'function') {
-				val = dival(val);
+				val = dival(val,styles.bg);
 				if (isList(val)) [key, val] = val;
 			}
 			else if (isList(dival)) {
@@ -17,8 +17,9 @@ function mStyles(styles) {
 			} else if (isString(dival)) key = dival;
 			else val = dival;
 		}
-		let noUnit = ['opacity', 'flex', 'grow', 'shrink', 'grid', 'z', 'iteration', 'count', 'orphans', 'widows', 'weight', 'order', 'index'];
-		let val1 = isNumber(val) && !noUnit.some(x => key.includes(x)) || key == 'fz' ? '' + Number(val) + 'px' : val;
+		// let noUnit = ['opacity', 'flex', 'grow', 'shrink', 'grid', 'z', 'iteration', 'count', 'orphans', 'widows', 'weight', 'order', 'index'];
+		let noUnit = ['opa', 'flex', 'grow', 'shrink', 'grid', 'z', 'iter', 'count', 'orph', 'widow', 'weight', 'order', 'index'];
+		let val1 = isNumber(val) && !noUnit.some(x => key.startsWith(x)) || key == 'fz' ? '' + Number(val) + 'px' : val;
 
 		res[key] = val1;
 	}
@@ -26,7 +27,7 @@ function mStyles(styles) {
 }
 function mStyle(elem, styles = {}, opts = {}) {
 	elem = toElem(elem);
-	let styles1 = mStyles(styles);
+	let styles1 = mStyles(styles); console.log(styles1)
 	for (const key in styles1) {
 		elem.style.setProperty(key, styles1[key]);
 	}

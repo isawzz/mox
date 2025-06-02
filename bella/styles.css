@@ -72,6 +72,11 @@ fieldset .disabled {
   align-items: stretch;
 }
 
+.cc{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .centerCentered {
   position: absolute;
   top: 50%;

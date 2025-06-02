@@ -165,6 +165,7 @@ const STYLES = {
   dir: 'flex-direction',
   editable: 'contenteditable',
   family: 'font-family',
+  fg: (v,bg) => ['color', v=='contrast'?colorIdealText(bg):colorFrom(v)],
   fit: 'object-fit',
   fontSize: 'font-size',
   fontStyle: 'font-style',

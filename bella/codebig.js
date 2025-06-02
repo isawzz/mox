@@ -4433,6 +4433,7 @@ function mDom(dParent, styles = {}, opts = {}) {
 	let tag = valf(opts.tag, 'div');
 	let d = document.createElement(tag);
 	if (tag == 'textarea') styles.wrap = 'hard';
+	console.log(styles)
 	mStyle(d, styles);
 	applyOpts(d, opts);
 	if (isdef(dParent)) mAppend(dParent, d);
@@ -4682,11 +4683,12 @@ function mKey(imgKey, d, styles = {}, opts = {}) {
 		let astyle = { w, h, fit: o && o.cats.includes('card') ? 'contain' : 'cover', 'object-position': 'center center' };
 		mDom(d0, astyle, { ...opts, tag: 'img', src: o[type], alt: imgKey });
 	} else if (type == 'plain') {
-		let x = mDom(d0, {}, { ...opts, html: o[type] });
+		let [family,fz]=[valf(styles.family,'opensans'),valf(styles.fz,12)]; console.log('fz',fz)
+		let x = mDom(d0, {family,fz}, { ...opts, html: o[type] }); console.log(x)
 	} else {
 		let family = Families[type] || 'inherit';
 		let text = ['fa6', 'fa', 'ga'].includes(type) ? `&#x${o[type]};` : o[type];
-		let fz = type == 'plain' ? 18 : h * .8; // h*.9;
+		let fz = styles.fz; //type == 'plain' ? 18 : h * .8; // h*.9;
 		let astyles = {
 			fz,
 			family,

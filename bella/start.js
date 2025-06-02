@@ -3,24 +3,28 @@ onload = start; VERBOSE = false; TESTING = true;
 function start() { test1_styles1(); }
 
 async function test1_styles1() {
-	let [dTop,dMain] = mLayoutTM('dPage');
-	mStyle('dPage',{bg:'red',overflow:'hidden'});mFlex(dMain);
-	mStyle(dMain,{overy:'auto'})
+	//let bg = 'black';	let fg = colorIdealText(bg); console.log(fg); return;
+	let [dTop, dMain] = mLayoutTM('dPage');
+	await loadAssetsStatic(); //loadColors(); //console.log(M.colorNames)
+	mStyle('dPage', { bg: 'acajou', overflow: 'hidden' }); mFlex(dMain);
+	mStyle(dMain, { overy: 'auto' })
 	//mStyle(dTop,{position:'sticky'});
 	//mStyle('dPage',{bg:'red',overy:'hidden'});
-	let dg=mDom(dMain,{bg:'green',w100:true,justifyContent:'center',display:'grid',autoCols:100,autoRows:100,gap:10,overy:'auto',padding:10, box:true});
-	for(const i of range(100)){
-		let d = mDom(dg, {bg:rColor(), w:100, h:100});
-		d.innerHTML = i;
+	let dg = mDom(dMain, { w100: true, justifyContent: 'center', display: 'grid', autoCols: 100, autoRows: 100, gap: 10, overy: 'auto', padding: 10, box: true });
+	for (const i of range(100)) {
+		let bg = rChoose(Object.values(dicolor.orange)); //console.log(bg, colorFrom(bg))
+		let fg = colorIdealText(bg); //console.log(fg)
+		let d = mDom(dg, { bg, fg, w: 100, h: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', clip: PolyClips.octagon }); //,{html:i});
+		mKey(rChoose(M.byType.fa), d, { fz: 10, family: 'algerian' }, { prefer: 'plain' })
 	}
 
-	mDom(dTop,{fg:'white',margin:10,align:'center'},{tag:'h1',html:'BEAUTIFUL WORLD'})
+	mDom(dTop, { fg: 'white', margin: 10, align: 'center' }, { tag: 'h1', html: 'BEAUTIFUL WORLD' })
 
 	// mStyle('dAll',{margin:0,padding:0,w100:true,h100:true,bg:'blue'})
 	// await loadColors(); let bg = rChoose(M.colorNames); let fg = colorIdealText(bg);
 	// stickyHeaderCode();
 	// let elemsTop = mLayoutLMR('dSticky');
-	// elemsTop.map(x=>x.innerHTML=x.id)
+	// elemsTop.map(x=>x.innerHTML=x.id);
 	//let elems = mLayoutM('dPage');
 	//let d=mBy('dPage');
 	//mStyle(d,{bg,fg});
@@ -113,7 +117,7 @@ async function test1_styles0() {
 	//stickyHeaderCode();
 	// let els = mLayoutM('dPage'); els.map(x => console.log(x));
 	await loadColors();//console.log(M.colorNames);
-	let n = 5000, d, ms = 1000, sz=5;
+	let n = 5000, d, ms = 1000, sz = 5;
 
 	let t = getNow();
 	document.innerHTML = `<div style="height:100vh;background:blue;" id='dPage'>`; d = mBy('dPage'); mStyle(d, { display: 'grid', autoCols: sz, autoRows: sz });
