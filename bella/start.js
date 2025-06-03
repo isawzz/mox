@@ -4,7 +4,9 @@ function start() { test1_styles2(); }
 
 async function test1_styles2() {
 
-	getTessSvgFacesVerts(HexBigTriTessagon)
+	let res=getTessSvgFacesVerts(HexBigTriTessagon,3,3);console.log(res);
+	let d=mSvg('dPage',{w:500,h:400,fill:'sangria'},{html:res.svg});
+	return;
 
 	API_BASE = getBackendUrl();
 

@@ -1,9 +1,32 @@
 
-function getTessSvgFacesVerts(func, options) {
+function mSvg(dParent, styles={}, opts={}) {
+	const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+	svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+	svg.setAttribute("viewBox", `0 0 ${styles.w} ${styles.h}`);
+	svg.setAttribute("width", `${styles.w}px`);
+	svg.setAttribute("height", `${styles.h}px`);
+	svg.setAttribute("preserveAspectRatio", "none");
+	applyOpts(svg, opts);
+	dParent.appendChild(svg);
+	return svg;
+	
+}
+function getTessSvgFacesVerts(TessClass, cols=3, rows=3, options={}) {
+		addKeys({
+		function: planeFunction,
+		u_range: [0.0, 1.0],
+		v_range: [0.0, 1.0],
+		u_num: cols,
+		v_num: rows,
+		u_cyclic: false,
+		v_cyclic: false,
+		adaptor_class: SvgAdaptor
+	}, options);
+
 	const tessagon = new TessClass(options);
 	const svgElem = tessagon.create_mesh();
-	const faces = tessagon.face_list;
-	const verts = tessagon.vert_list;
+	const faces = tessagon.mesh_adaptor.face_list;
+	const verts = tessagon.mesh_adaptor.vert_list;
 	return { tessagon, faces, verts, svgElem };
 }
 
