@@ -8,7 +8,7 @@ var U = {};
 var ColorThiefObject;
 var WhichCorner = 0;
 const CORNERS0 = ['♠', '♡']; //, '♣', '♢'];
-const CORNERS = ['◢', '◣', '◤', '◥'];
+const CORNERS_BGA = ['◢', '◣', '◤', '◥'];
 const CORNERS2 = ['⬔', '⬕'];
 const CORNERS3 = ['⮜', '⮝', '⮞', '⮟'];
 const CORNERS4 = ['⭐', '⭑']; //, '⭒', '⭓'];
@@ -242,6 +242,7 @@ const STYLES = {
   yover: 'overflow-y',
   z: 'z-index',
 };
+const NO_UNIT_STYLES = ['opa', 'flex', 'grow', 'shrink', 'grid', 'z', 'iter', 'count', 'orph', 'widow', 'weight', 'order', 'index'];
 const ST_EXT = {
   align: 'text-align',
   alignContent: 'align-content',

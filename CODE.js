@@ -1,4 +1,43 @@
 
+
+async function initTest1(){
+	API_BASE = getBackendUrl(); 
+	DA.items = {};
+	DA.selectedImages = [];
+	await loadAssetsStatic();
+	stickyHeaderCode();
+	let elems = mLayoutLM('dPage');
+	mStyle('dMain', { overy: 'auto' });
+	let dLeft = mBy('dLeft');
+	mStyle(dLeft, { overy: 'auto' });
+
+	document.addEventListener("visibilitychange", handleVisibilityChange);
+	DA.pollInterval = 3000;
+	DA.pollCounter = 0;
+	DA.backendURL = getServer(true) + 'simple0/php'; //'https://moxito.online/mox/simple0/php';
+	DA.gamelist = ['setgame', 'button96']; //'accuse aristo bluff ferro fishgame fritz huti lacuna nations setgame sheriff spotit wise'; if (DA.TEST0) gamelist += ' a_game'; gamelist = toWords(gamelist);
+	DA.funcs = { setgame: setgame(), button96: button96() }; //implemented games!
+	for (const gname in DA.gamelist) {
+		if (isdef(DA.funcs[gname])) continue;
+		DA.funcs[gname] = defaultGameFunc();
+	}
+	DA.evList = [];
+
+	M.tables = await MPollTables();
+	// let elems = mLayoutTM('dPage'); mStyle('dMain', { overy: 'auto', fg: 'inherit' }); mCenterFlex('dMain');
+	mLayoutTopTestExtraMessageTitle('dTop');
+	let username = localStorage.getItem('username') ?? 'hans';
+	if (TESTING) {
+		let names = ['amanda', 'felix', 'lauren', 'mimi', 'gul'];
+		let d = mBy('dTestRight'); mClass(d, 'button_container'); //mFlex(d);
+		for (const name of names) { let b = mDom(d, {}, { tag: 'button', html: name, onclick: async (ev) => await switchToUser(name) }); }
+		username = rChoose(names);
+	}
+	await showMenuButtons();
+	if (TESTING) await showTestButtons();
+
+}
+
 //#region minimax ALL
 
 function maxNttt() {
@@ -270,6 +309,61 @@ function setupGame() {
 
 //#endregion
 
+//#region mStylesX mit Cache
+// === Cached style key processing ===
+const _mStyleCache = new Map();
+const NO_UNIT_KEYS = ['opacity', 'flex', 'grow', 'shrink', 'grid', 'z', 'iteration', 'count', 'orphans', 'widows', 'weight', 'order', 'index'];
+
+function mStylesX(styles) {
+	let res = {};
+	for (const k in styles) {
+		let origKey = k, val = styles[k];
+
+		// === Lookup + cache transformed key/value handling ===
+		let cacheEntry = _mStyleCache.get(k);
+		if (!cacheEntry) {
+			let newKey = k, converter = null;
+			if (k in STYLES) {
+				const mapped = STYLES[k];
+				if (typeof mapped == 'function') {
+					converter = mapped;
+				} else if (Array.isArray(mapped)) {
+					[newKey, val] = mapped; // fixed output
+					_mStyleCache.set(k, [newKey, null, true]);
+					res[newKey] = val;
+					continue;
+				} else if (typeof mapped == 'string') {
+					newKey = mapped;
+				} else {
+					val = mapped;
+				}
+			}
+			const needsPx = !NO_UNIT_KEYS.some(x => newKey.includes(x)) && newKey !== 'fz';
+			_mStyleCache.set(k, [newKey, converter, needsPx]);
+			cacheEntry = [newKey, converter, needsPx];
+		}
+
+		let [key, fn, needsPx] = cacheEntry;
+		if (fn) {
+			val = fn(val);
+			if (Array.isArray(val)) [key, val] = val;
+		}
+		if (typeof val === 'number' && needsPx) val = val + 'px';
+		res[key] = val;
+	}
+	return res;
+}
+
+function mStyleX(elem, styles = {}, opts = {}) {
+	elem = toElem(elem);
+	const styleObj = mStylesX(styles);
+	for (const key in styleObj) {
+		elem.style.setProperty(key, styleObj[key]);
+	}
+	applyOpts(elem, opts);
+}
+
+//#endregion
 
 function genttt() {
 	function initializeBoard(rows, cols) {
@@ -379,9 +473,6 @@ function genttt() {
 	}
 
 }
-
-
-
 
 function unhighlightAll() {
 	if (DA.pathHighlighted) {

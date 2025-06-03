@@ -174,7 +174,7 @@ function alphaToHex(a01) {
 }
 function animatedTitle(msg = 'DU BIST DRAN!!!!!') {
 	TO.titleInterval = setInterval(() => {
-		let corner = CORNERS[WhichCorner++ % CORNERS.length];
+		let corner = CORNERS_BGA[WhichCorner++ % CORNERS_BGA.length];
 		document.title = `${corner} ${msg}`; //'⌞&amp;21543;    U+231E \0xE2Fo\u0027o Bar';
 	}, 1000);
 }
@@ -4433,7 +4433,7 @@ function mDom(dParent, styles = {}, opts = {}) {
 	let tag = valf(opts.tag, 'div');
 	let d = document.createElement(tag);
 	if (tag == 'textarea') styles.wrap = 'hard';
-	console.log(styles)
+	//console.log(styles)
 	mStyle(d, styles);
 	applyOpts(d, opts);
 	if (isdef(dParent)) mAppend(dParent, d);

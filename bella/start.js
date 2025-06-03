@@ -1,7 +1,24 @@
 onload = start; VERBOSE = false; TESTING = true;
 
-function start() { test1_styles1(); }
+function start() { test1_styles2(); }
 
+async function test1_styles2() {
+
+	getTessSvgFacesVerts(HexBigTriTessagon)
+
+	API_BASE = getBackendUrl();
+
+	let [dTop, dLeft, dMain] = mLayoutTLM('dPage');
+	await loadAssetsStatic(); //console.log(M.colorNames); //loadColors(); 
+	mStyle('dPage', { bg: 'sangria', overflow: 'hidden' });
+	mStyle(dMain, { overy: 'auto' }); mFlex(dMain);
+
+	let polys = createSvgTessellationPolygons(dMain,BrickTessagon,{w:100,h:100})
+	//mFlex(dLeft, false);
+
+	mButtonList(dLeft,getTessagonDict())
+
+}
 async function test1_styles1() {
 	//let bg = 'black';	let fg = colorIdealText(bg); console.log(fg); return;
 	let [dTop, dMain] = mLayoutTM('dPage');
@@ -246,6 +263,7 @@ async function test1_connect() {
 	fetchGamesList();
 
 }
+//************************** tess ******************************* */
 async function test1_preserveAspectRatio() {
 	await initTest();
 	let [cols, rows, tessname] = [20, 15, 'HexTessagon'];
