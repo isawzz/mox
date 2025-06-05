@@ -1,11 +1,32 @@
 
+function mColorSuccession(styles,bgdefault,fgdefault){
+	let bg = styles.bg || styles.background || bgdefault;
+	let fg = styles.fg || styles.color || fgdefault;
+	if (fg == 'contrast') fg = colorIdealText(bg); else fg = colorFrom(fg);
+	return [colorFrom(bg), fg];
+
+}
 function mSvg(dParent, styles={}, opts={}) {
+	// let html = `
+  //       <svg id="svg2" width="500" height="500" viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg" stroke="black"
+  //           fill="lightblue" stroke-width="0.005">
+  //           ${res}
+  //       </svg>
+  //       `;
+	// d.innerHTML = html;
+	dParent = toElem(dParent);
+	let [w,h] = mSizeSuccession(styles,500);
+	let [bg,fg] = mColorSuccession(styles, 'white','black');
 	const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
-	svg.setAttribute("viewBox", `0 0 ${styles.w} ${styles.h}`);
-	svg.setAttribute("width", `${styles.w}px`);
-	svg.setAttribute("height", `${styles.h}px`);
-	svg.setAttribute("preserveAspectRatio", "none");
+	console.log(svg)
+	// svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+	svg.setAttribute("viewBox", `0 0 ${1} ${1}`);
+	svg.setAttribute("width", w);
+	svg.setAttribute("height", h);
+	svg.setAttribute("fill", 'lightblue');
+	svg.setAttribute("stroke", 'white');
+	svg.setAttribute("stroke-width", 0.005);
+	//svg.setAttribute("preserveAspectRatio", "none");
 	applyOpts(svg, opts);
 	dParent.appendChild(svg);
 	return svg;
@@ -24,10 +45,10 @@ function getTessSvgFacesVerts(TessClass, cols=3, rows=3, options={}) {
 	}, options);
 
 	const tessagon = new TessClass(options);
-	const svgElem = tessagon.create_mesh();
+	const gCode = tessagon.create_mesh();
 	const faces = tessagon.mesh_adaptor.face_list;
 	const verts = tessagon.mesh_adaptor.vert_list;
-	return { tessagon, faces, verts, svgElem };
+	return { tessagon, faces, verts, gCode };
 }
 
 /**

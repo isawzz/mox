@@ -4,8 +4,15 @@ function start() { test1_styles2(); }
 
 async function test1_styles2() {
 
-	let res=getTessSvgFacesVerts(HexBigTriTessagon,3,3);console.log(res);
-	let d=mSvg('dPage',{w:500,h:400,fill:'sangria'},{html:res.svg});
+	await loadAssetsStatic(); //loadColors(); //console.log(M.colorNames)
+	let res = getTessSvgFacesVerts(HexTessagon, 3, 3); console.log(res);
+
+	// showSvg('dPage', res.gCode)
+	let d=mDom('dPage',{w:500,h:500,bg:'red'});
+	let d1 = mSvg(d, {  }, { html: res.gCode });
+	let polygons = res.polygons = d.querySelectorAll('polygon');
+
+	// for (const poly of polygons) { poly.setAttribute(fill, rColor()); }
 	return;
 
 	API_BASE = getBackendUrl();
@@ -15,10 +22,10 @@ async function test1_styles2() {
 	mStyle('dPage', { bg: 'sangria', overflow: 'hidden' });
 	mStyle(dMain, { overy: 'auto' }); mFlex(dMain);
 
-	let polys = createSvgTessellationPolygons(dMain,BrickTessagon,{w:100,h:100})
+	let polys = createSvgTessellationPolygons(dMain, BrickTessagon, { w: 100, h: 100 })
 	//mFlex(dLeft, false);
 
-	mButtonList(dLeft,getTessagonDict())
+	mButtonList(dLeft, getTessagonDict())
 
 }
 async function test1_styles1() {

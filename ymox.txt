@@ -1,8 +1,9 @@
 alles ist fuer immer ok - I have left this plane. 
 
-___ 6:02 AM 6/4/2025 airport lib 13.6. 84000 K4
+___ 6:10 AM 6/5/2025 airport lib 13.6. 85000 K3
 
-___ 4:47 AM 6/3/2025 airport lib 13.6. 83000 K4
+___ 6:02 AM 6/4/2025 airport lib 13.6. 84000 K3
+___ 4:47 AM 6/3/2025 airport lib 13.6. 83000 K3
 5:01 AM 6/3/2025 
 choices:
 1. noc restart
