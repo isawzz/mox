@@ -13,6 +13,7 @@ input {
   caret-color: black;
 }
 
+a,
 button,
 input,
 select {
@@ -154,10 +155,6 @@ button:active {
   box-shadow: none;
 }
 
-.no_select {
-  user-select: none;
-}
-
 .section {
   border-radius: 10px;
   border: 2px silver solid;
@@ -165,7 +162,6 @@ button:active {
   color: #111;
   font-size: 24px;
   margin: 10px;
-  margin-bottom: 0px;
   padding: 10px;
   box-sizing: border-box;
   width: 100%;
@@ -287,5 +283,6 @@ button:active {
   background-size: 100% 100%;
 
 }
-
 /*#endregion */
+
+
