@@ -1,6 +1,21 @@
 onload = start; VERBOSE = false; TESTING = true;
 
-function start() { test1_styles2(); }
+function start() { test1_hexboardTerritories(); }
+
+async function test1_hexboardTerritories() {
+	await loadAssetsStatic();
+	globalKeyHandling();
+	let [dTop,dLeft,dMain] = mLayoutTLM('dPage', { bg: 'lightblue' });
+	mStyle('dMain', { overy: 'auto' }); //mCenterFlex('dMain'); mFlex(dTop);
+
+	hexWithBorder(dMain); return;
+
+	let board = cryBoard('dMain', 5, 5, 80);
+	for (const tile of board) {
+		iDiv(tile).onclick = () => console.log(tile);
+		mStyle(iDiv(tile), { cursor: 'pointer' })
+	}
+}
 
 async function test1_styles2() {
 
@@ -8,8 +23,8 @@ async function test1_styles2() {
 	let res = getTessSvgFacesVerts(HexTessagon, 3, 3); console.log(res);
 
 	// showSvg('dPage', res.gCode)
-	let d=mDom('dPage',{w:500,h:500,bg:'red'});
-	let d1 = mSvg(d, {  }, { html: res.gCode });
+	let d = mDom('dPage', { w: 500, h: 500, bg: 'red' });
+	let d1 = mSvg(d, {}, { html: res.gCode });
 	let polygons = res.polygons = d.querySelectorAll('polygon');
 
 	// for (const poly of polygons) { poly.setAttribute(fill, rColor()); }
