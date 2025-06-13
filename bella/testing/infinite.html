@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Lazy Load Images</title>
+	<style>
+		#image-container {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+		}
+
+		.lazy-img {
+			width: 300px;
+			height: 200px;
+			object-fit: cover;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="image-container"></div>
+
+	<script>
+		function createLazyImageLoader({
+			container,
+			imageUrlCallback,   // function(index) => url
+			imageWidth = 300,
+			imageHeight = 200,
+			bufferPages = 1,
+			imagesPerRow = 3
+		}) {
+			let page = 0;
+			let isLoading = false;
+			const imagesPerPage = imagesPerRow * Math.ceil(window.innerHeight / imageHeight);
+
+			function loadImages() {
+				if (isLoading) return;
+				isLoading = true;
+
+				const fragment = document.createDocumentFragment();
+				for (let i = 0; i < imagesPerPage * (1 + bufferPages); i++) {
+					const index = page * imagesPerPage + i;
+					const img = document.createElement("img");
+					img.src = imageUrlCallback(index);
+					img.loading = "lazy";
+					img.className = "lazy-img";
+					img.width = imageWidth;
+					img.height = imageHeight;
+					fragment.appendChild(img);
+				}
+				container.insertBefore(fragment, sentinel);
+				page++;
+				isLoading = false;
+			}
+
+			// Sentinel element to observe scrolling near bottom
+			const sentinel = document.createElement("div");
+			sentinel.style.height = "1px";
+			container.appendChild(sentinel);
+
+			const observer = new IntersectionObserver((entries) => {
+				if (entries[0].isIntersecting) {
+					loadImages();
+				}
+			}, {
+				rootMargin: "200px"
+			});
+
+			observer.observe(sentinel);
+
+			// Initial load
+			loadImages();
+		}
+
+		// Example usage
+		const container = document.getElementById("image-container");
+
+		createLazyImageLoader({
+			container: container,
+			imageUrlCallback: index => `https://picsum.photos/300/200?random=${index}`,
+			imageWidth: 300,
+			imageHeight: 200,
+			bufferPages: 1,
+			imagesPerRow: 3
+		});
+	</script>
+</body>
+
+</html>

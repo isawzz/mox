@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<style>
+		.card {
+			width: 239px;
+			height: 335px;
+			border-radius: 12px;
+			background-color: white;
+			border: 1px solid black;
+			position: relative;
+			font-family: Arial, sans-serif;
+		}
+
+		.card-border {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.card-face {
+			position: relative;
+			width: 100%;
+			height: 100%;
+		}
+
+		.suit,
+		.rank {
+			position: absolute;
+			font-weight: bold;
+			color: black;
+		}
+
+		.top {
+			font-size: 26px;
+		}
+
+		.bottom {
+			font-size: 26px;
+		}
+
+		.card {
+			position: relative;
+			width: 239px;
+			height: 335px;
+			border: 1px solid black;
+			border-radius: 12px;
+			background: white;
+			font-family: Arial, sans-serif;
+		}
+
+		.rank,
+		.suit {
+			position: absolute;
+			font-size: 26px;
+			color: black;
+			font-weight: bold;
+		}
+
+		.card {
+			position: relative;
+			width: 239px;
+			height: 335px;
+			border: 1px solid black;
+			border-radius: 12px;
+			background: white;
+			font-family: Arial, sans-serif;
+		}
+
+		.rank,
+		.suit {
+			position: absolute;
+			font-size: 26px;
+			color: black;
+			font-weight: bold;
+		}
+	.card {
+			position: relative;
+			width: 239px;
+			height: 335px;
+			border: 1px solid black;
+			border-radius: 12px;
+			background: white;
+			font-family: Arial, sans-serif;
+		}
+		.corner {
+			position: absolute;
+			text-align: center;
+			line-height: 1;
+		}
+		.rank {
+			font-size: 26px;
+			font-weight: bold;
+		}
+		.suit {
+			font-size: 40px;
+		}
+		</style>
+	</head>
+
+<body>
+	<div class="card">
+		<!-- Top-left corner: stacked rank + suit -->
+		<div style="text-align:center;position:absolute;top: 6px; left: 6px;display:grid;width:30px;height:40px;">
+			<div style="font-size:20px;line-height:1;">10</div>
+			<div style="font-size:20px;line-height:1;">♣</div>
+		</div>
+	
+		<!-- Bottom-right corner: stacked and rotated -->
+		<div style="text-align:center;position:absolute;bottom: 6px; right: 6px;display:grid;width:30px;height:40px; transform: rotate(180deg);">
+			<div style="font-size:20px;line-height:1;">10</div>
+			<div style="font-size:20px;line-height:1;">♣</div>
+		</div>
+		<!-- <div class="corner" style="bottom: 6px; right: 6px; transform: rotate(180deg);">
+			<div class="rank">10</div>
+			<div class="suit">♣</div>
+		</div> -->
+	
+		<!-- Left column (4 clubs) -->
+		<div class="suit" style="top: 30px; left: 50px;">♣</div>
+		<div class="suit" style="top: 90px; left: 50px;">♣</div>
+		<div class="suit" style="top: 180px; left: 50px;">♣</div>
+		<div class="suit" style="top: 240px; left: 50px;">♣</div>
+	
+		<!-- Center column (3 clubs) -->
+		<div class="suit" style="top: 70px; left: 110px;">♣</div>
+		<div class="suit" style="top: 145px; left: 110px;">♣</div>
+		<div class="suit" style="top: 220px; left: 110px;">♣</div>
+	
+		<!-- Right column (4 clubs) -->
+		<div class="suit" style="top: 30px; left: 170px;">♣</div>
+		<div class="suit" style="top: 90px; left: 170px;">♣</div>
+		<div class="suit" style="top: 180px; left: 170px;">♣</div>
+		<div class="suit" style="top: 240px; left: 170px;">♣</div>
+	</div>
+	
+	<div class="card">
+		<!-- Corner rank and suit -->
+		<div class="rank" style="top: 6px; left: 6px;">10</div>
+		<div class="suit" style="top: 30px; left: 6px;">♣</div>
+		<div class="rank" style="bottom: 6px; right: 6px; transform: rotate(180deg);">10</div>
+		<div class="suit" style="bottom: 30px; right: 6px; transform: rotate(180deg);">♣</div>
+
+		<!-- Left column (4 clubs) -->
+		<div class="suit" style="top: 30px; left: 50px;">♣</div>
+		<div class="suit" style="top: 90px; left: 50px;">♣</div>
+		<div class="suit" style="top: 180px; left: 50px;">♣</div>
+		<div class="suit" style="top: 240px; left: 50px;">♣</div>
+
+		<!-- Middle column (3 clubs) -->
+		<div class="suit" style="top: 70px; left: 110px;">♣</div>
+		<div class="suit" style="top: 145px; left: 110px;">♣</div>
+		<div class="suit" style="top: 220px; left: 110px;">♣</div>
+
+		<!-- Right column (4 clubs) -->
+		<div class="suit" style="top: 30px; left: 170px;">♣</div>
+		<div class="suit" style="top: 90px; left: 170px;">♣</div>
+		<div class="suit" style="top: 180px; left: 170px;">♣</div>
+		<div class="suit" style="top: 240px; left: 170px;">♣</div>
+	</div>
+	<div class="card">
+		<!-- Corner symbols -->
+		<div class="rank" style="top: 6px; left: 6px;">10</div>
+		<div class="suit" style="top: 30px; left: 6px;">♣</div>
+		<div class="rank" style="bottom: 6px; right: 6px; transform: rotate(180deg);">10</div>
+		<div class="suit" style="bottom: 30px; right: 6px; transform: rotate(180deg);">♣</div>
+
+		<!-- Left column -->
+		<div class="suit" style="top: 40px; left: 40px;">♣</div>
+		<div class="suit" style="top: 135px; left: 40px;">♣</div>
+		<div class="suit" style="top: 230px; left: 40px;">♣</div>
+
+		<!-- Center column -->
+		<div class="suit" style="top: 40px; left: 100px;">♣</div>
+		<div class="suit" style="top: 135px; left: 100px;">♣</div>
+		<div class="suit" style="top: 230px; left: 100px;">♣</div>
+
+		<!-- Right column -->
+		<div class="suit" style="top: 40px; left: 160px;">♣</div>
+		<div class="suit" style="top: 135px; left: 160px;">♣</div>
+		<div class="suit" style="top: 230px; left: 160px;">♣</div>
+	</div>
+
+	<div class="card">
+		<!-- Top left corner -->
+		<div class="rank" style="top: 6px; left: 6px;">10</div>
+		<div class="suit" style="top: 28px; left: 6px;">♣</div>
+
+		<!-- Center pips -->
+		<div class="suit" style="top: 32px; left: 17px;">♣</div>
+		<div class="suit" style="top: 32px; right: 17px;">♣</div>
+		<div class="suit" style="top: 99px; left: 17px;">♣</div>
+		<div class="suit" style="top: 99px; right: 17px;">♣</div>
+		<div class="suit" style="top: 65.5px; left: 72px;">♣</div>
+
+		<!-- Mirrored bottom -->
+		<div class="rank" style="bottom: 6px; right: 6px; transform: rotate(180deg);">10</div>
+		<div class="suit" style="bottom: 28px; right: 6px; transform: rotate(180deg);">♣</div>
+		<div class="suit" style="bottom: 32px; left: 17px; transform: rotate(180deg);">♣</div>
+		<div class="suit" style="bottom: 32px; right: 17px; transform: rotate(180deg);">♣</div>
+		<div class="suit" style="bottom: 99px; left: 17px; transform: rotate(180deg);">♣</div>
+		<div class="suit" style="bottom: 99px; right: 17px; transform: rotate(180deg);">♣</div>
+		<div class="suit" style="bottom: 65.5px; left: 72px; transform: rotate(180deg);">♣</div>
+	</div>
+
+	<div class="card">
+		<div class="card-border">
+			<div class="card-face">
+				<div class="suit top" style="top: 5px; left: 50%; transform: translateX(-50%); font-size: 26px;">♣</div>
+				<div class="rank top" style="top: 10%; left: 50%; transform: translateX(-50%); font-size: 26px;">10</div>
+				<div class="suit" style="top: 25%; left: 25%; font-size: 26px;">♣</div>
+				<div class="suit" style="top: 25%; right: 25%; font-size: 26px;">♣</div>
+				<div class="suit" style="top: 45%; left: 25%; font-size: 26px;">♣</div>
+				<div class="suit" style="top: 45%; right: 25%; font-size: 26px;">♣</div>
+				<div class="suit bottom" style="bottom: 10%; left: 50%; transform: translateX(-50%); font-size: 26px;">♣</div>
+				<div class="rank bottom" style="bottom: 5px; left: 50%; transform: translateX(-50%); font-size: 26px;">10</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
