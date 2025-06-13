@@ -5961,17 +5961,6 @@ async function getAllTables() {
 	const tables = await api('GET', '/get_tables');
 	console.log(tables);
 }
-function getBackendUrl(isScript = null) {
-	if (nundef(DA.backendUrl)) {
-		let loc = window.location.href;
-		if (VERBOSE) console.log('href', loc);
-		let sessionType = DA.sessionType = detectSessionType();
-		if (VERBOSE) console.log('sessionType', sessionType);
-		let backendUrl = DA.backendUrl = sessionType == 'live' ? 'http://localhost:5000' : 'at0' ? 'https://moxito.online/at0' : 'fastcomet' ? 'https://moxito.online' : isScript || sessionType == 'php' ? 'http://localhost:8080/mox' : '..';
-		if (VERBOSE) console.log('backendUrl', backendUrl);
-	}
-	return DA.backendUrl;
-}
 function getBar(ctx, list, val) {
 	let res = list.filter(p => isWithinDelta(p.x, val, 2) && (isLightBefore(ctx, p.x, p.y) || isLightAfter(ctx, p.x, p.y)));
 	return res;

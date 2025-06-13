@@ -8,6 +8,11 @@ jetzt moecht ich in coding trennen zwischen closure und rest
 splitClosure
 =>next ist: vio98 getServer und detectSession aendern
 =>use API zeug
+fuer flask: 
+"http://localhost:5000/"
+'https://moxito.online/'
+
++ flaskgame0
 
 
 

@@ -1,25 +1,5 @@
 
 function arrLast(arr) { return arr.length > 0 ? arr[arr.length - 1] : null; }
-function detectSessionType() {
-	if (isdef(DA.project)) return DA.sessionType;
-	let loc = window.location.href; console.log('BAU1.JS ??????????????????detectSessionType', loc);
-	DA.project = stringAfterLast(stringBefore(loc, '/index.html'), '/'); console.log('project', DA.project);
-	DA.serverdir = SERVERDIR;
-	DA.sessionType =
-		loc.includes('moxito.online/at0') ? 'at0' :
-			loc.includes('moxito.online') ? 'fastcomet' :
-				loc.includes('telecave') ? 'telecave' :
-					loc.includes('8080') ? 'php' :
-						loc.includes(':3000') ? 'nodejs' :
-							loc.includes(':5000') ? 'flask' :
-								'live'; // loc.includes('vidulus') ? 'vps' :
-	return DA.sessionType;
-}
-function getServer(isScript = null) {
-	let sessionType = detectSessionType();
-	let server = sessionType == 'fastcomet' ? 'https://moxito.online/' : isScript || sessionType == 'php' ? 'http://localhost:8080/mox/' : '../';
-	return server;
-}
 function isList(arr) { return Array.isArray(arr); }
 function isString(param) { return typeof param == 'string'; }
 function isdef(x) { return x !== null && x !== undefined && x !== 'undefined'; }
