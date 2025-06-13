@@ -6,6 +6,8 @@ brauch ein neues namensschema! vio99->ball0
 :vio98
 jetzt moecht ich in coding trennen zwischen closure und rest
 splitClosure
+=>next ist: vio98 getServer und detectSession aendern
+=>use API zeug
 
 
 
