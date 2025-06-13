@@ -2,9 +2,10 @@ alles ist fuer immer ok - I have left this plane.
 
 ___ 5:44 AM 6/13/2025 airport 92000 K4
 ok - ilms code
-brauch ein neues namensschema!
-vio99->ball0
-
+brauch ein neues namensschema! vio99->ball0
+:vio98
+jetzt moecht ich in coding trennen zwischen closure und rest
+splitClosure
 
 
 

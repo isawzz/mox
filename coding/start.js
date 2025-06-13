@@ -1,7 +1,34 @@
 onload = start;
 
-async function start() {  } //project_ilms(); }//return;mlib_p5();return;project_p5(); }
+async function start() { }//splitClosureVio98(); } //project_ilms(); }//return;mlib_p5();return;project_p5(); }
 
+async function splitClosureVio98(){
+	let fullnames = ['../vio98/codebig.js'];
+	let starterFiles = ['../vio98/start.js'];
+	let starter = ['test0'];
+
+	let di = await codeDictForFiles(fullnames);
+	let diStarter = await codeDictForFiles(starterFiles);
+	let diAll = { ...di, ...diStarter };
+	//codeDictToText(di, 'codebig.txt');
+	let keys = Array.from(findFunctionClosure(diAll, starter)); console.log(keys)
+	let diClosure = {};
+	let diRest = {};
+	let diStarterClosure = {};
+	for (const k of keys) { 
+		if (k.startsWith('test')) diStarterClosure[k] = diStarter[k];
+		else	diClosure[k] = di[k]; 
+	}
+	for(const k in di){
+		if (!keys.includes(k)) diRest[k] = di[k];
+	
+	}
+	codeDictToText(diClosure, 'closure.txt');
+	codeDictToText(diRest, 'coderest.txt');
+	//let sorted = Array.from(keys).sort(); console.log(sorted);
+
+
+}
 async function mclosure_free(){
 	codePackClosure('../free',['globals','allcode','bau1','bau2','bau3','bau4','start'],['onclickSimple']);
 }
