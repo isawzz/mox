@@ -4,7 +4,7 @@ function start() { test0(); }
 
 async function test0() {
 
-	let url = 'https://moxito.online/at0';
+	let url = 'https://moxito.online/flaskgame0';
 	let res = await fetch(url); //, { mode: 'no-cors' });
 	if (res.ok) {
 		console.log('Flask server is running at', url);
