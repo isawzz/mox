@@ -32,9 +32,13 @@ function getServer(isScript = null) {
 }
 async function isServerRunning(which='flask',remote=false) {
 	let url = remote ? 'https://moxito.online/' : 'http://localhost:5000/';
-	url += which == 'flask' ? 'flaskgame0' : 'node';
+	url += which == 'flask' ? 'flaskgame0/' : 'node';
+	console.log('checking url', url);
   try {
-    const res = await fetch("http://localhost:5000/");
+    const res = await fetch(url, {
+			mode: 'no-cors',
+		});
+		console.log('res', res);
     return res.ok ? true : null;
   } catch (err) {
     return null;

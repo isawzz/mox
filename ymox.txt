@@ -1,5 +1,10 @@
 alles ist fuer immer ok - I have left this plane. 
 
+___ 5:27 AM 6/14/2025 airport 93000 K4
+ich brauche die static assets
+https://www.telecave.net/aroot\base\assets\images/ally.jpg
+nmknmhst as long as im alone im safe no one can hurt me
+no use telling MWHI
 ___ 5:44 AM 6/13/2025 airport 92000 K4
 ok - ilms code
 brauch ein neues namensschema! vio99->ball0
@@ -8,46 +13,6 @@ jetzt moecht ich in coding trennen zwischen closure und rest
 splitClosure
 =>next ist: vio98 getServer und detectSession aendern
 =>use API zeug
-fuer flask: 
-"http://localhost:5000/"
-'https://moxito.online/'
-
-+ flaskgame0
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ___ 5:51 AM 6/11/2025 airport 91000 K4
 omg!!!!! ich muss simple0 verwenden fuer php!!!!!
 just now reduce 
