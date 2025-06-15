@@ -8615,7 +8615,8 @@ async function loadStarImages() {
 	return starImages;
 }
 async function loadStaticYaml(path) {
-	let server = getServer();
+	//console.log('loadStaticYaml', path);
+	let server = await getDA('staticUrl',true); //console.log('server', server);
 	let res = await fetch(server + path);
 	if (!res.ok) return null;
 	return jsyaml.load(await res.text());

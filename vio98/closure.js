@@ -83,7 +83,7 @@ async function mGetFilenames(dir) {
 	return res.dir.filter(x => x != '.' && x != '..');
 }
 async function mPhpPost(cmd, o, projectName, verbose = false, jsonResult = true) {
-	let server = getServer('php');
+	let server = getDA('phpUrl');
 	if (isdef(o.path) && (o.path.startsWith('zdata') || o.path.startsWith('y'))) o.path = '../../' + o.path;
 	if (verbose) console.log('to php:', server + `${projectName}/php/${cmd}.php`, o);
 	let res = await fetch(server + `${projectName}/php/${cmd}.php`,

@@ -1,48 +1,27 @@
 
-function getBackendUrl(isScript = null) {
-	if (nundef(DA.backendUrl)) {
-		let loc = window.location.href;
-		if (VERBOSE) console.log('href', loc);
-		let sessionType = DA.sessionType = detectSessionType();
-		if (VERBOSE) console.log('sessionType', sessionType);
-		let backendUrl = DA.backendUrl = sessionType == 'live' ? 'http://localhost:5000' : 'at0' ? 'https://moxito.online/at0' : 'fastcomet' ? 'https://moxito.online' : isScript || sessionType == 'php' ? 'http://localhost:8080/mox' : '..';
-		if (VERBOSE) console.log('backendUrl', backendUrl);
+async function getDA(key, fast = false) {
+	if (isdef(DA[key])) return DA[key];
+	let loc = window.location.href; //console.log('href', loc);
+	DA.isMoxito = loc.includes('moxito.online');
+	DA.isLocal = !DA.isMoxito && !loc.includes('telecave');
+	DA.isLive = !loc.includes('localhost');
+	DA.project = stringAfterLast(stringBeforeLast(loc, '/'), '/'); //console.log('project', DA.project);
+	DA.staticUrl = DA.isLive ? '../' : 'https://moxito.online/';
+	DA.phpUrl = (DA.isLocal ? 'http://localhost:8080/mox/' : 'https://moxito.online/') + DA.project + '/php/';
+	DA.flaskUrl = (DA.isLocal ? 'http://localhost:5000/' : 'https://moxito.online/flaskgame0/');
+	DA.nodeUrl = (DA.isLocal ? 'http://localhost:3000/' : 'https://games.moxito.online/');
+	if (!fast) {
+		try {
+			let flaskLocal = await fetch(DA.flaskUrl); //, { mode: 'no-cors' })
+			//console.log('flaskLocal', flaskLocal)
+		} catch { DA.flaskUrl = 'https://moxito.online/flaskgame0/' }
+		//console.log('still here', DA.flaskUrl, DA.nodeUrl, DA.phpUrl, DA.staticUrl);
+		try {
+			let nodeLocal = await fetch(DA.nodeUrl); //, { mode: 'no-cors' })
+			//console.log('nodeLocal', nodeLocal)
+		} catch { DA.nodeUrl = 'https://games.moxito.online/' }
 	}
-	return DA.backendUrl;
-}
-function detectSessionType() {
-	if (isdef(DA.project)) return DA.sessionType;
-	let loc = window.location.href; console.log('BAU1.JS ??????????????????detectSessionType', loc);
-	DA.project = stringAfterLast(stringBefore(loc, '/index.html'), '/'); console.log('project', DA.project);
-	DA.serverdir = SERVERDIR;
-	DA.sessionType =
-		loc.includes('moxito.online/at0') ? 'at0' :
-			loc.includes('moxito.online') ? 'fastcomet' :
-				loc.includes('telecave') ? 'telecave' :
-					loc.includes('8080') ? 'php' :
-						loc.includes(':3000') ? 'nodejs' :
-							loc.includes(':5000') ? 'flask' :
-								'live'; // loc.includes('vidulus') ? 'vps' :
-	return DA.sessionType;
-}
-function getServer(isScript = null) {
-	let sessionType = detectSessionType();
-	let server = sessionType == 'fastcomet' ? 'https://moxito.online/' : isScript || sessionType == 'php' ? 'http://localhost:8080/mox/' : '../';
-	return server;
-}
-async function isServerRunning(which='flask',remote=false) {
-	let url = remote ? 'https://moxito.online/' : 'http://localhost:5000/';
-	url += which == 'flask' ? 'flaskgame0/' : 'node';
-	console.log('checking url', url);
-  try {
-    const res = await fetch(url, {
-			mode: 'no-cors',
-		});
-		console.log('res', res);
-    return res.ok ? true : null;
-  } catch (err) {
-    return null;
-  }
-}
 
-
+	showObject(DA, null, 'dPage');
+	return DA[key];
+}
