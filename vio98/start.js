@@ -18,10 +18,9 @@ async function test0() {
 	} catch { DA.flaskUrl = 'https://moxito.online/flaskgame0/' }
 	try {
 		let nodeLocal = await fetch(DA.nodeUrl); //, { mode: 'no-cors' })
-		console.log('flaskLocal', flaskLocal)
+		console.log('nodeLocal', nodeLocal)
 	} catch { DA.nodeUrl = 'https://games.moxito.online/' }
 	//soll ich es so machen dass wenn local ist und local flask nicht laeuft, remote flask teste?
-
 
 	showObject(DA, null, 'dPage');
 	//DA.flaskUrl = 
