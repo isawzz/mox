@@ -82,11 +82,11 @@ async function mGetFilenames(dir) {
 	let res = await mPhpPost('all', { action: 'dir', dir });
 	return res.dir.filter(x => x != '.' && x != '..');
 }
-async function mPhpPost(cmd, o, projectName, verbose = false, jsonResult = true) {
-	let server = getDA('phpUrl');
+async function mPhpPost(cmd, o, verbose = false, jsonResult = true) {
+	let server = await getDA('phpUrl');
 	if (isdef(o.path) && (o.path.startsWith('zdata') || o.path.startsWith('y'))) o.path = '../../' + o.path;
-	if (verbose) console.log('to php:', server + `${projectName}/php/${cmd}.php`, o);
-	let res = await fetch(server + `${projectName}/php/${cmd}.php`,
+	if (verbose) console.log('to php:', server + `${cmd}.php`, o);
+	let res = await fetch(server + `${cmd}.php`,
 		{
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },

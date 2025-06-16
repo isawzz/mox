@@ -332,19 +332,31 @@ fieldset .disabled {
     opacity: 1;
   }
 }
+
 .flexCC {
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
-  align-items: center;       /* valign (in row layout) */
-  justify-content: center; /* halign (in row layout) */
+  align-items: center;
+  justify-content: center;
 }
+
+.flexCS {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
 .flexSS {
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
-  align-items: flex-start;       /* valign (in row layout) */
-  justify-content: flex-start; /* halign (in row layout) */
+  align-items: flex-start;
+  /* valign (in row layout) */
+  justify-content: flex-start;
+  /* halign (in row layout) */
 }
 
 .gallery {
@@ -368,6 +380,7 @@ fieldset .disabled {
 
   /* justify-content: center; */
 }
+
 .gallery0 {
   display: grid;
   height: 100%;
