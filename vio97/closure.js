@@ -839,16 +839,6 @@ function mDom(dParent, styles = {}, opts = {}) {
 	if (isdef(dParent)) mAppend(dParent, d);
 	return d;
 }
-function mFlex(d, wrap = true, halign = 'start', valign = 'center', row = true) {
-	d = toElem(d);
-	mStyle(d, {
-		display: 'flex',
-		'flex-wrap': wrap ? 'wrap' : 'nowrap',
-		'flex-direction': row ? 'row' : 'column',
-		'align-items': row ? valign : halign,
-		'justify-content': row ? halign : valign
-	});
-}
 async function mGetFilenames(dir) {
 	let res = await mPhpPost('all', { action: 'dir', dir });
 	return res.dir.filter(x => x != '.' && x != '..');
@@ -985,6 +975,7 @@ function mStyle(elem, styles = {}, opts = {}) {
 	for (const key in styles1) {
 		elem.style.setProperty(key, styles1[key]);
 	}
+	applyOpts(elem, opts);
 }
 function mStyles(styles) {
 	let res = {};

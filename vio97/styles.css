@@ -354,8 +354,16 @@ fieldset .disabled {
   flex-wrap: wrap;
   flex-direction: row;
   align-items: flex-start;
-  /* valign (in row layout) */
   justify-content: flex-start;
+}
+
+.flexSpaceBetween {
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  align-items: baseline;
+  /* valign (in row layout) */
+  justify-content: space-between;
   /* halign (in row layout) */
 }
 

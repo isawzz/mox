@@ -4,15 +4,22 @@ onload = start; VERBOSE = true; TESTING = true;
 function start() { test0(); }
 
 async function test0() {
-	await loadAssetsStatic(); console.log(M);
-	let files = await mGetFilenames('tables'); console.log('files', files);
+	await DAInit();
+	await clickOn('games');
+	if (TESTING) await clickOn(rChoose(['gul', 'felix', 'amanda', 'lauren', 'mimi'])); 
+	await mSleep(10);
+	await clickOn('Set')
+	return;
+	//await loadAssetsStatic(); console.log(M);
+	//let files = await mGetFilenames('tables'); console.log('files', files);
+	//DA.tableIds = files.map(x => stringBefore(x, '.'));
 
-	let [dTop, dMain] = mLayoutTM('dPage');
-	mStyle('dMain', { overy: 'auto',padding:0 }); //,grid: '1fr / 1fr', gap: 10, padding: 10 });
-	let d = mDom(dMain,{gap:10,padding:10,bg:'red',wrap:true});  //,{className:'flex0'}); mFlex(d) //, { padding:10,flex:'center center row', wrap:true});//display: 'grid', gridCols: 2,gap:10, padding:10, bg: rColor() });
-	mClass(d,'flexCS')
+	//let [dTop, dMain] = mLayoutTM('dPage');
+	//mStyle('dMain', { overy: 'auto', padding: 0 });
+	//let d = mDom(dMain, { gap: 10, padding: 10, bg: 'red', wrap: true },{className: 'flexCS'});
 
-	for (const i of range(10)) {
-		showObject(DA, null, d, { bg: rColor() });
-	}
+	// for (const i of range(10)) { showObject(DA, null, d, { bg: rColor() }); }
+
+	//await showGamesAndTables(); console.log('tables', M.tables)
+	//await showGameMenu('setgame');
 }

@@ -1,19 +1,20 @@
 
-async function DAInit(TESTING = false) {
+async function DAInit() {
 	document.addEventListener("visibilitychange", handleVisibilityChange);
 	DA.pollInterval = 3000;
 	DA.pollCounter = 0;
-	DA.backendURL = getServer(true) + 'simple0/php'; //'https://moxito.online/mox/simple0/php';
-	DA.gamelist = ['setgame', 'button96']; //'accuse aristo bluff ferro fishgame fritz huti lacuna nations setgame sheriff spotit wise'; if (DA.TEST0) gamelist += ' a_game'; gamelist = toWords(gamelist);
+	DA.backendURL = await getDA('phpUrl'); //getServer(true) + 'simple0/php'; //'https://moxito.online/mox/simple0/php';
+	DA.gamelist = ['setgame', 'button96'];//,'accuse aristo bluff ferro fishgame fritz huti lacuna nations setgame sheriff spotit wise']; //if (DA.TEST0) gamelist += ' a_game'; gamelist = toWords(gamelist);
 	DA.funcs = { setgame: setgame(), button96: button96() }; //implemented games!
 	for (const gname in DA.gamelist) {
 		if (isdef(DA.funcs[gname])) continue;
 		DA.funcs[gname] = defaultGameFunc();
 	}
 	DA.evList = [];
-	await loadAssetsStatic();
+	await loadAssetsStatic(); //console.log(M);return;
 	M.tables = await MPollTables();
-	let elems = mLayoutTM('dPage'); mStyle('dMain', { overy: 'auto', fg: 'inherit' }); mCenterFlex('dMain');
+	let elems = mLayoutTM('dPage'); mStyle('dMain', { overy: 'auto', fg: 'inherit', pah:10 });//, {class:'flexCS'}); 
+	mCenterFlex('dMain');
 	mLayoutTopTestExtraMessageTitle('dTop');
 	let username = localStorage.getItem('username') ?? 'hans';
 	if (TESTING) {
@@ -10004,8 +10005,8 @@ async function mToggleButton(dParent, styles = {}) {
 	return mToggleCompose(...buttons);
 }
 function mToggleColorButton(dParent, styles = {}, opts = {}, states) {
-	addKeys({ tag: 'button' }, opts);
-	let b = mDom(dParent, styles, opts); mFlex(b, false, 'space-between', 'baseline', true);
+	addKeys({ tag: 'button', class:'flexSpaceBetween' }, opts);
+	let b = mDom(dParent, styles, opts); 
 	let sz = 16;
 	let c = mDom(b, { w: sz, h: sz, round: true, bg: 'blue', position: 'relative', top: 2, left: 3 }, { state: null });
 	if (nundef(states)) states = [{ color: 'green', blink: false, f: () => console.log('callback!') }, { color: 'red', blink: true, f: () => console.log('callback!') }];
@@ -13329,7 +13330,7 @@ async function showGameMenu(gamename) {
 	mRemoveIfExists('dGameMenu');
 	let dMenu = mDom('dMain', {}, { className: 'section', id: 'dGameMenu' });
 	mDom(dMenu, { maleft: 12 }, { html: `<h2>game options</h2>` });
-	let style = { display: 'flex', justify: 'center', w: '100%', gap: 10, matop: 6 };
+	let style = { display: 'flex', justifyContent: 'center', w: '100%', gap: 10, matop: 6 };
 	let dPlayers = mDom(dMenu, style, { id: 'dMenuPlayers' }); //mCenterFlex(dPlayers);
 	let dOptions = mDom(dMenu, style, { id: 'dMenuOptions' }); //'dMenuOptions'); //mCenterFlex(dOptions);
 	let dButtons = mDom(dMenu, style, { id: 'dMenuButtons' }); //'dMenuButtons');
@@ -13382,10 +13383,11 @@ async function showGamePlayers(dParent, users) {
 		let label = mDom(d, { matop: -4, fz: 12, hline: 12 }, { html: name });
 		d.setAttribute('username', name)
 		d.onclick = onclickGameMenuPlayer;
+		//updateUserImageToBotHuman(name, 'human');
 		let item = userToPlayer(name, DA.gamename); item.div = d; item.isSelected = false;
 		DA.allPlayers[name] = item;
 	}
-	await showGameMenuPlayerDialog(me);
+	//await showGameMenuPlayerDialog(me);
 }
 function showGameover(table, dParent) {
 	let winners = table.winners;
@@ -13421,15 +13423,15 @@ async function showGamesAndTables(force = false) {
 		let d = mDom(dParent, { fg: 'white' }, { id: 'game_menu' }); mCenterCenterFlex(d); //mFlexWrap(d);
 		let gamelist = DA.gamelist;
 		for (const gname of gamelist) {
-			let g = MGetGame(gname);
+			let g = MGetGame(gname); console.log(gname, g);
 			let bg = g.color;
-			let d1 = mDom(d, { cursor: 'pointer', rounding: 10, margin: 10, padding: 0, patop: 10, w: 140, height: 100, bg, position: 'relative' }, { id: g.id });
+			let d1 = mDom(d, { cursor: 'pointer', rounding: 10, margin: 10, padding: 10, patop: 10, w: 140, height: 100, bg, position: 'relative' }, { id: g.id });
 			d1.setAttribute('gamename', gname);
 			d1.onclick = onclickGameMenuItem;
 			mCenterFlex(d1);
 			let o = M.superdi[g.logo];
 			let fg = colorIdealText(bg);
-			let el = mDom(d1, { matop: 0, mabottom: 6, fz: 65, hline: 65, family: 'emoNoto', fg, display: 'inline-block' }, { html: o.text });
+			let el = mDom(d1, { matop: 0, mabottom: 6, fz: 65, hline: 65, family: 'emoNoto', fg, display: 'inline-block' }, { html: o.emo });
 			mLinebreak(d1);
 			mDom(d1, { fz: 18, align: 'center', fg }, { html: capitalize(g.friendly) });
 		}
@@ -13465,6 +13467,7 @@ async function showGamesAndTables(force = false) {
 	}
 	let dParent = mBy('dTableList');
 	if (nundef(dParent)) { mClear('dMain'); dParent = mDom('dMain', {}, { className: 'section', id: 'dTableList' }); }
+	console.log(dParent)
 	M.tables = await MPollTables();
 	let tables = dict2list(M.tables);
 	let me = UGetName();
@@ -13851,15 +13854,6 @@ function showTrick() {
 		mStyle(d1, { position: 'absolute', left: offset.x, top: offset.y, z: zIndex });
 		zIndex += 1;
 	}
-}
-async function showUserImage(uname, d, sz = 40) {
-	let u = MGetUser(uname);
-	let key = u.imgKey;
-	let m = M.superdi[key];
-	if (nundef(m)) {
-		key = 'unknown_user';
-	}
-	return await mKey(key, d, { 'object-position': 'center top', 'object-fit': 'cover', h: sz, w: sz, round: true, border: `${u.color} 3px solid` });
 }
 function showValidMoves(table) {
 	if (nundef(table.moves)) { console.log('no moves yet!'); return; }
@@ -15304,8 +15298,9 @@ async function updateTestButtonsLogin(names) {
 }
 function updateUserImageToBotHuman(playername, value) {
 	function doit(checked, name, val) {
-		let du = mByAttr('username', playername);
+		let du = mByAttr('username', playername); console.log('du', du);
 		let img = du.getElementsByTagName('img')[0]; //du.firstChild;
+		console.log('checked',checked,' name',name,'val',val, img)
 		if (checked == true) if (val == 'human') mStyle(img, { round: true }); else mStyle(img, { rounding: 2 });
 	}
 	if (isdef(value)) doit(true, 0, value); else return doit;
