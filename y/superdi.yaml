@@ -2141,11 +2141,8 @@ ballista:
 balloon:
   friendly: balloon
   img: ../assets/img/emo/balloon.png
-  text: '&#127880;'
+  emo: '&#127880;'
   cats: []
-  colls:
-    - emo
-    - spotit
   uni: '&#x1f388;'
 balloon_dog:
   cats: []
@@ -4993,10 +4990,8 @@ check_mark:
   friendly: check_mark
   img: ../assets/img/emo/check-mark.png
   ga: E077
-  text: '&#10004;'
+  emo: '&#10004;'
   cats: []
-  colls:
-    - emo
   uni: '&#x2714;'
 check_mark_button:
   emo: '&#9989;'
@@ -5617,10 +5612,8 @@ cloud:
   friendly: cloud
   img: ../assets/img/emo/cloud.png
   fa: f0c2
-  text: '&#9729;'
+  emo: '&#9729;'
   cats: []
-  colls:
-    - emo
   fa6: f0c2
   uni: '&#x2601;'
 cloud_arrow_down:
@@ -6190,10 +6183,8 @@ copyright:
   friendly: copyright
   img: ../assets/img/emo/copyright.png
   fa: f1f9
-  text: '&#169;'
+  emo: '&#169;'
   cats: []
-  colls:
-    - emo
   fa6: f1f9
   uni: '&#xa9;'
 coral:
@@ -6463,10 +6454,8 @@ cross_flare:
   ga: EA7B
 cross_mark:
   friendly: cross_mark
-  text: '&#x2718;'
+  emo: '&#x2718;'
   cats: []
-  colls:
-    - unicode
   uni: '&#x2718;'
 cross_mark_button:
   emo: '&#10062;'
@@ -6559,9 +6548,7 @@ crown:
   friendly: crown
   img: ../assets/img/emo/person-with-crown.png
   cats: []
-  colls:
-    - emo
-  text: '&#128081;'
+  emo: '&#128081;'
   fa6: f521
   uni: '&#x2655;'
 crown_coin:
@@ -8271,10 +8258,8 @@ envelope:
   img: ../assets/img/emo/envelope.png
   ga: EBAB
   fa: f0e0
-  text: '&#9993;'
+  emo: '&#9993;'
   cats: []
-  colls:
-    - emo
   fa6: f0e0
   uni: '&#x2709;'
 envelope_circle_check:
@@ -12800,10 +12785,8 @@ infinity:
   img: ../assets/img/emo/infinity.png
   ga: E10E
   fa: f534
-  text: '&#9854;'
+  emo: '&#9854;'
   cats: []
-  colls:
-    - emo
   fa6: f534
   uni: '&#x221e;'
 info:
@@ -13876,10 +13859,8 @@ left_right:
 left_right_arrow:
   friendly: left_right_arrow
   img: ../assets/img/emo/left-right-arrow.png
-  text: '&#8596;'
+  emo: '&#8596;'
   cats: []
-  colls:
-    - emo
   uni: '&#x2194;'
 left_speech_bubble:
   emo: '&#128488;'
@@ -17446,10 +17427,8 @@ pencil:
   friendly: pencil
   img: ../assets/img/emo/pencil.png
   ga: EB99
-  text: '&#9999;'
+  emo: '&#9999;'
   cats: []
-  colls:
-    - emo
   fa6: f303
   uni: '&#x270e;'
 pencil_alt:
@@ -17868,10 +17847,8 @@ pickup_truck:
 pie:
   friendly: pie
   img: ../assets/img/emo/pie.png
-  text: '&#129383;'
+  emo: '&#129383;'
   cats: []
-  colls:
-    - emo
   uni: '&#x220f;'
 pie_chart:
   cats: []
@@ -19201,10 +19178,8 @@ registered:
   friendly: registered
   img: ../assets/img/emo/registered.png
   fa: f25d
-  text: '&#174;'
+  emo: '&#174;'
   cats: []
-  colls:
-    - emo
   fa6: f25d
   uni: '&#xae;'
 relationship_bounds:

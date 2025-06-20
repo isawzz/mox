@@ -6,7 +6,7 @@ amanda:
   imgKey: amanda
   games:
     setgame:
-      level: 2
+      level: 7
     button96:
       handicap: 3
 annabel:
@@ -15,7 +15,7 @@ annabel:
   imgKey: annabel
   games:
     setgame:
-      level: 3
+      level: null
     button96:
       handicap: 3
 diana:
@@ -26,7 +26,7 @@ diana:
   imgKey: das
   games:
     setgame:
-      level: 7
+      level: null
     button96:
       handicap: 3
 felix:
@@ -37,7 +37,7 @@ felix:
   imgKey: felix
   games:
     setgame:
-      level: 4
+      level: 7
     button96:
       handicap: 3
 guest:
@@ -60,7 +60,7 @@ gul:
   imgKey: leopard
   games:
     setgame:
-      level: 1
+      level: null
     button96:
       handicap: 3
   fg: '#000000'
@@ -72,7 +72,7 @@ lauren:
   imgKey: lauren
   games:
     setgame:
-      level: 1
+      level: null
     button96:
       handicap: 3
 mimi:
@@ -83,7 +83,7 @@ mimi:
   imgKey: mimi
   games:
     setgame:
-      level: 1
+      level: null
     button96:
       handicap: 3
 nasi:
@@ -96,7 +96,7 @@ sarah:
   imgKey: sarah
   games:
     setgame:
-      level: 7
+      level: null
     button96:
       handicap: 3
   texture: ../assets/textures/marble_grey1.jpeg
@@ -117,4 +117,4 @@ wolferl:
   imgKey: billy
   games:
     setgame:
-      level: 7
+      level: 4

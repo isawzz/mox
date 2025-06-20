@@ -1,72 +1,130 @@
 
-async function showGamesAndTables(force = false) {
-  function showGames(dParent) {
-    mText(`<h2>games</h2>`, dParent, { maleft: 12 });
-    let d = mDom(dParent, { fg: 'white' }, { id: 'game_menu' }); mCenterCenterFlex(d); //mFlexWrap(d);
-    let gamelist = DA.gamelist;
-    for (const gname of gamelist) {
-      let g = MGetGame(gname); 
-      let bg = g.color;
-      let d1 = mDom(d, { cursor: 'pointer', rounding: 10, margin: 10, padding: 10, patop: 10, w: 140, height: 100, bg, position: 'relative' }, { id: g.id });
-      d1.setAttribute('gamename', gname);
-      d1.onclick = onclickGameMenuItem;
-      mCenterFlex(d1);
-      let o = M.superdi[g.logo];
-      let fg = colorIdealText(bg);
-      let el = mDom(d1, { matop: 0, mabottom: 6, fz: 65, hline: 65, family: 'emoNoto', fg, display: 'inline-block' }, { html: o.emo });
-      mLinebreak(d1);
-      mDom(d1, { fz: 18, align: 'center', fg }, { html: capitalize(g.friendly) });
-    }
-  }
-  function showTables(dParent, tables, me) {
-    mText(`<h2>tables</h2>`, dParent, { maleft: 12 });
-    if (isEmpty(tables)) { mDom(dParent, { maleft: 12, fz: 24, fg: 'blue' }, { html: 'no active game tables' }); return; }
-    let t = UI.tables = mDataTable(tables, dParent, null, ['friendly', 'game_friendly', 'playerNames'], 'tables', false);
-    mTableCommandify(t.rowitems.filter(ri => ri.o.status != 'open'), {
-      0: (item, val) => hFunc(val, 'onclickTable', item.o.id, item.id),
-    });
-    mTableStylify(t.rowitems.filter(ri => ri.o.status == 'open'), { 0: { fg: 'blue' }, });
-    let d = iDiv(t);
-    for (const ri of t.rowitems) {
-      let r = iDiv(ri);
-      let id = ri.o.id;
-      if (ri.o.prior == 1) mDom(r, {}, { tag: 'td', html: getWaitingHtml(24) });
-      if (ri.o.status == 'open') {
-        let playerNames = ri.o.playerNames;
-        if (playerNames.includes(me)) {
-          if (ri.o.owner != me) {
-            let h1 = hFunc('leave', 'onclickTableLeave', ri.o.id); let c = mAppend(r, mCreate('td')); c.innerHTML = h1;
-          }
-        } else {
-          let h1 = hFunc('join', 'onclickTableJoin', ri.o.id); let c = mAppend(r, mCreate('td')); c.innerHTML = h1;
-        }
-      }
-      if (ri.o.owner != me) continue;
-      let h = hFunc('delete', 'onclickTableDelete', id); let c = mAppend(r, mCreate('td')); c.innerHTML = h;
-      if (ri.o.status == 'open') { let h1 = hFunc('start', 'onclickTableStart', id); let c1 = mAppend(r, mCreate('td')); c1.innerHTML = h1; }
-    }
-    return tables;
-  }
-  let dParent = mBy('dTableList');
-  if (nundef(dParent)) { mClear('dMain'); dParent = mDom('dMain', {}, { className: 'section', id: 'dTableList' }); }
-	//return;
-  console.log(dParent)
-  M.tables = await MPollTables();
-  let tables = dict2list(M.tables);
-  let me = UGetName();
-  tables.map(x => x.prior = x.status == 'open' ? 0 : x.turn.includes(me) ? 1 : x.playerNames.includes(me) ? 2 : 3);
-  sortBy(tables, 'prior');
-  tables.map(x => x.game_friendly = capitalize(MGetGameFriendly(x.game)));
-  let changes = deepCompare(DA.tableList, tables);
-  DA.tableList = tables;
-  if (changes || force) {
-    mClear(dParent);
-    showTables(dParent, tables, me);
-    dParent = mBy('dGameList');
-    if (isdef(dParent)) { mClear(dParent); }
-    else { dParent = mDom('dMain', {}, { className: 'section', id: 'dGameList' }); }
-    showGames(dParent);
-    if (VERBOSE) console.log('games & tables: UPDATED!!!');
-  } else if (VERBOSE) console.log('games & tables: no change');
-}
 
+function createRadioGroup(dParent, key, values, selectedValue, onOptionChange = null) {
+  let list = values.split(',');
+  let fs = mRadioGroup(dParent, { fg: 'black' }, `d_${key}`, formatLegend(key));
+
+  for (const v of list) {
+    let val = isNumber(v) ? Number(v) : v;
+    let radio = mRadio(v, val, key, fs, { cursor: 'pointer' }, null, key, false);
+    if (onOptionChange) {
+      radio.firstChild.onchange = () => onOptionChange(val);
+    }
+  }
+
+  for (const ch of fs.children) {
+    if (!ch.id) continue;
+    let rval = stringAfterLast(ch.id, '_');
+    if (isNumber(rval)) rval = Number(rval);
+    ch.firstChild.checked = selectedValue == rval || (nundef(selectedValue) && `${rval}` == arrLast(list));
+  }
+
+  measureFieldset(fs);
+  return fs;
+}
+function createPlayerOptionsPopup(dParent, player, handler) {
+  let bg = MGetUserColor(player);
+  let d1 = mDom(dParent, {
+    bg: colorLight(bg, 50),
+    border: `solid 2px ${bg}`,
+    rounding: 6,
+    display: 'inline-block',
+    hPadding: 3
+  }, { id: 'dPlayerOptions' });
+
+  mDom(d1, {}, { html: player });
+  let d = mDom(d1);
+  mCenterFlex(d);
+
+  mButtonX(d1, handler, 20, 0, 'dimgray');
+  return [d1, d];
+}
+function setupCloseHandlers(elem, onClose, excludeElemId) {
+  const cleanup = () => {
+    document.removeEventListener('click', handleClickOutside);
+    document.removeEventListener('keydown', handleEscape);
+  };
+
+  const handleClickOutside = ev => {
+    if (mBy(excludeElemId).contains(ev.target)) return;
+    onClose();
+    cleanup();
+  };
+
+  const handleEscape = ev => {
+    if (ev.key === 'Escape') {
+      onClose();
+      cleanup();
+    }
+  };
+
+  setTimeout(() => {
+    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+  }, 0);
+}
+function createSection(parentId, sectionId) {
+  return mBy(sectionId) || mDom(parentId, {}, { className: 'section', id: sectionId });
+}
+function addActionButton(row, action, handler, id) {
+  return mAppend(row, mCreate('td')).innerHTML = hFunc(action, handler, id);
+}
+function createCardContainer(dParent, styles = {}, id) {
+  let container = mDom(dParent, { fg: 'white', ...styles }, { id });
+  mCenterCenterFlex(container);
+  return container;
+}
+function createGameCard(container, game) {
+  let bg = game.color, fg = colorIdealText(bg);
+  let styles = { cursor: 'pointer', rounding: 10, bg, fg, fz:65,hline:65,padding:10,wmin:140,margin:10,align:'center'}; //, margin: 10, padding: 10, patop: 10, w: 140, height: 100, bg, position: 'relative' }
+  let x=mKey(game.logo,container,styles,{label:capitalize(game.friendly), prefer:'emo',gamename: game.name, id:game.id, onclick: onclickGameMenuItem});
+  
+  return x;
+  let card = mDom(container, { cursor: 'pointer', rounding: 10, margin: 10, padding: 10, patop: 10, w: 140, height: 100, bg, position: 'relative' }, { id: game.id });
+  card.setAttribute('gamename', game.name);
+  card.onclick = onclickGameMenuItem;
+  mCenterFlex(card);
+  mDom(card, { matop: 0, mabottom: 6, fz: 65, hline: 65, family: 'emoNoto', fg, display: 'inline-block' }, { html: M.superdi[game.logo].emo });
+  mLinebreak(card);
+  mDom(card, { fz: 18, align: 'center', fg }, { html: capitalize(game.friendly) });
+  return card;
+}
+function setupPopupClose(popup, saveHandler, menuId = 'dMenuPlayers') {
+  const cleanup = () => {
+    document.removeEventListener('click', handleClickOutside);
+    document.removeEventListener('keydown', handleEscape);
+  };
+
+  const handleClickOutside = ev => {
+    if (mBy(menuId).contains(ev.target)) return;
+    saveHandler();
+    cleanup();
+  };
+
+  const handleEscape = ev => {
+    if (ev.key === 'Escape') {
+      saveHandler();
+      cleanup();
+    }
+  };
+
+  setTimeout(() => {
+    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+  }, 0);
+}
+function createOptionsPopup(dParent, title, bg, styles = {}) {
+  let d1 = mDom(dParent, {
+    bg: colorLight(bg, 50),
+    border: `solid 2px ${bg}`,
+    rounding: 6,
+    display: 'inline-block',
+    hPadding: 3,
+    ...styles
+  }, { id: 'dPlayerOptions' });
+
+  mDom(d1, {}, { html: title });
+  let d = mDom(d1);
+  mCenterFlex(d);
+  return [d1, d];
+}

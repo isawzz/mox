@@ -5,7 +5,7 @@ body {
   height: 100vh;
   width: 100vw;
   caret-color: #ffffff00;
-  font-size: 18px;
+  font-size: 16px;
   font-family: opensans, sans-serif;
 }
 
@@ -45,8 +45,8 @@ a:active,
 legend {
   color: green;
   font-size: 90%;
-  margin-left: 12px;
-  text-align: left;
+  /* margin-left: 12px; */
+  text-align: center;
 }
 
 fieldset {
@@ -126,7 +126,7 @@ fieldset .disabled {
   border: 2px silver solid;
   background-color: #f0f0f0d0;
   color: #111;
-  font-size: 24px;
+  /* font-size: 24px; */
   margin-top: 10px;
   padding: 10px;
   box-sizing: border-box;

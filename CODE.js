@@ -1,4 +1,353 @@
 
+async function setPlayerPlaying(allPlItem, gamename) {
+  let name = allPlItem.name;
+  addIf(DA.playerList, name);
+  highlightPlayerItem(allPlItem);
+  await saveDataFromPlayerOptionsUI(gamename);
+
+  DA.lastAllPlayerItem = allPlItem;
+  let poss = MGetGamePlayerOptions(gamename);
+  if (!poss) return;
+
+  let dParent = mBy('dGameMenu');
+  let [d1, d] = createPlayerOptionsPopup(dParent, name);
+
+  for (const [key, val] of Object.entries(poss)) {
+    if (!isString(val)) continue;
+    let userval = lookup(DA.allPlayers, [name, key]);
+    
+    // Update UI without closing popup
+    let onOptionChange = key == 'playmode' 
+      ? (val) => {
+          lookupSetOverride(DA.allPlayers, [name, key], val);
+          updateUserImageToBotHuman(name);
+        }
+      : (val) => lookupSetOverride(DA.allPlayers, [name, key], val);
+
+    createRadioGroup(d, key, val, userval, onOptionChange);
+  }
+
+  let [r, rp] = [getRectInt(allPlItem.div, dParent), getRectInt(d1)];
+  let x = Math.min(Math.max(r.x - rp.w / 2 + r.w / 2, 0), window.innerWidth - rp.w - 100);
+  mIfNotRelative(dParent);
+  mPos(d1, x, r.y - rp.h - 4);
+
+  // Close and save only on explicit actions
+  const saveAndClose = () => {
+    saveAndUpdatePlayerOptions(allPlItem, gamename);
+    cleanup();
+  };
+
+  const cleanup = () => {
+    document.removeEventListener('click', handleClickOutside);
+    document.removeEventListener('keydown', handleEscape);
+    if (mBy('dPlayerOptions')) mBy('dPlayerOptions').remove();
+  };
+
+  const handleClickOutside = ev => {
+    if (mBy('dMenuPlayers').contains(ev.target) || d1.contains(ev.target)) return;
+    saveAndClose();
+  };
+
+  const handleEscape = ev => {
+    if (ev.key === 'Escape') saveAndClose();
+  };
+
+  setTimeout(() => {
+    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+  }, 0);
+
+  mButtonX(d1, saveAndClose, 20, 0, 'dimgray');
+}
+function createRadioGroup(dParent, key, values, selectedValue, handler = null) {
+  let list = values.split(',');
+  let fs = mRadioGroup(dParent, { fg: 'black' }, `d_${key}`, formatLegend(key));
+
+  for (const v of list) {
+    let val = isNumber(v) ? Number(v) : v;
+    mRadio(v, val, key, fs, { cursor: 'pointer' }, handler, key, false);
+  }
+
+  for (const ch of fs.children) {
+    if (!ch.id) continue;
+    let rval = stringAfterLast(ch.id, '_');
+    if (isNumber(rval)) rval = Number(rval);
+    ch.firstChild.checked = selectedValue == rval || (nundef(selectedValue) && `${rval}` == arrLast(list));
+  }
+
+  measureFieldset(fs);
+  return fs;
+}
+
+async function setPlayerPlaying(allPlItem, gamename) {
+  let name = allPlItem.name;
+  // ...existing initialization code...
+
+  let dParent = mBy('dGameMenu');
+  let bg = MGetUserColor(name);
+  let [d1, d] = createOptionsPopup(dParent, name, bg);
+
+  // ...existing options creation code...
+
+  let [r, rp] = [getRectInt(allPlItem.div, dParent), getRectInt(d1)];
+  let x = Math.min(Math.max(r.x - rp.w / 2 + r.w / 2, 0), window.innerWidth - rp.w - 100);
+  mIfNotRelative(dParent);
+  mPos(d1, x, r.y - rp.h - 4);
+  mButtonX(d1, ev => saveAndUpdatePlayerOptions(allPlItem, gamename), 20, 0, 'dimgray');
+
+  setupPopupClose(d1, () => saveAndUpdatePlayerOptions(allPlItem, gamename));
+}
+async function setPlayerPlaying(allPlItem, gamename) {
+  let name = allPlItem.name;
+  addIf(DA.playerList, name);
+  highlightPlayerItem(allPlItem);
+  await saveDataFromPlayerOptionsUI(gamename);
+
+  DA.lastAllPlayerItem = allPlItem;
+  let poss = MGetGamePlayerOptions(gamename);
+  if (!poss) return;
+
+  let dParent = mBy('dGameMenu');
+  let bg = MGetUserColor(name);
+  let d1 = mDom(dParent, {
+    bg: colorLight(bg, 50),
+    border: `solid 2px ${bg}`,
+    rounding: 6,
+    display: 'inline-block',
+    hPadding: 3
+  }, { id: 'dPlayerOptions' });
+
+  mDom(d1, {}, { html: name });
+  let d = mDom(d1);
+  mCenterFlex(d);
+
+  for (const [key, val] of Object.entries(poss)) {
+    if (!isString(val)) continue;
+    let list = val.split(',');
+    let fs = mRadioGroup(d, { fg: 'black' }, `d_${key}`, formatLegend(key));
+    let handler = key == 'playmode' ? () => updateUserImageToBotHuman(name) : null;
+
+    for (const v of list) {
+      let val = isNumber(v) ? Number(v) : v;
+      mRadio(v, val, key, fs, { cursor: 'pointer' }, handler, key, false);
+    }
+
+    let userval = lookup(DA.allPlayers, [name, key]);
+    for (const ch of fs.children) {
+      if (!ch.id) continue;
+      let rval = stringAfterLast(ch.id, '_');
+      if (isNumber(rval)) rval = Number(rval);
+      ch.firstChild.checked = userval == rval || (nundef(userval) && `${rval}` == arrLast(list));
+    }
+    measureFieldset(fs);
+  }
+
+  let [r, rp] = [getRectInt(allPlItem.div, dParent), getRectInt(d1)];
+  let x = Math.min(Math.max(r.x - rp.w / 2 + r.w / 2, 0), window.innerWidth - rp.w - 100);
+  mIfNotRelative(dParent);
+  mPos(d1, x, r.y - rp.h - 4);
+  mButtonX(d1, ev => saveAndUpdatePlayerOptions(allPlItem, gamename), 20, 0, 'dimgray');
+
+  const cleanup = () => {
+    document.removeEventListener('click', handleClickOutside);
+    document.removeEventListener('keydown', handleEscape);
+  };
+
+  const handleClickOutside = ev => {
+    if (mBy('dMenuPlayers').contains(ev.target)) return;
+    saveAndUpdatePlayerOptions(allPlItem, gamename);
+    cleanup();
+  };
+
+  const handleEscape = ev => {
+    if (ev.key === 'Escape') {
+      saveAndUpdatePlayerOptions(allPlItem, gamename);
+      cleanup();
+    }
+  };
+
+  setTimeout(() => {
+    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+  }, 0);
+}
+async function setPlayerPlaying(allPlItem, gamename) {
+  let name = allPlItem.name;
+  addIf(DA.playerList, name);
+  highlightPlayerItem(allPlItem);
+  await saveDataFromPlayerOptionsUI(gamename);
+
+  DA.lastAllPlayerItem = allPlItem;
+  let poss = MGetGamePlayerOptions(gamename);
+  if (!poss) return;
+
+  let dParent = mBy('dGameMenu');
+  let [d1, d] = createPlayerOptionsPopup(dParent, name,
+    () => saveAndUpdatePlayerOptions(allPlItem, gamename));
+
+  for (const [key, val] of Object.entries(poss)) {
+    if (!isString(val)) continue;
+    let handler = key == 'playmode' ? () => updateUserImageToBotHuman(name) : null;
+    let userval = lookup(DA.allPlayers, [name, key]);
+    createRadioGroup(d, key, val, userval, handler);
+  }
+
+  let [r, rp] = [getRectInt(allPlItem.div, dParent), getRectInt(d1)];
+  let x = Math.min(Math.max(r.x - rp.w / 2 + r.w / 2, 0), window.innerWidth - rp.w - 100);
+  mIfNotRelative(dParent);
+  mPos(d1, x, r.y - rp.h - 4);
+
+  setupCloseHandlers(d1,
+    () => saveAndUpdatePlayerOptions(allPlItem, gamename),
+    'dMenuPlayers'
+  );
+}
+
+async function showGamesAndTables(force = false) {
+  let dTableList = createSection('dMain', 'dTableList');
+  M.tables = await MPollTables();
+  let tables = dict2list(M.tables), me = UGetName();
+  // ...existing code for table processing...
+
+  if (!changes && !force) return false;
+
+  mClear(dTableList);
+  showTables(dTableList, tables, me);
+  let dGameList = createSection('dMain', 'dGameList');
+  mClear(dGameList);
+  showGames(dGameList);
+  return true;
+}
+
+async function setPlayerPlaying(allPlItem, gamename) {
+	let name = allPlItem.name;
+	addIf(DA.playerList, name);
+	highlightPlayerItem(allPlItem);
+	await saveDataFromPlayerOptionsUI(gamename);
+
+	DA.lastAllPlayerItem = allPlItem;
+	let poss = MGetGamePlayerOptions(gamename);
+	if (!poss) return;
+
+	let dParent = mBy('dGameMenu');
+	let bg = MGetUserColor(name);
+	let d1 = mDom(dParent, {
+		bg: colorLight(bg, 50),
+		border: `solid 2px ${bg}`,
+		rounding: 6,
+		display: 'inline-block',
+		hPadding: 3
+	}, { id: 'dPlayerOptions' });
+
+	mDom(d1, {}, { html: name });
+	let d = mDom(d1);
+	mCenterFlex(d);
+
+	for (const [key, val] of Object.entries(poss)) {
+		if (!isString(val)) continue;
+		let list = val.split(',');
+		let fs = mRadioGroup(d, { fg: 'black' }, `d_${key}`, formatLegend(key));
+		let handler = key == 'playmode' ? () => updateUserImageToBotHuman(name) : null;
+
+		for (const v of list) {
+			let val = isNumber(v) ? Number(v) : v;
+			mRadio(v, val, key, fs, { cursor: 'pointer' }, handler, key, false);
+		}
+
+		let userval = lookup(DA.allPlayers, [name, key]);
+		for (const ch of fs.children) {
+			if (!ch.id) continue;
+			let rval = stringAfterLast(ch.id, '_');
+			if (isNumber(rval)) rval = Number(rval);
+			ch.firstChild.checked = userval == rval || (nundef(userval) && `${rval}` == arrLast(list));
+		}
+		measureFieldset(fs);
+	}
+
+	mIfNotRelative(dParent);
+	let [r, rp] = [getRectInt(allPlItem.div, dParent), getRectInt(d1)];
+	let x = Math.min(Math.max(r.x - rp.w / 2 + r.w / 2, 0), window.innerWidth - rp.w - 100);
+	mPos(d1, x, r.y - rp.h - 4);
+	mButtonX(d1, ev => saveAndUpdatePlayerOptions(allPlItem, gamename), 20, 0, 'dimgray');
+}
+
+async function setPlayerPlaying(allPlItem, gamename) {
+	let name = allPlItem.name;
+	addIf(DA.playerList, name);
+	highlightPlayerItem(allPlItem);
+	await saveDataFromPlayerOptionsUI(gamename);
+
+	DA.lastAllPlayerItem = allPlItem;
+	let poss = MGetGamePlayerOptions(gamename);
+	if (!poss) return;
+
+	let dParent = mBy('dGameMenu');
+	let bg = MGetUserColor(name);
+	let d1 = mDom(dParent, {
+		bg: colorLight(bg, 50),
+		border: `solid 2px ${bg}`,
+		rounding: 6,
+		display: 'inline-block',
+		hPadding: 3
+	}, { id: 'dPlayerOptions' });
+
+	mDom(d1, {}, { html: name });
+	let d = mDom(d1);
+	mCenterFlex(d);
+
+	for (const [key, val] of Object.entries(poss)) {
+		if (!isString(val)) continue;
+		let list = val.split(',');
+		let fs = mRadioGroup(d, { fg: 'black' }, `d_${key}`, formatLegend(key));
+		let handler = key == 'playmode' ? () => updateUserImageToBotHuman(name) : null;
+
+		for (const v of list) {
+			let val = isNumber(v) ? Number(v) : v;
+			mRadio(v, val, key, fs, { cursor: 'pointer' }, handler, key, false);
+		}
+
+		let userval = lookup(DA.allPlayers, [name, key]);
+		for (const ch of fs.children) {
+			if (!ch.id) continue;
+			let rval = stringAfterLast(ch.id, '_');
+			if (isNumber(rval)) rval = Number(rval);
+			ch.firstChild.checked = userval == rval || (nundef(userval) && `${rval}` == arrLast(list));
+		}
+		measureFieldset(fs);
+	}
+
+	let [r, rp] = [getRectInt(allPlItem.div, dParent), getRectInt(d1)];
+	let x = Math.min(Math.max(r.x - rp.w / 2 + r.w / 2, 0), window.innerWidth - rp.w - 100);
+	mIfNotRelative(dParent);
+	mPos(d1, x, r.y - rp.h - 4);
+	mButtonX(d1, ev => saveAndUpdatePlayerOptions(allPlItem, gamename), 20, 0, 'dimgray');
+
+	// Add click outside handler
+	const handleClickOutside = ev => {
+		if (!d1.contains(ev.target)) {
+			saveAndUpdatePlayerOptions(allPlItem, gamename);
+			document.removeEventListener('click', handleClickOutside);
+			document.removeEventListener('keydown', handleEscape);
+		}
+	};
+
+	// Add escape key handler 
+	const handleEscape = ev => {
+		if (ev.key === 'Escape') {
+			saveAndUpdatePlayerOptions(allPlItem, gamename);
+			document.removeEventListener('click', handleClickOutside);
+			document.removeEventListener('keydown', handleEscape);
+		}
+	};
+
+	// Small delay to avoid immediate trigger of click outside
+	setTimeout(() => {
+		document.addEventListener('click', handleClickOutside);
+		document.addEventListener('keydown', handleEscape);
+	}, 0);
+}
+
 function makeADivWithSvg0(d, x, r, sz, gap, clip, bg, territory) {
 	let html = `
 						<svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">

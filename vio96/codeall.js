@@ -3,16 +3,18 @@ async function DAInit() {
   DA.pollInterval = 3000;
   DA.pollCounter = 0;
   DA.backendURL = await getDA('phpUrl'); //getServer(true) + 'simple0/php'; //'https://moxito.online/mox/simple0/php';
-  DA.gamelist = ['setgame', 'button96'];//,'accuse aristo bluff ferro fishgame fritz huti lacuna nations setgame sheriff spotit wise']; //if (DA.TEST0) gamelist += ' a_game'; gamelist = toWords(gamelist);
+  DA.gamelist = ['setgame', 'button96'];
+  let gamelist = 'accuse aristo bluff button96 ferro fishgame fritz huti lacuna nations setgame sheriff spotit wise';
+  DA.gamelist = gamelist = toWords(gamelist);
   DA.funcs = { setgame: setgame(), button96: button96() }; //implemented games!
   for (const gname in DA.gamelist) {
     if (isdef(DA.funcs[gname])) continue;
     DA.funcs[gname] = defaultGameFunc();
   }
   DA.evList = [];
-  await loadAssetsStatic(); 
+  await loadAssetsStatic();
   M.tables = await MPollTables();
-  let elems = mLayoutTM('dPage'); mStyle('dMain', { overy: 'auto', fg: 'inherit', pah:10 });//, {class:'flexCS'}); 
+  let elems = mLayoutTM('dPage'); mStyle('dMain', { overy: 'auto', fg: 'inherit', pah: 10 });//, {class:'flexCS'}); 
   mCenterFlex('dMain');
   mLayoutTopTestExtraMessageTitle('dTop');
   let username = localStorage.getItem('username') ?? 'hans';
@@ -1436,6 +1438,7 @@ async function clickFirstTable() {
   if (table) { await onclickTable(table.id); return T; }
 }
 async function clickOn(prop, val) {
+  await mSleep(100);
   let elem = null;
   if (isDict(prop) && isdef(prop.tag)) elem = prop; else elem = findElementBy(prop, val);
   assertion(elem, `NO elem ${prop} ${val}`);
@@ -1445,6 +1448,18 @@ function clickOnElemWithAttr(prop, val) {
   let d = document.querySelectorAll(`[${prop}="${val}"]`)[0];
   if (isdef(d)) d.click();
   return d;
+}
+async function clickOnHTML(s) {
+  const elements = document.querySelectorAll('*');
+  for (let el of elements) {
+    if (el.innerHTML.trim() === s) {
+      el.click(); // Simulate a click
+      await mSleep(100);
+      return el;  // Optional: return the clicked element
+    }
+  }
+  console.warn(`No element with innerHTML ${s} found.`);
+  return null;
 }
 async function clickOnGame(gamename) { await showGameMenu(gamename); }
 async function clickOnPlayer(name) { return await showGameMenuPlayerDialog(name); }
@@ -8925,7 +8940,8 @@ function mButtonList(dParent, di) {
 }
 function mButtonX(dParent, handler = null, sz = 22, offset = 5, color = 'contrast') {
   mIfNotRelative(dParent);
-  let bx = mDom(dParent, { position: 'absolute', top: -2 + offset, right: -5 + offset, w: sz, h: sz, cursor: 'pointer' }, { className: 'hop1' });
+  let [top, right] = [-3 + offset, offset - 3];//[offset,offset];//top: -2 + offset, right: -5 + offset
+  let bx = mDom(dParent, { position: 'absolute', top, right, w: sz, h: sz, cursor: 'pointer' }, { className: 'hop1' });
   bx.onclick = ev => { evNoBubble(ev); if (!handler) dParent.remove(); else handler(ev); }
   let o = M.superdi.xmark;
   let bg = mGetStyle(dParent, 'bg'); if (isEmpty(bg)) bg = 'white';
@@ -9927,6 +9943,7 @@ function mKey(imgKey, d, styles = {}, opts = {}) {
     };
     let x = mDom(d0, astyles, { ...opts, html: text });
   }
+  if (isdef(opts.label)) mDom(d0, { fz: 18, align: 'center' }, { html: opts.label });
   return d0;
 }
 async function mKeyO(imgKey, d, styles = {}, opts = {}) {
@@ -10523,7 +10540,7 @@ function mRadio(label, val, name, dParent, styles = {}, onchangeHandler, group_i
   }
   return d;
 }
-function mRadioGroup(dParent, styles, id, legend, legendstyles) {
+function mRadioGroup(dParent, styles, id, legend, legendstyles = {}) {
   let dOuter = mDom(dParent, { bg: 'white', rounding: 10, margin: 4 })
   let f = mCreate('fieldset');
   f.id = id;
@@ -11020,8 +11037,8 @@ async function mToggleButton(dParent, styles = {}) {
   return mToggleCompose(...buttons);
 }
 function mToggleColorButton(dParent, styles = {}, opts = {}, states) {
-  addKeys({ tag: 'button', class:'flexSpaceBetween' }, opts);
-  let b = mDom(dParent, styles, opts); 
+  addKeys({ tag: 'button', class: 'flexSpaceBetween' }, opts);
+  let b = mDom(dParent, styles, opts);
   let sz = 16;
   let c = mDom(b, { w: sz, h: sz, round: true, bg: 'blue', position: 'relative', top: 2, left: 3 }, { state: null });
   if (nundef(states)) states = [{ color: 'green', blink: false, f: () => console.log('callback!') }, { color: 'red', blink: true, f: () => console.log('callback!') }];
@@ -11732,16 +11749,6 @@ function onclickClear(inp, grid) {
   let checklist = Array.from(grid.querySelectorAll('input[type="checkbox"]'));
   checklist.map(x => x.checked = false);
   sortCheckboxes(grid);
-}
-async function onclickClearPlayers() {
-  let me = UGetName();
-  DA.playerList = [me];
-  for (const name in DA.allPlayers) {
-    if (name != me) unselectPlayerItem(DA.allPlayers[name]);
-  }
-  assertion(!isEmpty(DA.playerList), "uname removed from playerList!!!!!!!!!!!!!!!")
-  DA.lastName = me;
-  mRemoveIfExists('dPlayerOptions')
 }
 async function onclickColor(color) {
   let hex = colorToHex79(color);
@@ -13562,25 +13569,6 @@ function sameList(l1, l2) {
   }
   return true;
 }
-async function saveAndUpdatePlayerOptions(allPl, gamename) {
-  let name = allPl.name;
-  let poss = MGetGamePlayerOptionsAsDict(gamename);
-  if (nundef(poss)) return;
-  let opts = {};
-  for (const p in poss) { allPl[p] = getRadioValue(p); if (p != 'playmode') opts[p] = allPl[p]; }
-  let id = 'dPlayerOptions'; mRemoveIfExists(id); //dont need UI anymore
-  let oldOpts = valf(MGetUserOptionsForGame(name, gamename), {});
-  let changed = false;
-  for (const p in poss) {
-    if (p == 'playmode') continue;
-    if (oldOpts[p] != opts[p]) { console.log('change:', p, oldOpts[p], opts[p]); changed = true; break; }
-  }
-  if (changed) {
-    let games = valf(MGetUser(name).games, {});
-    games[gamename] = opts;
-    let res = await postUsers();
-  }
-}
 function saveBase64Image(imgElement, filename) {
   if (!imgElement || !imgElement.src.startsWith('data:image/jpeg;base64,')) {
     console.error('Invalid image element or source.');
@@ -13600,12 +13588,6 @@ function saveBase64Image(imgElement, filename) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-}
-async function saveDataFromPlayerOptionsUI(gamename) {
-  let id = 'dPlayerOptions';
-  let lastAllPl = DA.lastAllPlayerItem;
-  let dold = mBy(id);
-  if (isdef(dold)) { await saveAndUpdatePlayerOptions(lastAllPl, gamename); dold.remove(); }
 }
 function saveFileAtClient(name, type, data) {
   if (data != null && navigator.msSaveBlob) return navigator.msSaveBlob(new Blob([data], { type: type }), name);
@@ -13782,77 +13764,6 @@ function setKeys({ allowDuplicates, nMin = 25, lang, key, keySets, filterFunc, p
   return primary;
 }
 function setLanguage(x) { currentLanguage = x; startLevel(); }
-async function setPlayerNotPlaying(item, gamename) {
-  await saveDataFromPlayerOptionsUI(gamename);
-  removeInPlace(DA.playerList, item.name);
-  mRemoveIfExists('dPlayerOptions');
-  unselectPlayerItem(item);
-}
-async function setPlayerPlaying(allPlItem, gamename) {
-  let [name, da] = [allPlItem.name, allPlItem.div];
-  addIf(DA.playerList, name);
-  highlightPlayerItem(allPlItem);
-  await saveDataFromPlayerOptionsUI(gamename);
-  let id = 'dPlayerOptions';
-  DA.lastAllPlayerItem = allPlItem;
-  let poss = MGetGamePlayerOptions(gamename);
-  if (nundef(poss)) return;
-  let dParent = mBy('dGameMenu');
-  let bg = MGetUserColor(name);
-  let rounding = 6;
-  let d1 = mDom(dParent, { bg: colorLight(bg, 50), border: `solid 2px ${bg}`, rounding, display: 'inline-block', hPadding: 3, rounding }, { id });
-  mDom(d1, {}, { html: `${name}` }); //title
-  d = mDom(d1, {}); mCenterFlex(d);
-  mCenterCenter(d);
-  for (const p in poss) {
-    let key = p;
-    let val = poss[p];
-    if (isString(val)) {
-      let list = val.split(',');
-      let legend = formatLegend(key);
-      let fs = mRadioGroup(d, { fg: 'black' }, `d_${key}`, legend);
-      let handler = key == 'playmode' ? updateUserImageToBotHuman(name) : null;
-      for (const v of list) { let r = mRadio(v, isNumber(v) ? Number(v) : v, key, fs, { cursor: 'pointer' }, handler, key, false); }
-      let userval = lookup(DA.allPlayers, [name, p]);
-      let chi = fs.children;
-      for (const ch of chi) {
-        let id = ch.id;
-        if (nundef(id)) continue;
-        let radioval = stringAfterLast(id, '_');
-        if (isNumber(radioval)) radioval = Number(radioval);
-        if (userval == radioval) ch.firstChild.checked = true;
-        else if (nundef(userval) && `${radioval}` == arrLast(list)) ch.firstChild.checked = true;
-      }
-      measureFieldset(fs);
-    }
-  }
-  let r = getRectInt(da, mBy('dGameMenu'));
-  let rp = getRectInt(d1);
-  let [y, w, h] = [r.y - rp.h - 4, rp.w, rp.h];
-  let x = r.x - rp.w / 2 + r.w / 2;
-  if (x < 0) x = r.x - 22;
-  if (x > window.innerWidth - w - 100) x = r.x - w + r.w + 14;
-  mIfNotRelative(dParent);
-  mPos(d1, x, y);
-  mButtonX(d1, ev => saveAndUpdatePlayerOptions(allPlItem, gamename), 18, 3, 'dimgray');
-}
-function setPlayersToMulti() {
-  for (const name in DA.allPlayers) {
-    lookupSetOverride(DA.allPlayers, [name, 'playmode'], 'human');
-    updateUserImageToBotHuman(name, 'human');
-  }
-  setRadioValue('playmode', 'human');
-}
-function setPlayersToSolo() {
-  for (const name in DA.allPlayers) {
-    if (name == UGetName()) continue;
-    lookupSetOverride(DA.allPlayers, [name, 'playmode'], 'bot');
-    updateUserImageToBotHuman(name, 'bot');
-  }
-  let popup = mBy('dPlayerOptions');
-  if (isdef(popup) && popup.firstChild.innerHTML.includes(UGetName())) return;
-  setRadioValue('playmode', 'bot');
-}
 function setRadioValue(prop, val) {
   let input = mBy(`i_${prop}_${val}`);
   if (nundef(input)) return;
@@ -13926,7 +13837,6 @@ function setgame() {
     let [me, players] = [UGetName(), table.players];
     let style = { patop: 8, mabottom: 20, wmin: 80, hmin: 90, bg: 'beige', fg: 'contrast' };
     let player_stat_items = await uiTypePlayerStats(table, me, 'dStats', 'rowflex', style);
-    return;
     for (const plname in players) {
       let pl = players[plname];
       let item = player_stat_items[plname];
@@ -14417,7 +14327,7 @@ async function showGameMenu(gamename) {
   let users = M.users = await loadStaticYaml('y/users.yaml'); //console.log('users',users); return;
   mRemoveIfExists('dGameMenu');
   let dMenu = mDom('dMain', {}, { className: 'section', id: 'dGameMenu' });
-  mDom(dMenu, { maleft: 12 }, { html: `<h2>game options</h2>` });
+  sectionTitle('dGameMenu', 'game options');
   let style = { display: 'flex', justifyContent: 'center', w: '100%', gap: 10, matop: 6 };
   let dPlayers = mDom(dMenu, style, { id: 'dMenuPlayers' }); //mCenterFlex(dPlayers);
   let dOptions = mDom(dMenu, style, { id: 'dMenuOptions' }); //'dMenuOptions'); //mCenterFlex(dOptions);
@@ -14719,43 +14629,6 @@ async function showTable(force = false) {
   } else if (VERBOSE) console.log("table no change");
   return DA.gameState;
 }
-async function showTables(from) {
-  await updateTestButtonsLogin();
-  let me = getUname();
-  let tables = Serverdata.tables = await mGetRoute('tables');
-  tables.map(x => x.prior = x.status == 'open' ? 0 : x.turn.includes(me) ? 1 : x.playerNames.includes(me) ? 2 : 3);
-  sortBy(tables, 'prior');
-  let dParent = mBy('dTableList');
-  if (isdef(dParent)) { mClear(dParent); }
-  else dParent = mDom('dMain', {}, { className: 'section', id: 'dTableList' });
-  if (isEmpty(tables)) { mText('no active game tables', dParent); return []; }
-  tables.map(x => x.game_friendly = capitalize(getGameFriendly(x.game)));
-  mText(`<h2>game tables</h2>`, dParent, { maleft: 12 })
-  let t = UI.tables = mDataTable(tables, dParent, null, ['friendly', 'game_friendly', 'playerNames'], 'tables', false);
-  mTableCommandify(t.rowitems.filter(ri => ri.o.status != 'open'), {
-    0: (item, val) => hFunc(val, 'onclickTable', item.o.id, item.id),
-  });
-  mTableStylify(t.rowitems.filter(ri => ri.o.status == 'open'), { 0: { fg: 'blue' }, });
-  let d = iDiv(t);
-  for (const ri of t.rowitems) {
-    let r = iDiv(ri);
-    let id = ri.o.id;
-    if (ri.o.prior == 1) mDom(r, {}, { tag: 'td', html: getWaitingHtml(24) });
-    if (ri.o.status == 'open') {
-      let playerNames = ri.o.playerNames;
-      if (playerNames.includes(me)) {
-        if (ri.o.owner != me) {
-          let h1 = hFunc('leave', 'onclickLeaveTable', ri.o.id); let c = mAppend(r, mCreate('td')); c.innerHTML = h1;
-        }
-      } else {
-        let h1 = hFunc('join', 'onclickJoinTable', ri.o.id); let c = mAppend(r, mCreate('td')); c.innerHTML = h1;
-      }
-    }
-    if (ri.o.owner != me) continue;
-    let h = hFunc('delete', 'onclickDeleteTable', id); let c = mAppend(r, mCreate('td')); c.innerHTML = h;
-    if (ri.o.status == 'open') { let h1 = hFunc('start', 'onclickStartTable', id); let c1 = mAppend(r, mCreate('td')); c1.innerHTML = h1; }
-  }
-}
 async function showTessellation(ev) {
   let name = ev.target.innerHTML;
   const response = await fetch(`http://localhost:5000/tesvg?u=${2}&v=${2}&shape=${name}`);
@@ -14877,13 +14750,13 @@ function showTrick() {
   }
 }
 async function showUserImage(uname, d, sz = 40) {
-  let u = MGetUser(uname); 
+  let u = MGetUser(uname);
   let key = u.imgKey;
   let m = M.superdi[key];
   if (nundef(m)) {
     key = 'unknown_user';
   }
-  let img = mDom(d, { h: sz, w: sz, round: true, border: `${u.color} 3px solid` },{tag:'img', src:m.img});
+  let img = mDom(d, { h: sz, w: sz, round: true, border: `${u.color} 3px solid` }, { tag: 'img', src: m.img });
   return img;
 }
 function showValidMoves(table) {
@@ -15692,9 +15565,9 @@ async function test0() {
   await loadAssetsStatic(); console.log(M);
   let files = await mGetFilenames('tables'); console.log('files', files);
   let [dTop, dMain] = mLayoutTM('dPage');
-  mStyle('dMain', { overy: 'auto',padding:0 }); //,grid: '1fr / 1fr', gap: 10, padding: 10 });
-  let d = mDom(dMain,{gap:10,padding:10,bg:'red',wrap:true});  //,{className:'flex0'}); mFlex(d) //, { padding:10,flex:'center center row', wrap:true});//display: 'grid', gridCols: 2,gap:10, padding:10, bg: rColor() });
-  mClass(d,'flexCC')
+  mStyle('dMain', { overy: 'auto', padding: 0 }); //,grid: '1fr / 1fr', gap: 10, padding: 10 });
+  let d = mDom(dMain, { gap: 10, padding: 10, bg: 'red', wrap: true });  //,{className:'flex0'}); mFlex(d) //, { padding:10,flex:'center center row', wrap:true});//display: 'grid', gridCols: 2,gap:10, padding:10, bg: rColor() });
+  mClass(d, 'flexCC')
   for (const i of range(10)) {
     showObject(DA, null, d, { bg: rColor() });
   }
@@ -16375,9 +16248,8 @@ async function updateTestButtonsLogin(names) {
 }
 function updateUserImageToBotHuman(playername, value) {
   function doit(checked, name, val) {
-    let du = mByAttr('username', playername); console.log('du', du);
-    let img = du.getElementsByTagName('img')[0]; //du.firstChild;
-    console.log('checked',checked,' name',name,'val',val, img)
+    let du = mByAttr('username', playername);
+    let img = du.getElementsByTagName('img')[0];
     if (checked == true) if (val == 'human') mStyle(img, { round: true }); else mStyle(img, { rounding: 2 });
   }
   if (isdef(value)) doit(true, 0, value); else return doit;
