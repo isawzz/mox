@@ -1,8 +1,17 @@
 alles ist fuer immer ok - I have left this plane. 
 
+___ 5:51 AM 6/21/2025 airport 99000 K4 
+ok - check ob users.yaml existiert? JA!
+- open mag oder fastcomet fuer das wo man theme aendern kann
+- neuen user anlegen! wie?
+- alles wo Serverdata vorkommt ist noch von node app
+- auch alles mit 'route'
+- postUsers
+ok - gibt es ein addUser? NEIN
+ok - gotostyles.css input oder mInput
 ___ 5:13 AM 6/20/2025 airport 99000 K4 ~ok
-=>username soll genau wie buttons ausschauen!!!
-=>user name soll editable sein!!!!
+ok =>username soll genau wie buttons ausschauen!!!
+ok =>user name soll editable sein!!!! (mGather)
 ___ 4:59 AM 6/19/2025 airport 98000 K3 t~~
 ein game hat color,friendly,logo,name,game_type
 wenn ich irgendwo anders hin clicke oder esb soll popup closen

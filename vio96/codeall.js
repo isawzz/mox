@@ -26,6 +26,7 @@ async function DAInit() {
   }
   await showMenuButtons();
   if (TESTING) await showTestButtons();
+  globalKeyHandling()
 }
 async function DASaveState(state) {
   if (isdef(state)) DA.gameState = state;
@@ -8844,27 +8845,27 @@ function mAdjustPage(wmargin) {
   mStyle('dMain', { w, h });
   mStyle('dPage', { w, h });
 }
-function mAlign(d, da, opts) {
-  if (mGetStyle(d, 'display') != 'inline-block') {
-    let parent = d.parentNode;
+function mAlign(box, dOuter, opts) {
+  if (mGetStyle(box, 'display') != 'inline-block') {
+    let parent = box.parentNode;
     let wrapper = mDom(parent, { display: 'inline-block' });
-    mAppend(wrapper, d);
-    d = wrapper;
+    mAppend(wrapper, box);
+    box = wrapper;
   }
-  let rda = getRect(da);
-  let rd = getRect(d);
+  let rOuter = getRect(dOuter);
+  let rbox = getRect(box);
   let align = valf(opts.align, 'bl'), ov = valf(opts.ov, 0);
-  if (align == 'tl') { dx = rda.l; dy = rda.t - rd.h * (1 - ov); }
-  else if (align == 'bl') { dx = rda.l; dy = rda.b - rd.h * ov; }
-  else if (align == 'cl') { dx = rda.l - rd.w * (1 - ov); dy = rda.t + rda.h / 2 - rd.h / 2; }
-  else if (align == 'tr') { dx = rda.l + rda.w - rd.w; dy = rda.t - rd.h * (1 - ov); }
-  else if (align == 'br') { dx = rda.l + rda.w - rd.w; dy = rda.t + rda.h - rd.h * ov; }
-  else if (align == 'cr') { dx = rda.l + rda.w - rd.w + rd.w * (1 - ov); dy = rda.t + rda.h / 2 - rd.h / 2; }
-  else if (align == 'tc') { dx = rda.l + rda.w / 2 - rd.w / 2; dy = rda.t - rd.h * (1 - ov); }
-  else if (align == 'bc') { dx = rda.l + rda.w / 2 - rd.w / 2; dy = rda.t + rda.h - rd.h * ov; }
-  else if (align == 'cc') { dx = rda.l + rda.w / 2 - rd.w / 2; dy = rda.t + rda.h / 2 - rd.h / 2; }
-  dx = clamp(dx, 0, window.innerWidth - rd.w); dy = clamp(dy, 0, window.innerHeight - rd.h);
-  mPos(d, dx, dy, opts.offx, opts.offy);
+  if (align == 'tl') { dx = rOuter.l; dy = rOuter.t - rbox.h * (1 - ov); }
+  else if (align == 'bl') { dx = rOuter.l; dy = rOuter.b - rbox.h * ov; }
+  else if (align == 'cl') { dx = rOuter.l - rbox.w * (1 - ov); dy = rOuter.t + rOuter.h / 2 - rbox.h / 2; }
+  else if (align == 'tr') { dx = rOuter.l + rOuter.w - rbox.w; dy = rOuter.t - rbox.h * (1 - ov); }
+  else if (align == 'br') { dx = rOuter.l + rOuter.w - rbox.w; dy = rOuter.t + rOuter.h - rbox.h * ov; }
+  else if (align == 'cr') { dx = rOuter.l + rOuter.w - rbox.w + rbox.w * (1 - ov); dy = rOuter.t + rOuter.h / 2 - rbox.h / 2; }
+  else if (align == 'tc') { dx = rOuter.l + rOuter.w / 2 - rbox.w / 2; dy = rOuter.t - rbox.h * (1 - ov); }
+  else if (align == 'bc') { dx = rOuter.l + rOuter.w / 2 - rbox.w / 2; dy = rOuter.t + rOuter.h - rbox.h * ov; }
+  else if (align == 'cc') { dx = rOuter.l + rOuter.w / 2 - rbox.w / 2; dy = rOuter.t + rOuter.h / 2 - rbox.h / 2; }
+  dx = clamp(dx, 0, window.innerWidth - rbox.w); dy = clamp(dy, 0, window.innerHeight - rbox.h);
+  mPos(box, dx, dy, opts.offx, opts.offy);
 }
 function mAnchorTo(elem, dAnchor, align = 'bl') {
   let rect = dAnchor.getBoundingClientRect();
@@ -9505,18 +9506,6 @@ function mGadget(name, styles = {}, opts = {}) {
   let inp = mDom(form, { outline: 'none', w: 130 }, { className: 'input', name: name, tag: 'input', type: 'text', placeholder: valf(opts.placeholder, `<enter ${name}>`) });
   mDom(form, { display: 'none' }, { tag: 'input', type: 'submit' });
   return { name, dialog, form, inp }
-}
-function mGather(f, d, styles = {}, opts = {}) {
-  return new Promise((resolve, _) => {
-    let dShield = mShield();
-    let fCancel = _ => { dShield.remove(); hotkeyDeactivate('Escape'); resolve(null) };
-    let fSuccess = val => { dShield.remove(); hotkeyDeactivate('Escape'); resolve(val) };
-    dShield.onclick = fCancel;
-    hotkeyActivate('Escape', fCancel);
-    let [box, inp] = mInBox(f, dShield, styles, {}, dictMerge(opts, { fSuccess }));
-    mAlign(box, d, { align: 'bl', offx: 20 });
-    inp.focus();
-  });
 }
 function mGetAttr(elem, prop) { return elem.getAttribute(prop); }
 async function mGetFilenames(dir) {
@@ -12320,11 +12309,6 @@ async function onclickThinking(ev) {
   let isActive = key == w.key;
   console.log(res);
 }
-async function onclickUser() {
-  let uname = await mGather(iDiv(UI.nav.commands.user), { w: 100, margin: 0 }, { content: 'username', align: 'br', placeholder: ' <username> ' });
-  if (!uname) return;
-  await switchToUser(uname);
-}
 async function onclickWatch() { }
 async function ondropPreviewImage(dParent, url, key) {
   if (isdef(key)) {
@@ -12922,7 +12906,7 @@ async function postUserChange(data, override = false) {
   return Serverdata.users[data.name] = override ? await mPostRoute('overrideUser', data) : await mPostRoute('postUser', data);
 }
 async function postUsers() {
-  let users = jsonToYaml(M.users);
+  //let users = jsonToYaml(M.users);
   let res = await mPhpPost('all', { action: 'savey', file: 'users', o: M.users });
   console.log('res', res);
 }
@@ -15441,19 +15425,6 @@ async function switchToOtherUser() {
   await switchToUser(uname);
 }
 async function switchToTables() { return await switchToMainMenu('play'); }
-async function switchToUser(username) {
-  if (!isEmpty(username)) username = normalizeString(username);
-  if (isEmpty(username)) username = 'guest';
-  let res = await mPhpPost('all', { username, action: 'login' });
-  U = res.userdata;
-  DA.tid = localStorage.getItem('tid');
-  let bg = U.color;
-  let fg = colorIdealText(bg);
-  mClear('dTopRight');
-  mDom('dTopRight', { display: 'inline', h: '80%', bg, fg }, { tag: 'button', html: `${username}` });
-  localStorage.setItem('username', username);
-  setTheme(U);
-}
 function sysBusy() { DA.prevSysState = DA.sysState; DA.sysState = 'idle'; }
 function sysIdle() { DA.prevSysState = DA.sysState; DA.sysState = 'busy'; }
 function sysInit() {
