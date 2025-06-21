@@ -7,6 +7,7 @@ ok - check ob users.yaml existiert? JA!
 - alles wo Serverdata vorkommt ist noch von node app
 - auch alles mit 'route'
 - postUsers
+- achtung!!!! postusers macht jetzt ein hallo.yaml in php dir!!!
 ok - gibt es ein addUser? NEIN
 ok - gotostyles.css input oder mInput
 ___ 5:13 AM 6/20/2025 airport 99000 K4 ~ok
